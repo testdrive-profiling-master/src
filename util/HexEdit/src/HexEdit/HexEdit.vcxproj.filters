@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base64.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboUtil.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="dlgfont.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DockWindow.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="endian.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FileChange.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HexEdit.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HexFile.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HexUtils.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="RecentFile.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="RegLib.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TabView.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolPanel.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="about.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgInsertFill.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgPasteSpecial.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgProperties.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgReverse.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgSelectRange.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgStrings.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="endian.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="FileChange.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="HexFileData.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="HexUtils.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RecentFile.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="RegLib.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ResizeWnd.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Statusbar.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TabView.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Toolbar.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolPanel.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="transform.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgHighlight.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="HexCommands.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DockWindow.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboUtil.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ColourCombo.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="base64.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboFont.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ComboFontSize.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgChecksum.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgCompare.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgCopyAs.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgExport.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="dlgfont.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgGoto.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgImport.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenSave.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Options.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenu.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="HexEdit.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Searchbar.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="motorola.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="intel.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="HexFind.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgModify.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\Trace.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Hexedit.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HexEdit.rc">
+      <Filter>소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\selarrow2.png">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\selbox.png">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\selbox2.png">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\toolbar1.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\toolbar2.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap1.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap2.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap3.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap4.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap7.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap9.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap10.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap11.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap12.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap13.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap14.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bitmap15.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bmp00001.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\bmp00002.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\hex.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\hexedit.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\ico00001.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\icon2.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\icon3.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\icon4.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\icon6.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="media\selarrow.png">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
+</Project>

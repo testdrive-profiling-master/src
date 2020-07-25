@@ -1,0 +1,36 @@
+  _____________________________________________________
+  Code Page   Description
+  _____________________________________________________
+  cp437	      MS-DOS United States
+  cp737	      Greek
+  cp775	      Baltic languages (1)
+  cp850	      MS-DOS Multilingual (Latin-1)
+  cp852	      MS-DOS Slavic (Latin-2)
+  cp855	      IBM Cyrillic
+  cp857	      IBM Turkish
+  cp860	      MS-DOS Portuguese
+  cp861	      MS-DOS Icelandic
+  cp862	      Hebrew
+  cp863	      MS-DOS Canadian French
+  cp865	      MS-DOS Nordic languages
+  cp866	      MS-DOS Russian
+  cp869	      IBM Modern Greek
+  cp874 *     MS-DOS Thai
+  cp932	      Japanese
+  cp936	      Chinese (People's Republic of China)
+  cp949	      Korean
+  cp936	      Chinese (Simplified)
+  cp950	      Chinese (Hong Kong)
+  cp1250 *    Windows Latin-2
+  cp1251 *    Windows Cyrillic
+  cp1252 *    Windows Latin-1
+  cp1253 *    Windows Greek
+  cp1254 *    Windows Turkish
+  cp1255 *    Windows Hebrew
+  cp1256 *    Windows Arabic
+  cp1257 *    Windows Baltic (1)
+  cp1258 *    Windows Vietnamese
+  dingbats    Microsoft dingbat characters
+  symbol      Microsoft miscellaneous symbol characters
+  _____________________________________________________
+

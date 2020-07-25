@@ -1,0 +1,113 @@
+#pragma once
+#include "TestDriveResource.h"
+#include "pugixml/pugixml.hpp"
+#include <map>
+
+typedef enum {
+	// word
+	LS_TESTDRIVE,
+	LS_OPTION,
+	LS_SYSTEM,
+	LS_LANGUAGE,
+	LS_ERROR,
+	LS_WARNING,
+	LS_LINE,
+	LS_PROFILE,
+	LS_PROFILE_VIEW,
+	LS_OUTPUT_WND,
+	LS_DOCUMENT,
+	LS_PROPERTY,
+	LS_PROPERTY_VIEW,
+	LS_MAIN_TITLE,
+	LS_SUB_TITLE,
+	LS_TAB_SYSTEM,
+	LS_TAB_APPLICATION,
+	LS_TAB_NOTIFY,
+	// message
+	LS_DOCUMENT_UPDATE =  200,
+	LS_DOCUMENT_UPDATE_DONE,
+	LS_LANGUAGE_CHANGE,
+	LS_PROJECT_BUSY,
+	LS_NO_PROJECT,
+	LS_TOO_MANY_RECURSIVE_CALL,
+	LS_OPEN_PROJECT_FIRST,
+	LS_ANOTHER_PROFILE_IS_RUNNING,
+	LS_NO_PROFILE_NAME,
+	LS_INVALID_FILE_PATH,
+	LS_CANT_OPEN_PROFILE,
+	LS_ERROR_IN_PROGRESS,
+	LS_ASERTED_BY_USER,
+	LS_CREATE_MEMORY_MODEL,
+	LS_TOO_BIG_MEMORY_REQUEST,
+	LS_ALREADY_MEMORY_EXIST,
+	LS_NONE_MEMORY_MODEL,
+	LS_INVALID_COLOR_TYPE,
+	LS_LOAD_MEM_FROM_IMAGE,
+	LS_LOAD_MEM_FROM_FILE,
+	LS_STORE_IMAGE_FROM_MEM,
+	LS_STORE_FILE_FROM_MEM,
+	LS_DOCUMENT_TITLE_DUPLICATED,
+	LS_PROJECT_CAN_NOT_LOADING,
+	LS_INVALID_COMMAND,
+	LS_DOCUMENT_UPDATE_NOT_ALLOWED,
+	LS_LIBRARY_LOAD_FAILED,
+	LS_LIBRARY_NO_DOC_ENTRY,
+	LS_SCRIPT_COMMAND,
+	LS_DOCUEMT_LOCKED,
+	LS_DOCUEMT_DENIED,
+	LS_DOCUEMT_IS_HIDE,
+	LS_DOCUEMT_IS_NOT_FOUND,
+	LS_PROFILE_PROGRAM_IS_RUNNING,
+	LS_PROFILE_PROGRAM_IS_DONE,
+	LS_LOAD_FILE_IS_FAILED,
+	LS_ACQUIRE_ADMIN,
+	// menu : screen buffer
+	LS_MENU_SCREEN_FILE = 1000,
+	LS_MENU_SCREEN_FILE_LOAD,
+	LS_MENU_SCREEN_FILE_SAVE_AS,
+	LS_MENU_SCREEN_SCALE_PITTING,
+	LS_MENU_SCREEN_SCREEN_PITTING,
+	LS_MENU_SCREEN_ANTIALIASING,
+	LS_MENU_SCREEN_SYNCHRONIZE_ACTION,
+}LOCALE_STRING;
+
+typedef struct {
+	CString		sName;
+	DWORD		dwLangID;
+	DWORD		dwSubLangID;
+	CString		sFileName;
+}LOCALE_DESC;
+
+typedef std::map<int, LOCALE_DESC>		LOCALE_LIST;
+typedef std::map<int, CString>			LOCALE_CACHE;
+
+class CLocalization
+{
+public:
+	CLocalization(void);
+	virtual ~CLocalization(void);
+
+	BOOL Initialize(LPCTSTR sPath);
+	void Release(void);
+
+	BOOL LoadLocale(LPCTSTR sFileName);
+	LOCALE_DESC* LocaleFromList(DWORD dwID);
+	inline LPCTSTR	Get(DWORD dwStringID) { return (LPCTSTR)(m_StringCache[dwStringID]); }
+	inline LOCALE_DESC* CurrentLocale(void) { return m_pCurrentLocale; }
+	BOOL SetLocale(DWORD dwLocaleID, DWORD dwLocaleSubID = 0, BOOL bInvalidate = FALSE);
+	LOCALE_DESC* FindLocale(DWORD dwLocaleID, DWORD dwLocaleSubID = 0);
+
+protected:
+	void AddLocaleList(LPCTSTR sName, DWORD dwLangID, DWORD dwSubLangID, LPCTSTR sFIleName);
+
+	LOCALE_LIST				m_LocaleList;
+	LOCALE_CACHE			m_StringCache;
+
+private:
+	LOCALE_DESC*			m_pCurrentLocale;
+	CString					m_sRootPath;
+	DWORD					m_dwTotalLocaleCount;
+};
+
+extern CLocalization	g_Localization;
+#define	_S(id)		(g_Localization.Get(LS_##id))

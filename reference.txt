@@ -1,0 +1,12 @@
+zip/unzip
+	http://stahlworks.com/dev/?tool=zipunzip
+
+curl
+	http://curl.haxx.se/download.html
+
+iStyle	1.20
+	http://code.google.com/p/istyle-verilog-formatter
+
+AStyle
+	http://astyle.sourceforge.net/
+	http://sourceforge.net/projects/astyle/

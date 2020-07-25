@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="base64.h" />
+    <ClInclude Include="ComboUtil.h" />
+    <ClInclude Include="dlgfont.h" />
+    <ClInclude Include="DockWindow.h" />
+    <ClInclude Include="endian.h" />
+    <ClInclude Include="FileChange.h" />
+    <ClInclude Include="HexEdit.h" />
+    <ClInclude Include="HexFile.h" />
+    <ClInclude Include="HexUtils.h" />
+    <ClInclude Include="RecentFile.h" />
+    <ClInclude Include="RegLib.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TabView.h" />
+    <ClInclude Include="ToolPanel.h" />
+    <ClInclude Include="version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\Trace.c" />
+    <ClCompile Include="about.c" />
+    <ClCompile Include="base64.cpp" />
+    <ClCompile Include="ColourCombo.cpp" />
+    <ClCompile Include="ComboFont.cpp" />
+    <ClCompile Include="ComboFontSize.cpp" />
+    <ClCompile Include="ComboUtil.cpp" />
+    <ClCompile Include="DlgChecksum.cpp" />
+    <ClCompile Include="DlgCompare.cpp" />
+    <ClCompile Include="DlgCopyAs.cpp" />
+    <ClCompile Include="DlgExport.cpp" />
+    <ClCompile Include="dlgfont.cpp" />
+    <ClCompile Include="DlgGoto.cpp" />
+    <ClCompile Include="DlgHighlight.cpp" />
+    <ClCompile Include="DlgImport.c" />
+    <ClCompile Include="DlgInsertFill.c" />
+    <ClCompile Include="DlgModify.cpp" />
+    <ClCompile Include="DlgPasteSpecial.c" />
+    <ClCompile Include="DlgProperties.c" />
+    <ClCompile Include="DlgReverse.c" />
+    <ClCompile Include="DlgSelectRange.c" />
+    <ClCompile Include="DlgStrings.c" />
+    <ClCompile Include="DockWindow.cpp" />
+    <ClCompile Include="endian.c" />
+    <ClCompile Include="FileChange.c" />
+    <ClCompile Include="HexCommands.c" />
+    <ClCompile Include="HexEdit.c" />
+    <ClCompile Include="HexFileData.c" />
+    <ClCompile Include="HexFind.cpp" />
+    <ClCompile Include="HexUtils.c" />
+    <ClCompile Include="intel.cpp" />
+    <ClCompile Include="motorola.cpp" />
+    <ClCompile Include="OpenSave.c" />
+    <ClCompile Include="Options.cpp" />
+    <ClCompile Include="RecentFile.c" />
+    <ClCompile Include="RegLib.c" />
+    <ClCompile Include="ResizeWnd.c" />
+    <ClCompile Include="Searchbar.cpp" />
+    <ClCompile Include="Settings.c" />
+    <ClCompile Include="ShellContextMenu.cpp" />
+    <ClCompile Include="Statusbar.c" />
+    <ClCompile Include="TabView.c" />
+    <ClCompile Include="Toolbar.c" />
+    <ClCompile Include="ToolPanel.c" />
+    <ClCompile Include="transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Hexedit.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HexEdit.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="media\bitmap1.bmp" />
+    <None Include="media\bitmap10.bmp" />
+    <None Include="media\bitmap11.bmp" />
+    <None Include="media\bitmap12.bmp" />
+    <None Include="media\bitmap13.bmp" />
+    <None Include="media\bitmap14.bmp" />
+    <None Include="media\bitmap15.bmp" />
+    <None Include="media\bitmap2.bmp" />
+    <None Include="media\bitmap3.bmp" />
+    <None Include="media\bitmap4.bmp" />
+    <None Include="media\bitmap7.bmp" />
+    <None Include="media\bitmap9.bmp" />
+    <None Include="media\bmp00001.bmp" />
+    <None Include="media\bmp00002.bmp" />
+    <None Include="media\hex.ico" />
+    <None Include="media\hexedit.ico" />
+    <None Include="media\ico00001.ico" />
+    <None Include="media\icon2.ico" />
+    <None Include="media\icon3.ico" />
+    <None Include="media\icon4.ico" />
+    <None Include="media\icon6.ico" />
+    <None Include="media\selarrow.png" />
+    <None Include="media\selarrow2.png" />
+    <None Include="media\selbox.png" />
+    <None Include="media\selbox2.png" />
+    <None Include="media\toolbar1.bmp" />
+    <None Include="media\toolbar2.bmp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CCA8E812-0A35-4ABA-B2BC-5D2D69D42949}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>HexEdit</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;SEQUENCE64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ConfigLib.lib;DockLib.lib;GridView.lib;TypeLib.lib;TypeView.lib;HexView.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>cp -f  $(TargetPath) $(TESTDRIVE_DIR)bin\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;SEQUENCE64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ConfigLib.lib;DockLib.lib;GridView.lib;TypeLib.lib;TypeView.lib;HexView.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>cp -f  $(TargetPath) $(TESTDRIVE_DIR)bin\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

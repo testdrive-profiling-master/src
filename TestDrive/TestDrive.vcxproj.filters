@@ -1,0 +1,748 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Component">
+      <UniqueIdentifier>{7afd1243-27fc-44d1-8934-1f4214c084f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\AviGenerator">
+      <UniqueIdentifier>{4d9c074c-4c63-4ffc-b340-eecc31d2fdfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Document">
+      <UniqueIdentifier>{7d177372-660b-4f98-91bc-987534703aae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{d78d4557-8a21-4344-ad49-c886c13cbba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\ChartCtrl">
+      <UniqueIdentifier>{850e3a1c-0743-431c-b476-33745f48829b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Mail">
+      <UniqueIdentifier>{031a9bbb-4092-42b6-b0e5-5d6ecc459ba7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Speech">
+      <UniqueIdentifier>{223ace2b-b92d-4dd9-a073-842c7c976f39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Network">
+      <UniqueIdentifier>{9b01711f-3078-4690-8b57-3f01476f07bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Excel">
+      <UniqueIdentifier>{2c443373-f981-47d3-acd0-a87e724e22af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{1e1ef8ff-01b5-422c-a643-d5fd2d4c721b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pugixml">
+      <UniqueIdentifier>{bc6a4d89-58e0-4a0e-beb6-68f7d2b3bf5a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestDrive.reg" />
+    <None Include="res\file_view.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\file_view_hc.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\class_view.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\class_view_hc.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\fileview.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\fileview_hc.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\classview.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\classview_hc.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\explorer.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\explorer_hc.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\sort.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\sort_hc.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\menuimages.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\menuimages_hc.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\output_wnd.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\output_wnd_hc.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\properties_wnd.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\properties_wnd_hc.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\properties.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\properties_hc.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\info.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\buttons.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\filelarge.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\filesmall.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\main.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\writelarge.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\writesmall.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\ribbon.mfcribbon-ms">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\TestDrive.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\TestDriveDoc.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\TestDrive.ico">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\Toolbar.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\Toolbar256.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\msg_tab.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\company.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\profile_item.bmp">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\png1.png">
+      <Filter>리소스 파일</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildFrm.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestDriveDoc.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestDriveView.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewTree.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualManagerEx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolBaseWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkDirectory.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestDriveVersion.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TDSemaphore.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="WatchDogFile.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfileView.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\Mail.h">
+      <Filter>Component\Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\SMTPConnection2.h">
+      <Filter>Component\Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\atlmime.h">
+      <Filter>Component\Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\atlsmtpconnection.h">
+      <Filter>Component\Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\atlsmtputil.h">
+      <Filter>Component\Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="Mail\atlspriv.h">
+      <Filter>Component\Mail</Filter>
+    </ClInclude>
+    <ClInclude Include="Paser.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="UACElevate.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="AccelCodeDecoder.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Output.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="OleRichEditCtrl.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestDriveImp.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="commandlist.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistryCtrl.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="FullPath.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="SAPI\Speech.h">
+      <Filter>Component\Speech</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfileData.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentChildFrame.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyObject.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewObject.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyGridCtrl.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\NetworkAdapter.h">
+      <Filter>Component\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="AviGenerator\AVIGenerator.h">
+      <Filter>Component\AviGenerator</Filter>
+    </ClInclude>
+    <ClInclude Include="SplashScreenEx.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="SerialCom\serialport.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferCtrl.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Excel\XLAutomation.h">
+      <Filter>Component\Excel</Filter>
+    </ClInclude>
+    <ClInclude Include="Excel\XLEzAutomation.h">
+      <Filter>Component\Excel</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\PointsOrdering.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartAxis.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartAxisLabel.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartBalloonLabel.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartBarSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCandlestickSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartColor.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCrossHairCursor.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCtrl.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartCursor.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartDateTimeAxis.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartDragLineCursor.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartFont.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartGanttSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartGradient.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartGrid.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLabel.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLegend.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLineSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartLogarithmicAxis.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartMouseListener.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartPointsArray.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartPointsSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartScrollBar.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSerieBase.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSeriesMouseListener.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartStandardAxis.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartString.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartSurfaceSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartTitle.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartCtrl\ChartXYSerie.h">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClInclude>
+    <ClInclude Include="ButtonCtrl.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="RichEditControl50W.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="ReportView.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="HtmlCtrl.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Html.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="RedirectExecute.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="TokenLink.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="TestDriveLua.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentView.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentMiniFrame.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrmBase.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentTabbedPane.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Localization.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DocumentCtrl.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="CFileTypeAccess.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TestDriveResource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml\pugixml.hpp">
+      <Filter>pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml\pugiconfig.hpp">
+      <Filter>pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolMiniFrame.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolTabbedPane.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildFrm.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDriveDoc.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDriveView.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewTree.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputWnd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesWnd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientWnd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualManagerEx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolBaseWnd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkDirectory.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TDSemaphore.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WatchDogFile.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ProfileView.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Mail\Mail.cpp">
+      <Filter>Component\Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="Mail\SMTPConnection2.cpp">
+      <Filter>Component\Mail</Filter>
+    </ClCompile>
+    <ClCompile Include="Paser.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="UACElevate.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Output.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="OleRichEditCtrl.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AccelCodeDecoder.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDriveImp.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="commandlist.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryCtrl.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="FullPath.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="SAPI\Speech.cpp">
+      <Filter>Component\Speech</Filter>
+    </ClCompile>
+    <ClCompile Include="ProfileData.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentWnd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentChildFrame.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertyObject.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewObject.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertyGridCtrl.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\NetworkAdapter.cpp">
+      <Filter>Component\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="AviGenerator\AVIGenerator.cpp">
+      <Filter>Component\AviGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="SplashScreenEx.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="SerialCom\serialport.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferCtrl.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Excel\XLAutomation.cpp">
+      <Filter>Component\Excel</Filter>
+    </ClCompile>
+    <ClCompile Include="Excel\XLEzAutomation.cpp">
+      <Filter>Component\Excel</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartAxis.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartAxisLabel.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartBarSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCandlestickSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartColor.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCrossHairCursor.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCtrl.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartCursor.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartDateTimeAxis.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartDragLineCursor.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartFont.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartGanttSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartGradient.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartGrid.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartLegend.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartLineSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartLogarithmicAxis.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartPointsSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartScrollBar.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartStandardAxis.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartSurfaceSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartTitle.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartCtrl\ChartXYSerie.cpp">
+      <Filter>Component\ChartCtrl</Filter>
+    </ClCompile>
+    <ClCompile Include="ButtonCtrl.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="RichEditControl50W.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportView.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Html.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="HtmlCtrl.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="RedirectExecute.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="TokenLink.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDriveLua.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentView.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentMiniFrame.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrmBase.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentTabbedPane.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Localization.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DocumentCtrl.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="CFileTypeAccess.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TestDriveResource.cpp">
+      <Filter>Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml\pugixml.cpp">
+      <Filter>pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolMiniFrame.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolTabbedPane.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TestDrive.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\background.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

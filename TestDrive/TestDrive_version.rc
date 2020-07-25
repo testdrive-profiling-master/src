@@ -1,0 +1,38 @@
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,1,2,5
+ PRODUCTVERSION 2,1,2,5
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041204b0"
+        BEGIN
+            VALUE "CompanyName", "HyungKi Jeong (clonextop@gmail.com)"
+            VALUE "FileDescription", "TestDrive Profiling Master 2nd Edition"
+            VALUE "FileVersion", "2.1.2 - 5th release"
+            VALUE "InternalName", "TestDrive.exe"
+            VALUE "LegalCopyright", "HyungKi Jeong (clonextop@gmail.com).  All rights reserved."
+            VALUE "OriginalFilename", "TestDrive.exe"
+            VALUE "ProductName", "TestDrive Profiling Master 2nd Edition"
+            VALUE "ProductVersion", "2.1.2 - 5th release"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x412, 1200
+    END
+END
+
+
+STRINGTABLE
+BEGIN
+    ID_PROJECT_VERSION      "2.1.2 - 5th release"
+END

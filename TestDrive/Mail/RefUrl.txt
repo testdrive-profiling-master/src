@@ -1,0 +1,9 @@
+;ATL 서버 라이브러리
+http://atlserver.codeplex.com
+;아래 참조되어 atlmime.h이 수정되었음
+http://atlserver.codeplex.com/workitem/4683
+
+
+
+;ATL SMTP 연결 라이브러리
+http://www.codeproject.com/KB/tips/CSMTPConnection2.aspx
