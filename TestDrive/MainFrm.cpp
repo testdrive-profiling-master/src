@@ -158,18 +158,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CMainFrame::OnClose(){
 	// 모든 도큐먼트의 락상태 조사
-	if(!g_pDocumentList->RemoveAll()){
+	if(g_pDocumentList && !g_pDocumentList->RemoveAll()){
 		g_pTestDrive->LogWarning(_T("현재 '락'상태의 도큐먼트가 존재하여, 종료할 수 없습니다. 도큐먼트 실행이 중지된 후 다시 시도하십시오."));
 		return;
 	}
 	// Release documents
-	if(g_pTestDrive->IsProjectOpen()){
+	if(g_pTestDrive && g_pTestDrive->IsProjectOpen()){
 		if(!g_pTestDrive->CloseProject()){
 			g_pTestDrive->LogWarning(_T("현재 실행중인 프로세스가 존재합니다. 실행중인 프로세스가 종료된 후 다시 시도하십시오."));
 			return;
 		}
 	}
-
 	CMainFrameBase::OnClose();
 }
 
