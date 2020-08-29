@@ -22,7 +22,7 @@
     <ProjectGuid>{2D7DE92B-C113-4DB6-970F-933D4F444961}</ProjectGuid>
     <RootNamespace>TestDrive</RootNamespace>
     <Keyword>MFCProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -37,7 +37,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -53,7 +53,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -314,7 +314,6 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClInclude Include="RegistryCtrl.h" />
     <ClInclude Include="ReportView.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="RichEditControl50W.h" />
     <ClInclude Include="SAPI\Speech.h" />
     <ClInclude Include="SerialCom\serialport.h" />
     <ClInclude Include="SplashScreenEx.h" />
@@ -405,7 +404,6 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClCompile Include="RedirectExecute.cpp" />
     <ClCompile Include="RegistryCtrl.cpp" />
     <ClCompile Include="ReportView.cpp" />
-    <ClCompile Include="RichEditControl50W.cpp" />
     <ClCompile Include="SAPI\Speech.cpp" />
     <ClCompile Include="SerialCom\serialport.cpp" />
     <ClCompile Include="SplashScreenEx.cpp" />

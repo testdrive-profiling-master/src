@@ -47,7 +47,6 @@ BEGIN_MESSAGE_MAP(COleRichEditCtrl, CRichEditCtrl)
 	ON_WM_SETFOCUS()
 	ON_WM_KILLFOCUS()
 	ON_WM_MOUSEWHEEL()
-	ON_WM_NCPAINT()
 	ON_MESSAGE(CWM_FILE_CHANGED_NOTIFICATION, OnUpdate)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -58,19 +57,20 @@ int COleRichEditCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CRichEditCtrl::OnCreate(lpCreateStruct) == -1)
  		return -1;
  	
-	// m_pIRichEditOleCallback should have been created in PreSubclassWindow
-
- 	ASSERT( m_pIRichEditOleCallback != NULL );
-
-	SendMessage(EM_SETLANGOPTIONS, 0, (SendMessage(EM_GETLANGOPTIONS, 0, 0)& ~(IMF_AUTOFONT| IMF_AUTOFONTSIZEADJUST)));	// 자동 폰트 변경 방지
-	// set the IExRichEditOleCallback pointer if it wasn't set 
-	// successfully in PreSubclassWindow
-
-	if ( !m_bCallbackSet ){
-		SetOLECallback( m_pIRichEditOleCallback );
-	}
+	PostInitialize();
 
 	return 0;
+}
+
+void COleRichEditCtrl::PostInitialize(void) {
+	// m_pIRichEditOleCallback should have been created in PreSubclassWindow
+	ASSERT(m_pIRichEditOleCallback != NULL);
+
+	SendMessage(EM_SETLANGOPTIONS, 0, (SendMessage(EM_GETLANGOPTIONS, 0, 0) & ~(IMF_AUTOFONT)));	// 자동 폰트 변경 방지																		// successfully in PreSubclassWindow
+
+	if (!m_bCallbackSet) {
+		SetOLECallback(m_pIRichEditOleCallback);
+	}
 }
 
 void COleRichEditCtrl::OnAccel(ACCEL_CODE code){

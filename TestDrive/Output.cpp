@@ -86,28 +86,24 @@ void COutput::OnAccel(ACCEL_CODE code){
 
 void COutput::OnSetFocus(CWnd* pOldWnd){
 	SetCurrentCopynPasteAction(TRUE);
-	CRichEditCtrl::OnSetFocus(pOldWnd);
+	COleRichEditCtrl::OnSetFocus(pOldWnd);
 }
 
 void COutput::OnKillFocus(CWnd* pNewWnd){
 	SetCurrentCopynPasteAction(FALSE);
-	CRichEditCtrl::OnKillFocus(pNewWnd);
+	COleRichEditCtrl::OnKillFocus(pNewWnd);
 }
 
 BOOL COutput::Create(COutputWnd* pPaneWnd, CWnd* pParentWnd, CFont* pFont, UINT nID){
 	CRect rectDummy;
 	rectDummy.SetRectEmpty();
-	BOOL bRet	= FALSE;
-	{
-		CWnd* pWnd = this;
-		//bRet	= CRichEditCtrl::Create(LBS_NOINTEGRALHEIGHT | WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_HSCROLL | WS_VSCROLL | WS_CLIPSIBLINGS, rectDummy, pParentWnd, nID);
-		bRet	= pWnd->Create(_T("RichEdit50W"), NULL, LBS_NOINTEGRALHEIGHT | WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_HSCROLL | WS_VSCROLL | WS_CLIPSIBLINGS, rectDummy, pParentWnd, nID);
-	}
+	BOOL bRet	= COleRichEditCtrl::Create(LBS_NOINTEGRALHEIGHT | WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_HSCROLL | WS_VSCROLL | WS_CLIPSIBLINGS, rectDummy, pParentWnd, nID);
 
-	if(bRet){
-		SetOptions(ECOOP_OR, ECO_AUTOWORDSELECTION|ECO_READONLY|ECO_AUTOVSCROLL|ECO_AUTOHSCROLL);
-		SetFont(pFont);
-	}
+	if (!bRet) return FALSE;
+
+	PostInitialize();
+	SetOptions(ECOOP_OR, ECO_AUTOWORDSELECTION|ECO_READONLY|ECO_AUTOVSCROLL|ECO_AUTOHSCROLL);
+	SetFont(pFont);
 
 	m_pParent = pPaneWnd;
 
@@ -130,7 +126,6 @@ BOOL COutput::Create(COutputWnd* pPaneWnd, CWnd* pParentWnd, CFont* pFont, UINT 
 	default:				_tcscpy(m_cf.szFaceName, _T("Courier New"));	break;
 	}
 	CRichEditCtrl::SetSel(0, -1);
-	SendMessage(EM_SETLANGOPTIONS, 0, (LPARAM)(SendMessage(EM_GETLANGOPTIONS) & ~IMF_AUTOFONT));
 	Clear();
 	return bRet;
 }

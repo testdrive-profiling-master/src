@@ -642,7 +642,7 @@ void CMainFrame::OnSettingChange(UINT uFlags, LPCTSTR lpszSection)
 	m_wndOutput.UpdateFonts();
 }
 
-UINT CMainFrame::OnPowerBroadcast(UINT wParam, LPARAM lParam){
+UINT CMainFrame::OnPowerBroadcast(UINT wParam, LPARAM lParam) {
 	if(wParam == PBT_APMRESUMESUSPEND){
 		// hibernate mode 탈출시 초기화된 look&feel 다시 적용.
 		OnApplicationLook(theApp.m_nAppLook);

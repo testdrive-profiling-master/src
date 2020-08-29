@@ -414,9 +414,6 @@
     <ClInclude Include="ButtonCtrl.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="RichEditControl50W.h">
-      <Filter>System</Filter>
-    </ClInclude>
     <ClInclude Include="ReportView.h">
       <Filter>System</Filter>
     </ClInclude>
@@ -678,9 +675,6 @@
       <Filter>Component\ChartCtrl</Filter>
     </ClCompile>
     <ClCompile Include="ButtonCtrl.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
-    <ClCompile Include="RichEditControl50W.cpp">
       <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="ReportView.cpp">

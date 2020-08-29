@@ -2,7 +2,7 @@
 # Project
 #-------------------------------------------------
 SRC_PATH		:= .
-TARGETPATH		:= ../../Program/bin
+TARGETPATH		:= $(TESTDRIVE_DIR)/bin
 TARGETNAME		:= iStyle
 
 SRCS			:= \

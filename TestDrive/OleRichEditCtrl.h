@@ -28,6 +28,7 @@ class COleRichEditCtrl :
 public:
 	COleRichEditCtrl();
 	virtual ~COleRichEditCtrl();
+	void PostInitialize(void);
 
 	long StreamInFromResource(int iRes, LPCTSTR sType);
 	void Test(void);
@@ -38,7 +39,6 @@ public:
 	BOOL Save(LPCTSTR lpszFileName);
 	void Clear(BOOL bClose = FALSE);
 	void AppendText(LPCTSTR lpszText);
-
 
 
 	int SetTextEx(LPCTSTR lpstrText, DWORD dwFlags = ST_SELECTION, UINT uCodePage = 1200)
