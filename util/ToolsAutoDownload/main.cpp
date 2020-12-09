@@ -141,14 +141,20 @@ bool GetDownloadHtmlJRE(char* sPath){
 	if(fp){
 		char sLine[1024*64];
 		while(fgets(sLine, 1024* 64, fp)){
-			char* sURL = strstr(sLine, ">Download</a>");
+			char* sURL = strstr(sLine, "-x64.exe</a>");
 			if (!sURL) continue;
-			*sURL = NULL;
-			sURL = strstr(sLine, "<a href=\"");
-			if (!sURL) continue;
-			strcpy(sLine, sURL + 9);
+			sURL[8] = NULL;
 			{
-				sprintf(sPath, "https://www.java.com%s", sLine);
+				char* sTok = sLine;
+				while (sURL = strstr(sTok, "<a href")) {
+					sTok = sURL + 1;
+				}
+				sURL = strstr(sTok, ">");
+				if (!sURL) continue;
+				strcpy(sLine, sURL + 1);
+			}
+			{
+				sprintf(sPath, "https://enos.itcollege.ee/~jpoial/allalaadimised/jdk8/%s", sLine);
 				bFound = true;
 				printf("URL found : %s\n", sPath);
 				break;
@@ -274,14 +280,17 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}else
 	if(!strcmp(argv[1], "jre")){
-		system("wget --no-cookies --no-check-certificate --header \"Cookie: oraclelicense = accept - securebackup - cookie\" \"https://www.java.com/download/\" -O download.html");
+		//system("wget --no-cookies --no-check-certificate --header \"Cookie: oraclelicense = accept-securebackup-cookie\" \"https://www.java.com/download/\" -O download.html");
+		system("wget --no-cookies --no-check-certificate \"https://enos.itcollege.ee/~jpoial/allalaadimised/jdk8/\" -O download.html");
 		if(GetDownloadHtmlJRE(sPath)){
-			{
+			/*{
 				sprintf(sCommand, "wget --no-cookies --no-check-certificate --header \"Cookie: oraclelicense = accept - securebackup - cookie\" \"%s\" -O download.html", sPath);
 				system(sCommand);
-			}
-			if(GetDownloadPathJRE(sPath)){
-				sprintf(sCommand, "wget --no-cookies --no-check-certificate --header \"Cookie: oraclelicense = accept - securebackup - cookie\" \"%s\" -O jre.exe", sPath);
+			}*/
+			//if(GetDownloadPathJRE(sPath))
+			{
+				//sprintf(sCommand, "wget --no-cookies --no-check-certificate --header \"Cookie: oraclelicense = accept - securebackup - cookie\" \"%s\" -O jre.exe", sPath);
+				sprintf(sCommand, "wget --no-cookies --no-check-certificate \"%s\" -O jre.exe", sPath);
 				system(sCommand);
 			}
 		}
