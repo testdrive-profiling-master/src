@@ -227,6 +227,8 @@ bool GetDownloadPathMinGW(char* sPath){
 				if(!sURL) continue;
 				sURL = strstr(sLine, "x86_64");
 				if (!sURL) continue;
+				sURL = strstr(sLine, ".sig");
+				if (sURL) continue;
 				strcpy(sPath, sLine);
 				bFound = true;
 				printf("URL found : %s\n", sPath);
