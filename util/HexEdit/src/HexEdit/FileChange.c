@@ -38,7 +38,7 @@ DWORD WINAPI ChangeNotifyThread(NOTIFY_DATA *pnd)
 	lstrcpy(szDirectory, pnd->szFile);
 
 	// get the directory name from filename
-	if(GetFileAttributes(szDirectory) != FILE_ATTRIBUTE_DIRECTORY)
+	if(!(GetFileAttributes(szDirectory) & FILE_ATTRIBUTE_DIRECTORY))
 	{
 		TCHAR *slash = _tcsrchr(szDirectory, _T('\\'));
 		if(slash) *slash = '\0';

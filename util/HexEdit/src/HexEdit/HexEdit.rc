@@ -710,7 +710,7 @@ BEGIN
     LTEXT           "Copyright ?1999 - 2011 by Catch22 Productions.",IDC_ABOUT_LEGALSTR,70,40,222,8,0,WS_EX_TRANSPARENT
     LTEXT           "Original Written by J Brown.\nModified by HyungKi Jeong.",IDC_ABOUT_AUTHOR,70,51,265,20,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,72,302,2
-    CONTROL         "Original at <a href=""http://www.catch22.net"">www.catch22.net</a>\nDownload at <a href=""http://sourceforge.net/projects/test-drive/"">TestDrive Profiling Master</a>",IDC_ABOUT_WEBSITE,
+    CONTROL         "Original at <a href=""http://www.catch22.net"">www.catch22.net</a>\nDownload at <a href=""https://testdrive-profiling-master.github.io/"">TestDrive Profiling Master</a>",IDC_ABOUT_WEBSITE,
                     "SysLink",WS_TABSTOP,70,80,265,24
     CONTROL         "<a href=""http://www.catch22.net/licence"">Terms and Conditions</a>",IDC_ABOUT_TERMS,
                     "SysLink",WS_TABSTOP,70,104,172,11
