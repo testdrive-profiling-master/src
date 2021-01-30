@@ -62,6 +62,7 @@ const string ASResource::PRO_RESETALL              = string("`resetall");
 const string ASResource::PRO_TIMESCALE             = string("`timescale");
 const string ASResource::PRO_UNCONNECTED_DRIVE     = string("`unconnected_drive");
 const string ASResource::PRO_UNDEF                 = string("`undef");
+const string ASResource::PRO_IMPORT                = string("import");
 
 const string ASResource::AS_OPEN_BRACKET = string("{");
 const string ASResource::AS_CLOSE_BRACKET = string("}");
@@ -121,6 +122,7 @@ const string ASResource::AS_CASE         = string("case"     );
 const string ASResource::AS_CASEX        = string("casex"    );
 const string ASResource::AS_CASEZ        = string("casez"    );
 const string ASResource::AS_FUNCTION     = string("function" );
+const string ASResource::AS_GENERATE     = string("generate" );
 const string ASResource::AS_FORK         = string("fork"     );
 const string ASResource::AS_TABLE        = string("table"    );
 const string ASResource::AS_TASK         = string("task"     );
@@ -131,6 +133,7 @@ const string ASResource::AS_BEGIN        = string("begin"    );
 
 const string ASResource::AS_ENDCASE      = string("endcase"       );
 const string ASResource::AS_ENDFUNCTION  = string("endfunction"   );
+const string ASResource::AS_ENDGENERATE  = string("endgenerate"   );
 const string ASResource::AS_JOIN         = string("join"          );
 const string ASResource::AS_ENDTASK      = string("endtask"       );
 const string ASResource::AS_ENDTABLE     = string("endtable"      );

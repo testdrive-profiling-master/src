@@ -87,6 +87,7 @@ class ASResource
         static const string PRO_ENDCELLDEFINE ,PRO_ENDIF ,PRO_IFDEF ,PRO_INCLUDE ;
         static const string PRO_NOUNCONNECTED_DRIVE ,PRO_RESETALL ,PRO_TIMESCALE ;
         static const string PRO_UNCONNECTED_DRIVE ,PRO_UNDEF;
+        static const string PRO_IMPORT;
 
         static const string AS_ASSIGN;
         static const string AS_LS_ASSIGN,AS_EQUAL_EQUAL,AS_NOT_EQUAL_EQUAL;
@@ -99,8 +100,8 @@ class ASResource
         static const string AS_NOT, AS_BIT_XOR, AS_BIT_OR, AS_BIT_AND, AS_BIT_NOT;
         static const string AS_QUESTION, AS_COLON, AS_SEMICOLON, AS_COMMA;
 
-        static const string AS_BEGIN, AS_CASE,AS_CASEX ,AS_CASEZ,AS_FUNCTION,AS_FORK,AS_TABLE,AS_TASK,AS_SPECIFY,AS_PRIMITIVE; // add verilog
-        static const string AS_END,   AS_ENDCASE,AS_ENDFUNCTION,AS_JOIN,AS_ENDTASK,AS_ENDTABLE,AS_ENDSPECIFY,AS_ENDPRIMITIVE;
+        static const string AS_BEGIN, AS_CASE,AS_CASEX ,AS_CASEZ,AS_FUNCTION,AS_GENERATE,AS_FORK,AS_TABLE,AS_TASK,AS_SPECIFY,AS_PRIMITIVE; // add verilog
+        static const string AS_END,   AS_ENDCASE,AS_ENDFUNCTION,AS_ENDGENERATE,AS_JOIN,AS_ENDTASK,AS_ENDTABLE,AS_ENDSPECIFY,AS_ENDPRIMITIVE;
         static const string AS_INITIAL,AS_FOREVER,AS_ALWAYS,AS_REPEAT;
 
     public:
@@ -154,6 +155,7 @@ class ASBeautifier : protected ASResource
         static vector<const string*> headers;
         static vector<const string*> nonParenHeaders;
         static vector<const string*> preprocessorHeaders;
+        static vector<const string*> preprocessorDifines;
 
         static vector<const string*> verilogBlockBegin;
         static vector<const string*> verilogBlockEnd;

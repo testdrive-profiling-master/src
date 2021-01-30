@@ -6,6 +6,8 @@
 // compiler_defines.h
 // by Tal Davidson (davidsont@bigfoot.com)
 //
+// modified by HyungKi Jeong (clonextop@gmail.com)
+//
 // This file is a part of "Artistic Style" - an indentater and reformatter
 // of C, C++, C# and Java source files.
 //
@@ -57,7 +59,7 @@ using namespace astyle;
 ostream *_err = &cerr;
 string _suffix = ".orig";
 
-const string _version = "1.20";
+const string _version = "1.21";
 bool shouldBackupFile = true;
 
 // --------------------------------------------------------------------------
@@ -366,7 +368,7 @@ void printHelpTitle()
     cout <<  " (Fast and Free Automatic Formatter for Verilog Source Code)\n";
     cout << "               (Created by haimag, Report Bugs: haimag@gmail.com)\n";
     cout << "               (Thanks to Tal Davidson & Astyle)\n";
-    cout << "               (Fixed by Hyung-Ki Jeong (clonextop@gmail.com))\n";
+    cout << "               (Modified by HyungKi Jeong (clonextop@gmail.com))\n";
     cout << endl;
     SetColor(7,0);
     //~ cout << endl;
@@ -436,7 +438,7 @@ void printHelpFull()
     SetColor(7,0);
     cout << "    -s   OR   -s#   OR   --indent=spaces=#\n";
     cout << "    Indent using # spaces per indent. Not specifying #\n" ;
-    cout << "    will result in a default of 4 spacec per indent.\n" ;
+    cout << "    will result in a default of 4 spaces per indent.\n" ;
     cout << endl;
     cout << "    -t   OR   -t#   OR   --indent=tab=#\n";
     cout << "    Indent using tab characters, assuming that each\n";

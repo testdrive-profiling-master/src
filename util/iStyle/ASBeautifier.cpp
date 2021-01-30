@@ -64,7 +64,8 @@ vector<const string*> ASBeautifier::nonParenHeaders;
 
 vector<const string*> ASBeautifier::verilogBlockBegin;
 vector<const string*> ASBeautifier::verilogBlockEnd;
-    vector<const string*> ASBeautifier::preprocessorHeaders;
+vector<const string*> ASBeautifier::preprocessorHeaders;
+vector<const string*> ASBeautifier::preprocessorDifines;
 
 /*
 * initialize the static vars
@@ -95,6 +96,7 @@ void ASBeautifier::initStatic()
     verilogBlockBegin.push_back(&AS_CASEX     );
     verilogBlockBegin.push_back(&AS_CASEZ     );
     verilogBlockBegin.push_back(&AS_FUNCTION  );
+    verilogBlockBegin.push_back(&AS_GENERATE  );
     verilogBlockBegin.push_back(&AS_FORK      );
     verilogBlockBegin.push_back(&AS_TABLE     );
     verilogBlockBegin.push_back(&AS_TASK      );
@@ -105,6 +107,7 @@ void ASBeautifier::initStatic()
 
     verilogBlockEnd.push_back(&AS_ENDCASE      );
     verilogBlockEnd.push_back(&AS_ENDFUNCTION  );
+    verilogBlockEnd.push_back(&AS_ENDGENERATE  );
     verilogBlockEnd.push_back(&AS_JOIN         );
     verilogBlockEnd.push_back(&AS_ENDTASK      );
     verilogBlockEnd.push_back(&AS_ENDTABLE     );
@@ -126,6 +129,8 @@ void ASBeautifier::initStatic()
     preprocessorHeaders.push_back(&PRO_TIMESCALE            );
     preprocessorHeaders.push_back(&PRO_UNCONNECTED_DRIVE    );
     preprocessorHeaders.push_back(&PRO_UNDEF                );
+
+    preprocessorDifines.push_back(&PRO_IMPORT               );
 }
 
 /**
@@ -561,6 +566,8 @@ string ASBeautifier::beautify(const string &originalLine)
     // handle preprocessor commands
     bool isPreprocesor = false;
     if(line[0] == PREPROCESSOR_CHAR)  isPreprocesor= (findHeader(line, 0, preprocessorHeaders)!=NULL);
+    else if(findHeader(line, 0, preprocessorDifines)!=NULL) isPreprocesor = true;
+
     if ( !isInComment && (isPreprocesor || backslashEndsPrevLine))
     {
         if (line[0] == PREPROCESSOR_CHAR)
