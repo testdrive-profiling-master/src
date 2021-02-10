@@ -1,7 +1,6 @@
 call clean.bat .
 call clean.bat TestDrive
-call clean.bat TestDrive\lua\project
-call clean.bat TestDrive\lua\sample
+call clean.bat TestDrive\lua
 call clean.bat TestDrive\locale
 call clean.bat TestDrive\locale\Korean
 call clean.bat TestDrive\locale\Japanese
@@ -37,4 +36,4 @@ call clean.bat Program\Example\advance\Julia4D\code
 call clean.bat Program\Example\simple\test\test
 
 del /Q Program\locale\*.pdb
-del /Q TestDrive\lua\lib\*.lib
+del /Q TestDrive\lib\*.lib

@@ -1,0 +1,8 @@
+x64
+*.d
+*.o
+Release
+Debug
+.vs
+.settings
+*.user

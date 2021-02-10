@@ -12,4 +12,3 @@ HKEY_CLASSES_ROOT\TestDrive_Profiling_Master.Document\shell\open\ddeexec\applica
     ;  기본값으로 "command"에 있는 응용 프로그램 이름이 사용됩니다.
 
 HKEY_CLASSES_ROOT\TestDrive_Profiling_Master.Document = TestDrive_Profiling_Master.Document
-

@@ -1,5 +1,6 @@
 #pragma once
-#include "lua_tinker.h" 
+#include "LuaLibrary.h"
+#include "LuaBridge/LuaBridge.h"
 
 class CTestDriveLua
 {
@@ -7,7 +8,7 @@ public:
 	CTestDriveLua(void);
 	~CTestDriveLua(void);
 
-	void Initialize(void);
+	BOOL Initialize(void);
 	void Release(void);
 	BOOL Run(const char* sFileName);
 	static inline lua_State* GetCurrent(void)	{return m_pCurrentLua->m_pLua;}
