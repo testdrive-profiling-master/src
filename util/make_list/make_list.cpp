@@ -14,6 +14,8 @@ typedef struct{
 }LIST_DESC;
 LIST_DESC	g_desc;
 
+string			g_sCurrentPath;
+
 list<string>	path_list;
 list<string>	exclude_list;
 
@@ -148,16 +150,40 @@ void RetrievePathName(LPCSTR sPath, DWORD dwSize, LPSTR sFullPath, LPSTR* lpFile
 	GetFullPathName(sRetrivePath, dwSize, sFullPath, lpFilePart);
 }
 
+void MakePathShorten(TCHAR* sPath)
+{
+	if (!sPath) return;
+	string	sTopPath = g_sCurrentPath;
+	for (int i = 0; sTopPath.size(); i++) {
+		if (strstr(sPath, sTopPath.c_str()) == sPath) {
+			string	sNewPath(sPath + sTopPath.size());
+			
+			for (int t = 0; t < i; t++) {
+				sNewPath.insert(0, "..");
+				if (t != i - 1) sNewPath.insert(0, "/");
+			}
+			strcpy(sPath, sNewPath.c_str());
+			break;
+		}
+		{
+			int iPos = sTopPath.rfind('/');
+			if (iPos > 0) sTopPath.erase(iPos, -1);
+			else break;
+		}
+	}
+	printf("sFilename = %s\n", sPath);
+}
+
 BOOL MakeList(FILE* fList){
 	int iCount = 0;
-	for(list<string>::iterator iter=path_list.begin();iter!=path_list.end();iter++){
+	for(auto i=path_list.begin();i!=path_list.end();i++){
 		// 파일 검색
 		HANDLE			hSrch;
 		WIN32_FIND_DATA	wfd;
 		BOOL			bRet	= TRUE;
-		TCHAR			sFullPath[1024], *sFilePart;
+		TCHAR			sFullPath[4096], *sFilePart;
 
-		RetrievePathName(iter->c_str(), 1024, sFullPath, &sFilePart);
+		RetrievePathName(i->c_str(), 4096, sFullPath, &sFilePart);
 
 		hSrch	= FindFirstFile(sFullPath, &wfd);
 		if(sFilePart) *sFilePart = NULL;
@@ -167,8 +193,11 @@ BOOL MakeList(FILE* fList){
 		while(bRet){
 			if(!(wfd.dwFileAttributes & (FILE_ATTRIBUTE_DEVICE|FILE_ATTRIBUTE_DIRECTORY))){
 				if(!CheckExcludeFile(wfd.cFileName)){
-					TCHAR	sFilename[1024];
+					TCHAR	sFilename[4096];
 					sprintf(sFilename, "%s%s", sFullPath, wfd.cFileName);
+
+					MakePathShorten(sFilename);
+
 					fprintf(fList, g_desc.sFormat, sFilename);
 					iCount++;
 				}
@@ -259,6 +288,17 @@ int _tmain(int argc, _TCHAR* argv[]){
 		__env.sPreFix[0]		= '\0';
 		__env.sPostFix[0]		= '\0';
 		strcpy(__env.sOutputFileName, "list.txt");
+	}
+
+	GetEnvironmentStrings();
+	{
+		int		iPos;
+		TCHAR	sDir[1024*40];
+		GetCurrentDirectory(1024 * 40, sDir);
+		g_sCurrentPath	= sDir;
+		while ((iPos = g_sCurrentPath.find('\\')) >= 0) {
+			g_sCurrentPath[iPos] = '/';
+		}
 	}
 
 	if(!CheckParams(argc-1, &argv[1])){
