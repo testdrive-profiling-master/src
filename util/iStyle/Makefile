@@ -2,9 +2,9 @@
 # Project
 #-------------------------------------------------
 SRC_PATH		:= .
-TARGETPATH		:= $(TESTDRIVE_DIR)/bin
+TARGETPATH		:= .
 TARGETNAME		:= iStyle
-
+INSTALL_PATH	:= $(TESTDRIVE_DIR)/bin
 SRCS			:= \
 	$(wildcard $(SRC_PATH)/*.cpp)
 	
