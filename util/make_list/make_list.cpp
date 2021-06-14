@@ -171,7 +171,6 @@ void MakePathShorten(TCHAR* sPath)
 			else break;
 		}
 	}
-	printf("sFilename = %s\n", sPath);
 }
 
 BOOL MakeList(FILE* fList){
