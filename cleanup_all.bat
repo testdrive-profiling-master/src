@@ -14,10 +14,6 @@ call clean.bat TestDrive\locale\Dutch
 call clean.bat TestDrive\TestDriver
 call clean.bat TestDrive\UpVersion
 call clean.bat util\CheckInception
-call clean.bat util\MacChanger
-call clean.bat util\TextReplace
-call clean.bat util\putty
-call clean.bat util\make_list
 call clean.bat util\GPASM
 call clean.bat util\iStyle
 call clean.bat util\HexEdit
@@ -28,12 +24,5 @@ call clean.bat util\InvokeEclipse
 call clean.bat util\Verilator_helper
 
 del /S /Q util\HexEdit\src\lib\*.lib
-
-call clean.bat TestDriveSetup
-
-call clean.bat Program\Example\advance\Control
-call clean.bat Program\Example\advance\Julia4D\code
-call clean.bat Program\Example\simple\test\test
-
 del /Q Program\locale\*.pdb
 del /Q TestDrive\lib\*.lib
