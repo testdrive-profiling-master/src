@@ -15,13 +15,11 @@ call clean.bat TestDrive\TestDriver
 call clean.bat TestDrive\UpVersion
 call clean.bat util\CheckInception
 call clean.bat util\GPASM
-call clean.bat util\iStyle
 call clean.bat util\HexEdit
 call clean.bat util\ToolsAutoDownload
 call clean.bat util\WatchDogRun
 call clean.bat util\HierarchicalMake
 call clean.bat util\InvokeEclipse
-call clean.bat util\Verilator_helper
 
 del /S /Q util\HexEdit\src\lib\*.lib
 del /Q Program\locale\*.pdb
