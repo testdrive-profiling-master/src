@@ -197,13 +197,12 @@ BOOL CTestDriveApp::InitRegistries(void) {
 		SetRegistryDWORD(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION"), _T("TestDrive.exe"), 10000);
 	}
 	// MinGW 환경 추가
-	ModifyGlobalEnvironmentPath(CString(InstalledPath()) + _T("bin\\msys64\\mingw32\\bin"), _T("msys64\\mingw32\\bin"), FALSE);
 	ModifyGlobalEnvironmentPath(CString(InstalledPath()) + _T("bin\\msys64\\usr\\bin"), _T("\\msys64\\usr\\bin"));
 	ModifyGlobalEnvironmentPath(CString(InstalledPath()) + _T("bin\\msys64\\mingw64\\bin"), _T("\\msys64\\mingw64\\bin"));
+	ModifyGlobalEnvironmentPath(CString(InstalledPath()) + _T("bin\\msys64\\ucrt64\\bin"), _T("\\msys64\\ucrt64\\bin"));
 
 	// 이전 deprecated 제거
-	ModifyGlobalEnvironmentPath(NULL, CString(InstalledPath()) + _T("bin\\MinGW\\bin"));
-	ModifyGlobalEnvironmentPath(NULL, CString(InstalledPath()) + _T("bin\\MinGW\\msys\\1.0\\bin"));
+	//ModifyGlobalEnvironmentPath(NULL, CString(InstalledPath()) + _T("bin\\MinGW\\bin"));
 
 	return TRUE;
 }
