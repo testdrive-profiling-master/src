@@ -19,7 +19,6 @@ call clean.bat util\HexEdit
 call clean.bat util\ToolsAutoDownload
 call clean.bat util\WatchDogRun
 call clean.bat util\HierarchicalMake
-call clean.bat util\InvokeEclipse
 
 del /S /Q util\HexEdit\src\lib\*.lib
 del /Q Program\locale\*.pdb
