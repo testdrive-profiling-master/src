@@ -298,11 +298,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}else
 	if(!strcmp(argv[1], "mingw")){
-		system("wget --no-check-certificate https://sourceforge.net/projects/msys2/files/Base/x86_64/ -O download.html");
-		if(GetDownloadPathMinGW(sPath)){
-			sprintf(sCommand, "wget --no-check-certificate \"%s\" -O msys2.tar.xz", sPath);
-			system(sCommand);
-		}
+		sprintf(sCommand, "wget --no-check-certificate \"https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.tar.xz\" -O msys2.tar.xz", sPath);
+		system(sCommand);
 	}
 	else{
 		printf("*E : not support for download '%s'\n", argv[1]);
