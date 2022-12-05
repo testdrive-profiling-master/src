@@ -258,7 +258,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	if(!strcmp(argv[1], "eclipse")){
-		system("curl http://www.eclipse.org/downloads/packages/ -o download.html");
+		system("curl https://www.eclipse.org/downloads/packages/ -o download.html");
 
 		if(GetDownloadPathEclipse(sPath, IsWow64()))
 		{
