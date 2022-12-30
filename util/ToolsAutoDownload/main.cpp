@@ -27,6 +27,19 @@ BOOL IsWow64(void)
 #endif
 }
 
+int GetFileSize(char* sPath)
+{
+	int rst = 0;
+
+	FILE* f = fopen(sPath, "r");
+	if (f != NULL) {
+		fseek(f, 0, SEEK_END);
+		rst = ftell(f);
+		fclose(f);
+	}
+
+	return rst;
+}
 
 bool GetDownloadPathEclipse(char* sPath, BOOL b64 = TRUE){
 	bool	bFound	= false;
@@ -209,35 +222,36 @@ bool GetDownloadPathJRE(char* sPath){
 }
 
 bool GetDownloadPathMinGW(char* sPath){
-	bool	bFound	= false;
+	bool		bFound	= false;
 	FILE*	fp		= fopen("download.html", "rt");
 	if(fp){
 		char *sLine = new char[1024*1024];
 		while(fgets(sLine, 1024*1024, fp)){
-			char* sURL = strstr(sLine, "\"http");
-			if(!sURL) continue;
-			strcpy(sLine, sURL+1);
-			sURL = strstr(sLine, "\"");
-			if (!sURL) continue;
-			*sURL = NULL;
+			char* sTok = strstr(sLine, "/msys2-installer/tree/");
+			if(!sTok) continue;
+			strcpy(sLine, sTok +22);
+			sTok = strstr(sLine, "\"");
+			if (!sTok) continue;
+			*sTok = NULL;
+			sprintf(sPath, "https://github.com/msys2/msys2-installer/releases/%s", sLine);
 			{
-				sURL = strstr(sLine, "msys2");
-				if (!sURL) continue;
-				sURL = strstr(sLine, ".tar.xz");
-				if(!sURL) continue;
-				sURL = strstr(sLine, "x86_64");
-				if (!sURL) continue;
-				sURL = strstr(sLine, ".sig");
-				if (sURL) continue;
-				strcpy(sPath, sLine);
-				bFound = true;
-				printf("URL found : %s\n", sPath);
-				break;
+				char sShort[1024];
+				strcpy(sShort, sLine);
+				while ((sTok = strstr(sShort, "-")) != 0) {
+					strcpy(sTok, sTok +1);
+				}
+
+				sprintf(sPath, "https://github.com/msys2/msys2-installer/releases/download/%s/msys2-base-x86_64-%s.tar.xz", sLine, sShort);
 			}
+			
+			bFound = true;
+			printf("URL found : %s\n", sPath);
+			break;
 		}
 		fclose(fp);
 		system("del /Q download.html");
 	}
+
 	return bFound;
 }
 
@@ -298,8 +312,17 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}else
 	if(!strcmp(argv[1], "mingw")){
-		sprintf(sCommand, "wget --no-check-certificate \"https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.tar.xz\" -O msys2.tar.xz", sPath);
+		sprintf(sCommand, "wget --no-check-certificate \"https://github.com/msys2/msys2-installer/releases\" -O download.html", sPath);
 		system(sCommand);
+		if (GetDownloadPathMinGW(sPath)) {
+			sprintf(sCommand, "wget --no-check-certificate \"%s\" -O msys2.tar.xz", sPath);
+			system(sCommand);
+
+			if (!GetFileSize("msys2.tar.xz")) {
+				sprintf(sCommand, "wget --no-check-certificate \"https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.tar.xz\" -O msys2.tar.xz", sPath);
+				system(sCommand);
+			}
+		}
 	}
 	else{
 		printf("*E : not support for download '%s'\n", argv[1]);
