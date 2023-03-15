@@ -321,6 +321,25 @@ BOOL CPaser::GetTokenInt(int* token_int)
 	return TRUE;
 }
 
+BOOL CPaser::GetTokenInt64(int64_t* token_int)
+{
+	TCHAR temp[256];
+	TD_TOKEN_TYPE	type = GetToken(temp);
+	switch (type) {
+	case TD_TOKEN_INT:
+		if(!StrToInt64Ex(temp, STIF_DEFAULT, (LONGLONG*)token_int)) return false;
+		break;
+	case TD_TOKEN_HEX:
+		_stscanf(temp, _T("%llx"), token_int);
+		break;
+	case TD_TOKEN_BINARY:
+		*token_int = StrGetBinary(temp);
+	default:
+		return FALSE;
+	}
+	return TRUE;
+}
+
 BOOL CPaser::GetTokenFloat(float* token_float)
 {
 	TCHAR temp[256];
@@ -574,7 +593,7 @@ TRIM_COMMENT_OUT:
 	TrimSpace(pLine);
 }
 
-BOOL CPaser::Seek(DWORD offset, int origin)
+BOOL CPaser::Seek(size_t offset, int origin)
 {
 	if(m_File.m_pStream) return !m_File.Seek(offset, origin);
 	return 0;
@@ -592,10 +611,10 @@ void CPaser::Write(const void* pBuff, DWORD max_size)
 	m_File.Write(pBuff, max_size);
 }
 
-DWORD CPaser::GetFileSize(void)
+uint64_t CPaser::GetFileSize(void)
 {
 	if(!m_File.m_pStream) return 0;
-	return (DWORD)m_File.GetLength();
+	return m_File.GetLength();
 }
 
 DWORD CPaser::AppendText(LPCTSTR fmt, ...)

@@ -1499,10 +1499,10 @@ NO_PROFILE_NAME:
 					switch(i){
 					case CMD_MEMORY_CREATE:
 						{
-							DWORD mem_size;
+							uint64_t mem_size;
 							TCHAR mem_name[MAX_PATH];
 							*mem_name = 0;
-							if(!paser.GetTokenInt((int*)&mem_size)) goto ERROR_OCCUR;
+							if(!paser.GetTokenInt64((int64_t*)&mem_size)) goto ERROR_OCCUR;
 							if(paser.TokenOut(TD_DELIMITER_COMMA)){
 								if(!paser.GetTokenString(mem_name)) goto ERROR_OCCUR;
 							}
@@ -1523,16 +1523,12 @@ NO_PROFILE_NAME:
 							if(!*mem_name) _tcscpy(mem_name, MMFileName);
 
 							pMsg->LogOut(_S(CREATE_MEMORY_MODEL), RGB(0,0,255));
-							pMsg->LogOut(_TEXT_(_T("'%s' : %d Bytes "), mem_name, mem_size), RGB(0,0,255), CFE_BOLD);
+							pMsg->LogOut(_TEXT_(_T("'%s' : %lld Bytes "), mem_name, mem_size), RGB(0,0,255), CFE_BOLD);
 
 							if((mem_size/0x100000))		pMsg->LogOut(_TEXT_(_T("(%.1fMB)\n"), (float)mem_size/0x100000), RGB(0,0,255), CFE_BOLD);
 							else if((mem_size/0x400))	pMsg->LogOut(_TEXT_(_T("(%.1fKB)\n"), (float)mem_size/0x400), RGB(0,0,255), CFE_BOLD);
 							else pMsg->LogOut(_T("\n"));
 
-							if(mem_size >= 0x40000000){
-								LogOut(_S(TOO_BIG_MEMORY_REQUEST), SYSMSG_WARNING);
-								ShowDescriptionCode(&paser);
-							}
 							{
 								CMemory* pMemory = new CMemory;
 								if(!pMemory->Create(mem_size, mem_name)){

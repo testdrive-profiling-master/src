@@ -61,7 +61,7 @@ void CMemory::DeleteAll(void){
 	while((pMemory = Find(NULL))) delete pMemory;
 }
 
-BOOL CMemory::Create(DWORD dwByteSize, LPCTSTR lpszName)
+BOOL CMemory::Create(uint64_t dwByteSize, LPCTSTR lpszName)
 {
 	if(!dwByteSize || (!lpszName && !m_sName.GetLength())) return FALSE;
 	
@@ -72,12 +72,15 @@ BOOL CMemory::Create(DWORD dwByteSize, LPCTSTR lpszName)
 	{
 //RETRY_CREATE_MAP:
 		// 공유 메모리 설정
-		m_MemHandle = CreateFileMapping(INVALID_HANDLE_VALUE,
-			NULL,
-			PAGE_READWRITE,
-			0,
-			dwByteSize + sizeof(TESTDRIVE_CONFIG),
-			lpszName);
+		{
+			uint64_t		mapped_size = dwByteSize + sizeof(TESTDRIVE_CONFIG);
+			m_MemHandle = CreateFileMapping(INVALID_HANDLE_VALUE,
+				NULL,
+				PAGE_READWRITE,
+				(mapped_size >> 32) & 0xFFFFFFFF,
+				mapped_size & 0xFFFFFFFF,
+				lpszName);
+		}
 
 		if (GetLastError() == ERROR_ALREADY_EXISTS) {	// 이미 열려 있었다면, 프로젝트가 중복 열림으로 인식하고 종료.
 			if(m_MemHandle) CloseHandle(m_MemHandle);
@@ -137,7 +140,7 @@ LPCTSTR CMemory::GetName(void){
 	return (LPCTSTR)m_sName;
 }
 
-DWORD CMemory::GetSize(void){
+uint64_t CMemory::GetSize(void){
 	return m_dwMemorySize;
 }
 
@@ -146,17 +149,17 @@ DWORD g_DitherPattern[]={	0,4,1,5,	//  0  8  2 10
 							1,5,0,4,	//  3 11  1  9
 							6,3,7,2};	// 15  7 13  5
 
-BOOL CMemory::IsValidAddress(DWORD dwAddress){
+BOOL CMemory::IsValidAddress(uint64_t dwAddress){
 	return (dwAddress < m_dwMemorySize);
 }
 
-BYTE* CMemory::GetPointer(DWORD dwAddress, DWORD dwSize){
+BYTE* CMemory::GetPointer(uint64_t dwAddress, uint64_t dwSize){
 	if(dwSize) dwSize--;
-	if(!IsValidAddress(dwAddress+dwSize)) return NULL;
+	if(!IsValidAddress(dwAddress + dwSize)) return NULL;
 	return &m_pMemory[dwAddress];
 }
 
-BOOL CMemory::Load(MEM_DISC disc, const TCHAR* lpszFileName, DWORD offset){
+BOOL CMemory::Load(MEM_DISC disc, const TCHAR* lpszFileName, uint64_t offset){
 	CPaser src;
 	if(!m_pMemory || offset>=m_dwMemorySize) return FALSE;
 	if(!src.Create(lpszFileName)) return FALSE;
@@ -196,8 +199,8 @@ BOOL CMemory::Load(MEM_DISC disc, const TCHAR* lpszFileName, DWORD offset){
 		{
 			src.Release();
 			if(!src.Create(lpszFileName, CFile::modeRead|CFile::typeBinary)) return FALSE;
-			DWORD read_size = src.GetFileSize();
-			if(read_size+offset > m_dwMemorySize) read_size = m_dwMemorySize -= offset;
+			uint64_t read_size = src.GetFileSize();
+			if((read_size+offset) > m_dwMemorySize) read_size = m_dwMemorySize -= offset;
 			src.Read(pMem, read_size);
 		}break;
 	case MEM_DISC_FLOAT:
@@ -257,7 +260,7 @@ MEMORY_ACCESS_OVERFLOW:
 	return FALSE;
 }
 
-BOOL CMemory::Save(MEM_DISC disc, LPCTSTR lpszFileName, DWORD offset, DWORD size, DWORD stride)
+BOOL CMemory::Save(MEM_DISC disc, LPCTSTR lpszFileName, uint64_t offset, uint64_t size, DWORD stride)
 {
 	CPaser dest;
 	if (!m_pMemory || (offset+size) > m_dwMemorySize) return FALSE;
@@ -288,14 +291,14 @@ BOOL CMemory::Save(MEM_DISC disc, LPCTSTR lpszFileName, DWORD offset, DWORD size
 }
 
 
-BOOL CMemory::LoadImage(LPCTSTR lpszFileName, DWORD dwOffset, COLORFORMAT iColorType, DWORD stride){
+BOOL CMemory::LoadImage(LPCTSTR lpszFileName, uint64_t dwOffset, COLORFORMAT iColorType, DWORD stride){
 	CBuffer	img;
 	if(!img.CreateFromFile(lpszFileName, iColorType)) return FALSE;
 	
 	{	// memory validation check
 		DWORD LineBytes		= img.Width() * img.ColorBitCount()/8;
 		if(!stride || stride<LineBytes) stride = LineBytes;
-		DWORD LastAddress	= dwOffset + (img.Height()*stride) - 1;
+		uint64_t LastAddress	= dwOffset + (img.Height()*stride) - 1;
 		if(!IsValidAddress(LastAddress)) return FALSE;
 	}
 	{	// Copy to memory
@@ -306,7 +309,7 @@ BOOL CMemory::LoadImage(LPCTSTR lpszFileName, DWORD dwOffset, COLORFORMAT iColor
 	return TRUE;
 }
 
-BOOL CMemory::StoreImage(LPCTSTR lpszFileName, DWORD dwOffset, DWORD dwWidth, DWORD dwHeight, COLORFORMAT iColorType, BOOL bStoreAlpha, DWORD stride){
+BOOL CMemory::StoreImage(LPCTSTR lpszFileName, uint64_t dwOffset, DWORD dwWidth, DWORD dwHeight, COLORFORMAT iColorType, BOOL bStoreAlpha, DWORD stride){
 	CBuffer	img;
 	if(!dwWidth || !dwHeight) return FALSE;
 
@@ -315,7 +318,7 @@ BOOL CMemory::StoreImage(LPCTSTR lpszFileName, DWORD dwOffset, DWORD dwWidth, DW
 	{	// memory validation check
 		DWORD LineBytes		= dwWidth * img.ColorBitCount()/8;
 		if(!stride || stride<LineBytes) stride = LineBytes;
-		DWORD LastAddress	= dwOffset + (dwHeight*stride) - 1;
+		uint64_t LastAddress	= dwOffset + (dwHeight*stride) - 1;
 		if(!IsValidAddress(LastAddress)) return FALSE;
 	}
 	{	// Copy from memory

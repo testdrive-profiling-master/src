@@ -68,11 +68,12 @@ public:
 	BOOL GetTokenName(TCHAR* token_name);
 	BOOL GetTokenString(TCHAR* token_str);
 	BOOL GetTokenInt(int* token_int);
+	BOOL GetTokenInt64(int64_t* token_int);
 	BOOL GetTokenFloat(float* token_float);
 	BOOL GetTokenDouble(double* token_double);
 	BOOL GetTokenText(PVOID pMEM, int& address);
-	BOOL Seek(DWORD offset, int origin = SEEK_SET);
-	DWORD GetFileSize(void);
+	BOOL Seek(size_t offset, int origin = SEEK_SET);
+	uint64_t GetFileSize(void);
 	DWORD Read(void* pBuff, DWORD max_size);
 	void Write(const void* pBuff, DWORD max_size);
 	DWORD AppendText(LPCTSTR fmt, ...);
