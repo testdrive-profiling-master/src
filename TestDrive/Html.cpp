@@ -19,13 +19,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-IMPLEMENT_DYNAMIC(CHtml, CHtmlView)
-BEGIN_MESSAGE_MAP(CHtml, CHtmlView)
-	ON_WM_MOUSEACTIVATE()
-	ON_WM_DESTROY()
-END_MESSAGE_MAP()
-
+#include "TestDriveImp.h"
 
 CHtml::CHtml(void) : m_pManager(NULL), m_dwID(0), m_bBlockNewWindow(FALSE), m_pParent(NULL), m_creationModeId(0)
 {
@@ -101,7 +95,7 @@ HRESULT CHtml::OnCreateEnvironmentCompleted(HRESULT result, ICoreWebView2Environ
 {
 	m_webViewEnvironment = environment;
 	m_webViewEnvironment->CreateCoreWebView2Controller(
-		this->GetSafeHwnd(), Microsoft::WRL::Callback
+		m_pParent->GetSafeHwnd(), Microsoft::WRL::Callback
 		<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>
 		(this, &CHtml::OnCreateCoreWebView2ControllerCompleted).Get());
 
@@ -124,10 +118,9 @@ HRESULT CHtml::OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebV
 #endif
 			m_creationModeId == IDM_CREATION_MODE_TARGET_DCOMP);
 
-		HRESULT hresult = m_webView->Navigate
-		(L"https://google.com");
+		HRESULT hr = m_webView->Navigate(_T("https://google.com"));
 
-		if (hresult == S_OK)
+		if (hr == S_OK)
 		{
 			TRACE("Web Page Opened Successfully");
 			ResizeEverything();
@@ -137,6 +130,8 @@ HRESULT CHtml::OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebV
 	{
 		TRACE("Failed to create webview");
 	}
+
+	g_pTestDrive->LogInfo(_T("OnCreateCoreWebView2ControllerCompleted"));
 	return S_OK;
 }
 
@@ -153,19 +148,25 @@ void CHtml::ResizeEverything(void)
 	}
 }
 
+void CHtml::Navigate(LPCTSTR lpszURL, LPCTSTR lpszTargetFrame)
+{
+		/*if (m_webView && m_webView->NavigateToString(lpszURL) == S_OK) {
+			ResizeEverything();
+		}*/
+}
+/*
 int CHtml::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message){
 	// bypass CView doc/frame stuff
 	SetCurrentCopynPasteAction(TRUE);
 	return CWnd::OnMouseActivate(pDesktopWnd, nHitTest, message);
-}
+	return 0;
+}*/
 
-void CHtml::OnDestroy(){
-	CWnd::OnDestroy();
-}
 
 void CHtml::OnBeforeNavigate2(	LPCTSTR lpszURL, DWORD nFlags,
 								LPCTSTR lpszTargetFrameName, CByteArray& baPostedData,
 								LPCTSTR lpszHeaders, BOOL* pbCancel){
+	/*
 	if(m_pManager) lpszURL = m_pManager->OnHtmlBeforeNavigate(m_dwID, lpszURL);
 
 	if(!lpszURL) *pbCancel = TRUE;
@@ -173,11 +174,11 @@ void CHtml::OnBeforeNavigate2(	LPCTSTR lpszURL, DWORD nFlags,
 		CHtmlView::OnBeforeNavigate2(	lpszURL, nFlags,
 										lpszTargetFrameName, baPostedData,
 										lpszHeaders, pbCancel);
-	}
+	}*/
 }
 
 void CHtml::OnDocumentComplete(LPCTSTR lpszURL){
-	if(m_pManager) m_pManager->OnHtmlDocumentComplete(m_dwID, lpszURL);
+	//if(m_pManager) m_pManager->OnHtmlDocumentComplete(m_dwID, lpszURL);
 }
 
 void CHtml::SetManager(ITDHtmlManager* pManager, DWORD dwID){
@@ -186,7 +187,7 @@ void CHtml::SetManager(ITDHtmlManager* pManager, DWORD dwID){
 }
 
 BOOL CHtml::CallJScript(LPCTSTR lpszScript){
-	HRESULT			hr;
+	/*HRESULT			hr;
 	IDispatch*		pDispatch;
 	IHTMLDocument2* pDocument;
 	IHTMLWindow2*	pWindow;
@@ -213,7 +214,8 @@ BOOL CHtml::CallJScript(LPCTSTR lpszScript){
 
 		pDispatch->Release();
 	}
-	return SUCCEEDED(hr);
+	return SUCCEEDED(hr);*/
+	return S_OK;
 }
 
 void CHtml::SetBlockNewWindow(BOOL bBlock){
@@ -222,7 +224,7 @@ void CHtml::SetBlockNewWindow(BOOL bBlock){
 
 HRESULT CHtml::ExecFormCommand(const GUID *pGuid, long cmdID, long cmdExecOpt, VARIANT* pInVar, VARIANT* pOutVar) const 
 { 
-	CComQIPtr <IHTMLDocument2> spDoc (GetHtmlDocument ()); 
+	/*CComQIPtr <IHTMLDocument2> spDoc(GetHtmlDocument());
 	HRESULT hr = E_FAIL; 
 
 	if (spDoc) 
@@ -233,19 +235,21 @@ HRESULT CHtml::ExecFormCommand(const GUID *pGuid, long cmdID, long cmdExecOpt, V
 		else 
 			hr = E_NOINTERFACE; 
 	}
-	return hr; 
+	return hr;*/
+	return S_OK;
 }
 
 HRESULT CHtml::ExecFormCommand(long cmdID, long cmdExecOpt, VARIANT* pInVar, VARIANT* pOutVar) const 
 { 
-	return ExecFormCommand (&CGID_MSHTML, cmdID, cmdExecOpt, pInVar, pOutVar);
+	//return ExecFormCommand (&CGID_MSHTML, cmdID, cmdExecOpt, pInVar, pOutVar);
+	return S_OK;
 }
 
 BOOL CHtml::CheckVisible(void){
-	if(!IsWindowVisible()){
+	/*if (!IsWindowVisible()) {
 		SetCurrentCopynPasteAction(FALSE);
 		return FALSE;
-	}
+	}*/
 	return TRUE;
 }
 
@@ -266,24 +270,27 @@ void CHtml::OnAccel(ACCEL_CODE code){
 }
 
 void CHtml::OnNewWindow2(LPDISPATCH* ppDisp, BOOL* Cancel){
-	if(m_bBlockNewWindow){
+	/*if (m_bBlockNewWindow) {
 		//*ppDisp = GetApplication();	// 새창 띄우기를 하지 않음.
 		*Cancel	= TRUE;
 		//Navigate2(m_sNaviURL);
 	}else
-	CHtmlView::OnNewWindow2(ppDisp, Cancel);
+	CHtmlView::OnNewWindow2(ppDisp, Cancel);*/
 }
 
 BOOL CHtml::PreTranslateMessage(MSG* pMsg) {
+	/*
 	if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE))
 	{
 		::TranslateMessage(pMsg);
 	}
 	return CHtmlView::PreTranslateMessage(pMsg);
+	*/
+	return S_OK;
 }
 
 BOOL CHtml::PutText(CString strFormName, CString strObjectID, CString strPutText){
-	CComPtr<IDispatch> pDisp			= NULL;
+	/*CComPtr<IDispatch> pDisp = NULL;
 	CComPtr<IDispatch> pActiveDisp		= NULL;
 	CComPtr<IHTMLDocument2> pDispDoc2	= NULL;
 	CComPtr<IHTMLFormElement> pForm		= NULL;
@@ -405,11 +412,12 @@ BOOL CHtml::PutText(CString strFormName, CString strObjectID, CString strPutText
 	CComBSTR bstrPutText(strPutText);
 	pInputElem->select();
 	pInputElem->put_value( bstrPutText );//텍스트 입력
-
+	*/
 	return TRUE;
 }
 
 BOOL CHtml::GetText(CString strFormName, CString strObjectID, CString& lpszText){
+	/*
 	CComPtr<IDispatch> pDisp			= NULL;
 	CComPtr<IDispatch> pActiveDisp		= NULL;
 	CComPtr<IHTMLDocument2> pDispDoc2	= NULL;
@@ -535,11 +543,13 @@ BOOL CHtml::GetText(CString strFormName, CString strObjectID, CString& lpszText)
 		pInputElem->get_value(&bstrPutText);
 		lpszText	= bstrPutText;
 	}
+	*/
 	return TRUE;
 }
 
 BOOL CHtml::ClickButton(LPCTSTR sObjectID)
 {
+	/*
 	CComPtr<IHTMLElement> pElement = NULL;
 	CComPtr<IDispatch> pDisp = NULL;
 	CComPtr<IHTMLDocument3> pDoc3 = NULL;
@@ -617,9 +627,12 @@ BOOL CHtml::ClickButton(LPCTSTR sObjectID)
 	}
 
 	return bSuccess;
+	*/
+	return S_OK;
 }
 
 BOOL CHtml::RunScript(LPCTSTR sScript){
+	/*
 	CComPtr<IHTMLElement> pElement = NULL;
 	CComPtr<IDispatch> pDisp = NULL;
 	DISPID dispid = NULL;
@@ -747,6 +760,6 @@ BOOL CHtml::RunScript(LPCTSTR sScript){
 
 	if(FAILED(hr))
 		return FALSE;
-
+	*/
 	return TRUE;
 }

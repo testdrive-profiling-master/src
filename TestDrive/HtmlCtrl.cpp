@@ -33,11 +33,12 @@ END_MESSAGE_MAP()
 
 void CHtmlCtrl::UpdateLayout(void){
 	SetWindowPos(NULL, m_Layout.ViewX(), m_Layout.ViewY(), m_Layout.ViewWidth(), m_Layout.ViewHeight(), SWP_NOACTIVATE | SWP_NOZORDER);
-	if(IsWindow(m_Html.m_hWnd))
+	/*if (IsWindow(m_Html.m_hWnd))
 	{
 		m_Html.SetWindowPos(NULL, 0, 0, m_Layout.ViewWidth(), m_Layout.ViewHeight(), SWP_NOACTIVATE | SWP_NOZORDER);
 		m_Html.UpdateWindow();
-	}
+	}*/
+	m_Html.ResizeEverything();
 }
 
 ITDObject* CHtmlCtrl::GetObject(void){
@@ -50,13 +51,15 @@ BOOL CHtmlCtrl::Create(CWnd* pParentWnd){
 	if(!CWnd::Create(NULL, NULL, WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE | WS_CLIPSIBLINGS, rc, pParentWnd, GetLastWindowID(pParentWnd))) return FALSE;
 	BringWindowToTop();
 
-	{
+	/* {
 		RECT rc;
 		CWnd::GetClientRect(&rc);
 		m_Html.Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, rc, this, AFX_IDW_PANE_FIRST);
 		m_Html.SetSilent(TRUE);
 		m_Html.SetRegisterAsBrowser(TRUE);
-	}
+	}*/
+
+	m_Html.Initialize(this);
 
 	return TRUE;
 }
@@ -82,7 +85,7 @@ void CHtmlCtrl::Navigate(LPCTSTR lpszURL, LPCTSTR lpszTargetFrame){
 		}
 	}
 
-	m_Html.Navigate2(sURL, 0, lpszTargetFrame);
+	m_Html.Navigate(sURL, lpszTargetFrame);
 }
 
 void CHtmlCtrl::SetManager(ITDHtmlManager* pManager, DWORD dwID){
@@ -90,11 +93,11 @@ void CHtmlCtrl::SetManager(ITDHtmlManager* pManager, DWORD dwID){
 }
 
 int CHtmlCtrl::GetWidth(void){
-	return (int)m_Html.GetWidth();
+	return 100;// (int)m_Html.GetWidth();
 }
 
 int CHtmlCtrl::GetHeight(void){
-	return (int)m_Html.GetHeight();
+	return 100;// (int)m_Html.GetHeight();
 }
 
 BOOL CHtmlCtrl::Paser(CPaser* pPaser, int x, int y){

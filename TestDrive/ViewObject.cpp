@@ -104,13 +104,8 @@ ERROR_OUT:
 }
 
 BEGIN_MESSAGE_MAP(CViewObject, CWnd)
-	ON_WM_ERASEBKGND()
 	ON_WM_NCPAINT()
 END_MESSAGE_MAP()
-
-BOOL CViewObject::OnEraseBkgnd(CDC* pDC){
-	return FALSE;
-}
 
 void CViewObject::OnNcPaint(){
 	CDC* pDC = GetWindowDC();

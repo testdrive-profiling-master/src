@@ -17,23 +17,20 @@ namespace winrtComp = winrt::Windows::UI::Composition;
 #endif
 
 class CHtml :
-	public CHtmlView,
 	public AccelCodeDecoder
 {
-	DECLARE_DYNAMIC(CHtml)
 public:
 	CHtml(void);
 	virtual ~CHtml(void);
 
 	void Initialize(CWnd* pParent);
+	void Navigate(LPCTSTR lpszURL, LPCTSTR lpszTargetFrame);
 
 	virtual void PostNcDestroy(){}
 	virtual void OnDocumentComplete(LPCTSTR lpszURL);
 	virtual void OnBeforeNavigate2(LPCTSTR lpszURL, DWORD nFlags,
 		LPCTSTR lpszTargetFrameName, CByteArray& baPostedData,
 		LPCTSTR lpszHeaders, BOOL* pbCancel);
-// 	virtual BOOL OnAmbientProperty(COleControlSite* pSite, DISPID dispid,
-// 		VARIANT* pvar);
 
 	void SetManager(ITDHtmlManager* pManager, DWORD dwID);
 	BOOL CallJScript(LPCTSTR lpszScript);
@@ -62,6 +59,7 @@ public:
 	{
 		return m_pParent  ? m_pParent->m_hWnd : NULL;
 	}
+	void ResizeEverything(void);
 
 protected:
 	HRESULT OnCreateEnvironmentCompleted(HRESULT result, ICoreWebView2Environment* environment);
@@ -78,9 +76,8 @@ protected:
 	ITDHtmlManager*		m_pManager;
 	CWnd*				m_pParent;
 
-	DECLARE_MESSAGE_MAP()
-	afx_msg int OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message);
-	afx_msg void OnDestroy();
+	//DECLARE_MESSAGE_MAP()
+	//afx_msg int OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message);
 
 	// WebView2
 	template <class ComponentType, class... Args> void NewComponent(Args&&... args);
@@ -93,7 +90,6 @@ protected:
 	Microsoft::WRL::ComPtr<IDCompositionDevice> m_dcompDevice;
 	std::vector<std::unique_ptr<ComponentBase>> m_components;
 	
-	void ResizeEverything(void);
 	HRESULT DCompositionCreateDevice2(IUnknown* renderingDevice, REFIID riid, void** ppv);
 };
 
