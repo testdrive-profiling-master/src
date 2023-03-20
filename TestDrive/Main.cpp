@@ -61,7 +61,8 @@ BOOL CTestDriveApp::InitInstance()
 	// 이 항목을 설정하십시오.
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
-	CoInitialize(NULL);
+	//CoInitialize(NULL);
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);	// for WebView2
 
 	CWinAppEx::InitInstance();
 	SetRegistryKey(_T("CloneX"));

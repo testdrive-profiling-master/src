@@ -160,6 +160,7 @@
     <None Include="res\png1.png">
       <Filter>리소스 파일</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -468,6 +469,12 @@
     <ClInclude Include="ToolTabbedPane.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="ViewComponent.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentBase.h">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -727,6 +734,9 @@
     </ClCompile>
     <ClCompile Include="ToolTabbedPane.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewComponent.cpp">
+      <Filter>System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

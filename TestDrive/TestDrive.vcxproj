@@ -196,6 +196,7 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="res\buttons.bmp" />
     <None Include="res\classview.bmp" />
     <None Include="res\classview_hc.bmp" />
@@ -277,6 +278,7 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClInclude Include="ChildFrm.h" />
     <ClInclude Include="ClientWnd.h" />
     <ClInclude Include="commandlist.h" />
+    <ClInclude Include="ComponentBase.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="DocumentMiniFrame.h" />
     <ClInclude Include="DocumentTabbedPane.h" />
@@ -332,6 +334,7 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClInclude Include="ToolMiniFrame.h" />
     <ClInclude Include="ToolTabbedPane.h" />
     <ClInclude Include="UACElevate.h" />
+    <ClInclude Include="ViewComponent.h" />
     <ClInclude Include="ViewObject.h" />
     <ClInclude Include="DocumentCtrl.h" />
     <ClInclude Include="ViewTree.h" />
@@ -425,6 +428,7 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClCompile Include="ToolMiniFrame.cpp" />
     <ClCompile Include="ToolTabbedPane.cpp" />
     <ClCompile Include="UACElevate.cpp" />
+    <ClCompile Include="ViewComponent.cpp" />
     <ClCompile Include="ViewObject.cpp" />
     <ClCompile Include="DocumentCtrl.cpp" />
     <ClCompile Include="ViewTree.cpp" />
@@ -440,10 +444,17 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\native\Microsoft.Web.WebView2.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties RESOURCE_FILE="TestDrive.rc" />
     </VisualStudio>
   </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1587.40\build\native\Microsoft.Web.WebView2.targets'))" />
+  </Target>
 </Project>

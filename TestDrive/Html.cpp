@@ -1,7 +1,17 @@
 #include "StdAfx.h"
 #include "Html.h"
 #include "TestDriveImp.h"
-//#include "ExDispid.h" // IE5.5 이상이 지원 되는 헤더가 필요 합니다.
+#include "ViewComponent.h"
+#include <sstream>
+#include <windowsx.h>
+#include <WinUser.h>
+#ifdef USE_WEBVIEW2_WIN10
+#include <windows.ui.composition.interop.h>
+#endif
+
+#define IDM_GET_BROWSER_VERSION_AFTER_CREATION 170
+#define IDM_GET_BROWSER_VERSION_BEFORE_CREATION 171
+#define IDM_CREATION_MODE_TARGET_DCOMP 195
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -17,7 +27,7 @@ BEGIN_MESSAGE_MAP(CHtml, CHtmlView)
 END_MESSAGE_MAP()
 
 
-CHtml::CHtml(void) : m_pManager(NULL), m_dwID(0), m_bBlockNewWindow(FALSE)
+CHtml::CHtml(void) : m_pManager(NULL), m_dwID(0), m_bBlockNewWindow(FALSE), m_pParent(NULL), m_creationModeId(0)
 {
 }
 
@@ -25,6 +35,122 @@ CHtml::~CHtml(void)
 {
 	SetCurrentCopynPasteAction(FALSE);
 	m_pManager	= NULL;
+}
+
+void CHtml::Initialize(CWnd* pParent)
+{
+	m_pParent		= pParent;
+	m_dcompDevice	= nullptr;
+	HRESULT hr2 = DCompositionCreateDevice2(nullptr, IID_PPV_ARGS(&m_dcompDevice));
+	if (!SUCCEEDED(hr2))
+	{
+		AfxMessageBox(L"Attempting to create WebView using DComp Visual is not supported.\r\n"
+			"DComp device creation failed.\r\n"
+			"Current OS may not support DComp.\r\n"
+			"Create with Windowless DComp Visual Failed", MB_OK);
+		return;
+	}
+
+#ifdef USE_WEBVIEW2_WIN10
+	m_wincompCompositor = nullptr;
+#endif
+	LPCWSTR subFolder = nullptr;
+	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+	options->put_AllowSingleSignOnUsingOSPrimaryAccount(FALSE);
+
+	HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(
+		subFolder, nullptr, options.Get(),
+		Microsoft::WRL::Callback
+		<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>
+		(this, &CHtml::OnCreateEnvironmentCompleted).Get());
+
+	if (!SUCCEEDED(hr))
+	{
+		if (hr == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND))
+		{
+			TRACE("Couldn't find Edge installation. Do you have a version installed that is compatible with this ");
+		}
+		else
+		{
+			AfxMessageBox(L"Failed to create webview environment");
+		}
+	}
+}
+
+HRESULT CHtml::DCompositionCreateDevice2(IUnknown* renderingDevice, REFIID riid, void** ppv)
+{
+	HRESULT hr = E_FAIL;
+	static decltype(::DCompositionCreateDevice2)* fnCreateDCompDevice2 = nullptr;
+	if (fnCreateDCompDevice2 == nullptr)
+	{
+		HMODULE hmod = ::LoadLibraryEx(L"dcomp.dll", nullptr, 0);
+		if (hmod != nullptr)
+		{
+			fnCreateDCompDevice2 = reinterpret_cast<decltype(::DCompositionCreateDevice2)*>(
+				::GetProcAddress(hmod, "DCompositionCreateDevice2"));
+		}
+	}
+	if (fnCreateDCompDevice2 != nullptr)
+	{
+		hr = fnCreateDCompDevice2(renderingDevice, riid, ppv);
+	}
+	return hr;
+}
+
+HRESULT CHtml::OnCreateEnvironmentCompleted(HRESULT result, ICoreWebView2Environment* environment)
+{
+	m_webViewEnvironment = environment;
+	m_webViewEnvironment->CreateCoreWebView2Controller(
+		this->GetSafeHwnd(), Microsoft::WRL::Callback
+		<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>
+		(this, &CHtml::OnCreateCoreWebView2ControllerCompleted).Get());
+
+	return S_OK;
+}
+
+HRESULT CHtml::OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebView2Controller* controller)
+{
+	if (result == S_OK)
+	{
+		m_controller = controller;
+		Microsoft::WRL::ComPtr<ICoreWebView2> coreWebView2;
+		m_controller->get_CoreWebView2(&coreWebView2);
+		m_webView = coreWebView2.Get();
+
+		NewComponent<ViewComponent>(
+			this, m_dcompDevice.Get(),
+#ifdef USE_WEBVIEW2_WIN10
+			m_wincompCompositor,
+#endif
+			m_creationModeId == IDM_CREATION_MODE_TARGET_DCOMP);
+
+		HRESULT hresult = m_webView->Navigate
+		(L"https://google.com");
+
+		if (hresult == S_OK)
+		{
+			TRACE("Web Page Opened Successfully");
+			ResizeEverything();
+		}
+	}
+	else
+	{
+		TRACE("Failed to create webview");
+	}
+	return S_OK;
+}
+
+void CHtml::ResizeEverything(void)
+{
+	if (m_pParent) {
+		RECT availableBounds = { 0 };
+		m_pParent->GetClientRect(&availableBounds);
+
+		if (auto view = GetComponent<ViewComponent>())
+		{
+			view->SetBounds(availableBounds);
+		}
+	}
 }
 
 int CHtml::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message){
@@ -53,24 +179,6 @@ void CHtml::OnBeforeNavigate2(	LPCTSTR lpszURL, DWORD nFlags,
 void CHtml::OnDocumentComplete(LPCTSTR lpszURL){
 	if(m_pManager) m_pManager->OnHtmlDocumentComplete(m_dwID, lpszURL);
 }
-
-// #include <mshtmdid.h>
-// 
-// BOOL CHtml::OnAmbientProperty(COleControlSite* pSite, DISPID dispid, VARIANT* pvar){
-// 	if(pvar && dispid == DISPID_AMBIENT_DLCONTROL){
-// 		// 스크립트 오류 메시지 안보이게 하기
-// 		V_VT(pvar) = VT_I4;
-// 
-// 		V_I4(pvar) =
-// 			DLCTL_DLIMAGES |
-// 			DLCTL_VIDEOS |
-// 			DLCTL_BGSOUNDS |
-// 			DLCTL_NO_SCRIPTS | 0;
-// 		return TRUE;
-// 	}else{
-// 		return CHtmlView::OnAmbientProperty(pSite, dispid, pvar);
-// 	}
-// }
 
 void CHtml::SetManager(ITDHtmlManager* pManager, DWORD dwID){
 	m_pManager	= pManager;
