@@ -469,10 +469,10 @@
     <ClInclude Include="ToolTabbedPane.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ViewComponent.h">
+    <ClInclude Include="ComponentBase.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentBase.h">
+    <ClInclude Include="Html_old.h">
       <Filter>System</Filter>
     </ClInclude>
   </ItemGroup>
@@ -735,7 +735,7 @@
     <ClCompile Include="ToolTabbedPane.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ViewComponent.cpp">
+    <ClCompile Include="Html_old.cpp">
       <Filter>System</Filter>
     </ClCompile>
   </ItemGroup>
@@ -748,5 +748,8 @@
     <Image Include="res\background.png">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
   </ItemGroup>
 </Project>

@@ -51,7 +51,7 @@ void CViewObject::Release(void){
 	if(pDoc) pDoc->DeleteObject(this);
 }
 
-CViewObject* CViewObject::New(OBJECT_TYPE iViewType, CWnd* pParentWnd, CPaser* pPaser){
+CViewObject* CViewObject::New(OBJECT_TYPE iViewType, CWnd* pParentWnd, CPaser* pPaser, POST_VIEW_OBJECT_CREATE_FUNC post_create_fn){
 	CViewObject* pVO	= NULL;
 
 	switch(iViewType){
@@ -69,6 +69,8 @@ ERROR_OUT:
 	if(pVO){
 		pVO->m_iViewType	= iViewType;
 	
+		if (post_create_fn) post_create_fn(pVO);
+
 		if(pPaser){	// Name & Layout parsing
 			
 			if(!pPaser->TokenOut(TD_DELIMITER_SOPEN)) goto ERROR_OUT;

@@ -24,6 +24,10 @@ static char THIS_FILE[] = __FILE__;
 
 static LPCTSTR	__sPROPERTY_EXPANDED	= _T("TESTDRIVE_PROPERTY_VIEW_EXPANDED");
 
+static void __webview2_setup_fn(CViewObject* pObj) {
+	((CHtmlCtrl*)pObj)->SetWebView2();
+}
+
 IMPLEMENT_DYNAMIC(CDocumentView, CWnd)
 
 CDocumentView::CDocumentView() : m_dwRefCount(0), m_bAutoClose(FALSE), m_bShow(TRUE)
@@ -321,8 +325,8 @@ ITDButton* CDocumentView::CreateButton(LPCTSTR lpszName, int x, int y, int width
 	return NULL;
 }
 
-ITDHtml* CDocumentView::CreateHtml(LPCTSTR lpszName, int x, int y, int width, int height){
-	CViewObject* pVO	= CViewObject::New(TDOBJECT_HTML, this);
+ITDHtml* CDocumentView::CreateHtml(LPCTSTR lpszName, int x, int y, int width, int height, BOOL bWebView2){
+	CViewObject* pVO	= CViewObject::New(TDOBJECT_HTML, this, NULL, bWebView2 ? __webview2_setup_fn : nullptr);
 	if(pVO){
 		pVO->GetLayout()->SetPosition(x, y);
 		pVO->GetLayout()->SetSize(width, height);
@@ -739,6 +743,7 @@ typedef enum{
 	VIEWDOCUMENT_CMD_REPORT,
 	VIEWDOCUMENT_CMD_BUTTON,
 	VIEWDOCUMENT_CMD_HTML,
+	VIEWDOCUMENT_CMD_HTML2,
 	VIEWDOCUMENT_CMD_POSITION,
 	VIEWDOCUMENT_CMD_PROGRAM,
 	VIEWDOCUMENT_CMD_DESCRIPTION,
@@ -752,6 +757,7 @@ const TCHAR*	g_sViewDocumentCmd[VIEWDOCUMENT_CMD_SIZE]={
 	_T("report"),
 	_T("button"),
 	_T("html"),
+	_T("html2"),
 	_T("position"),
 	_T("SetProgram"),
 	_T("SetDescription"),
@@ -836,6 +842,15 @@ BOOL CDocumentView::Load(CPaser* pPaser){
 							pVO->Paser(pPaser, x, y);
 							break;
 						}
+						goto ERROR_OUT;
+					case VIEWDOCUMENT_CMD_HTML2:
+						pVO = CViewObject::New(TDOBJECT_HTML, this, pPaser, __webview2_setup_fn);
+						if (pVO) {
+							m_ViewObjectList.push_back(pVO);
+							pVO->Paser(pPaser, x, y);
+							break;
+						}
+						goto ERROR_OUT;
 					default:
 						goto ERROR_OUT;
 					}

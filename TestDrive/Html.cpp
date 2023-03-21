@@ -12,11 +12,6 @@
 #include <windows.ui.composition.interop.h>
 #endif
 
-#define IDM_GET_BROWSER_VERSION_AFTER_CREATION 170
-#define IDM_GET_BROWSER_VERSION_BEFORE_CREATION 171
-#define IDM_CREATION_MODE_TARGET_DCOMP 195
-#define IDM_WEBVIEW2_CREATE_COMPLETE	WM_USER + 12
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE

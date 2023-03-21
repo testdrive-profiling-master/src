@@ -1,6 +1,7 @@
 #pragma once
 #include "ViewObject.h"
 #include "Html.h"
+#include "Html_old.h"
 #include "AccelCodeDecoder.h"
 
 class CHtmlCtrl :
@@ -13,6 +14,8 @@ class CHtmlCtrl :
 public:
 	CHtmlCtrl(void);
 	virtual ~CHtmlCtrl(void);
+
+	void SetWebView2(void);
 
 	virtual BOOL Create(CWnd* pParentWnd);
 	virtual BOOL Paser(CPaser* pPaser, int x, int y);
@@ -35,5 +38,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
+	BOOL				m_bOld;
 	CHtml				m_Html;
+	CHtml_old			m_Html_old;
 };

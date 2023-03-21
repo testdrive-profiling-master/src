@@ -117,6 +117,9 @@ public:
 };
 
 class CDocumentWnd;
+class CViewObject;
+
+typedef void (*POST_VIEW_OBJECT_CREATE_FUNC)(CViewObject* pObj);
 
 class CViewObject :
 	public CWnd,
@@ -133,7 +136,7 @@ public:
 	virtual BOOL Create(CWnd* pParentWnd) = 0;
 	virtual BOOL Paser(CPaser* pPaser, int x, int y) = 0;
 
-	static CViewObject* New(OBJECT_TYPE iViewType, CWnd* pParentWnd, CPaser* pPaser = NULL);
+	static CViewObject* New(OBJECT_TYPE iViewType, CWnd* pParentWnd, CPaser* pPaser = NULL, POST_VIEW_OBJECT_CREATE_FUNC post_create_fn = NULL);
 
 	STDMETHOD_(ITDLayout*, GetLayout)(void);
 	STDMETHOD_(OBJECT_TYPE, GetType)(void);

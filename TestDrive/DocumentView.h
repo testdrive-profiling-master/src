@@ -54,7 +54,7 @@ public:
 	STDMETHOD_(ITDBuffer*, CreateBuffer)(LPCTSTR lpszName, int x, int y, int width, int height);
 	STDMETHOD_(ITDReport*, CreateReport)(LPCTSTR lpszName, int x, int y, int width, int height);
 	STDMETHOD_(ITDButton*, CreateButton)(LPCTSTR lpszName, int x, int y, int width, int height);
-	STDMETHOD_(ITDHtml*, CreateHtml)(LPCTSTR lpszName, int x, int y, int width, int height);
+	STDMETHOD_(ITDHtml*, CreateHtml)(LPCTSTR lpszName, int x, int y, int width, int height, BOOL bWebView2);
 	STDMETHOD_(void, Lock)(void);
 	STDMETHOD_(void, UnLock)(void);
 	STDMETHOD_(BOOL, IsLocked)(void);

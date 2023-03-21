@@ -290,6 +290,7 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClInclude Include="FullPath.h" />
     <ClInclude Include="Html.h" />
     <ClInclude Include="HtmlCtrl.h" />
+    <ClInclude Include="Html_old.h" />
     <ClInclude Include="Localization.h" />
     <ClInclude Include="Mail\atlmime.h" />
     <ClInclude Include="Mail\atlsmtpconnection.h" />
@@ -334,7 +335,6 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClInclude Include="ToolMiniFrame.h" />
     <ClInclude Include="ToolTabbedPane.h" />
     <ClInclude Include="UACElevate.h" />
-    <ClInclude Include="ViewComponent.h" />
     <ClInclude Include="ViewObject.h" />
     <ClInclude Include="DocumentCtrl.h" />
     <ClInclude Include="ViewTree.h" />
@@ -387,6 +387,7 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClCompile Include="FullPath.cpp" />
     <ClCompile Include="Html.cpp" />
     <ClCompile Include="HtmlCtrl.cpp" />
+    <ClCompile Include="Html_old.cpp" />
     <ClCompile Include="Localization.cpp" />
     <ClCompile Include="Mail\Mail.cpp" />
     <ClCompile Include="Mail\SMTPConnection2.cpp" />
@@ -428,7 +429,6 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClCompile Include="ToolMiniFrame.cpp" />
     <ClCompile Include="ToolTabbedPane.cpp" />
     <ClCompile Include="UACElevate.cpp" />
-    <ClCompile Include="ViewComponent.cpp" />
     <ClCompile Include="ViewObject.cpp" />
     <ClCompile Include="DocumentCtrl.cpp" />
     <ClCompile Include="ViewTree.cpp" />
