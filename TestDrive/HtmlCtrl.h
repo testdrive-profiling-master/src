@@ -33,7 +33,7 @@ public:
 
 protected:
 	DECLARE_MESSAGE_MAP()
-	//afx_msg void OnPaint(void);
 
+private:
 	CHtml				m_Html;
 };

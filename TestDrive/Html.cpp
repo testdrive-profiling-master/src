@@ -1,10 +1,13 @@
 #include "StdAfx.h"
 #include "Html.h"
 #include "TestDriveImp.h"
-#include "ViewComponent.h"
 #include <sstream>
 #include <windowsx.h>
 #include <WinUser.h>
+#include <winstring.h>	// For wil::unique_hstring
+#include <wil/common.h>
+#include <wil/win32_helpers.h>
+
 #ifdef USE_WEBVIEW2_WIN10
 #include <windows.ui.composition.interop.h>
 #endif
@@ -12,6 +15,7 @@
 #define IDM_GET_BROWSER_VERSION_AFTER_CREATION 170
 #define IDM_GET_BROWSER_VERSION_BEFORE_CREATION 171
 #define IDM_CREATION_MODE_TARGET_DCOMP 195
+#define IDM_WEBVIEW2_CREATE_COMPLETE	WM_USER + 12
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -21,13 +25,15 @@ static char THIS_FILE[] = __FILE__;
 
 #include "TestDriveImp.h"
 
-CHtml::CHtml(void) : m_pManager(NULL), m_dwID(0), m_bBlockNewWindow(FALSE), m_pParent(NULL), m_creationModeId(0)
+CHtml::CHtml(void) : m_pManager(NULL), m_dwID(0), m_bBlockNewWindow(FALSE), m_pParent(NULL), m_bInitialized(FALSE),
+	m_NewWindowRequestedToken({0}),
+	m_navigationStartingToken({0}),
+	m_navigationCompletedToken({0})
 {
 }
 
 CHtml::~CHtml(void)
 {
-	SetCurrentCopynPasteAction(FALSE);
 	m_pManager	= NULL;
 }
 
@@ -49,8 +55,11 @@ void CHtml::Initialize(CWnd* pParent)
 	m_wincompCompositor = nullptr;
 #endif
 	LPCWSTR subFolder = nullptr;
+	LPCWSTR sBrowserArg = L" --disable-web-security --allow-file-access-from-files --allow-file-access --allow-running-insecure-content --allow-insecure-localhost --allow-cross-origin-auth-prompt";
 	auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
 	options->put_AllowSingleSignOnUsingOSPrimaryAccount(FALSE);
+	options->put_ExclusiveUserDataFolderAccess(FALSE);
+	options->put_AdditionalBrowserArguments(sBrowserArg);
 
 	HRESULT hr = CreateCoreWebView2EnvironmentWithOptions(
 		subFolder, nullptr, options.Get(),
@@ -67,6 +76,14 @@ void CHtml::Initialize(CWnd* pParent)
 		else
 		{
 			AfxMessageBox(L"Failed to create webview environment");
+		}
+	}
+	else {
+		// wait for creation complete
+		MSG msg;
+		while (!m_bInitialized && GetMessage(&msg, nullptr, WM_USER + 1, WM_USER + 1)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 }
@@ -111,27 +128,54 @@ HRESULT CHtml::OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebV
 		m_controller->get_CoreWebView2(&coreWebView2);
 		m_webView = coreWebView2.Get();
 
-		NewComponent<ViewComponent>(
-			this, m_dcompDevice.Get(),
-#ifdef USE_WEBVIEW2_WIN10
-			m_wincompCompositor,
-#endif
-			m_creationModeId == IDM_CREATION_MODE_TARGET_DCOMP);
+		m_webView->add_NewWindowRequested(
+			Microsoft::WRL::Callback
+			<ICoreWebView2NewWindowRequestedEventHandler>(this, &CHtml::OnNewWindowRequested).Get(),
+			&m_NewWindowRequestedToken);
 
-		HRESULT hr = m_webView->Navigate(_T("https://google.com"));
+		m_webView->add_NavigationStarting(
+			Microsoft::WRL::Callback
+			<ICoreWebView2NavigationStartingEventHandler>(this, &CHtml::OnNavigationStart).Get(),
+			&m_navigationStartingToken);
 
-		if (hr == S_OK)
-		{
-			TRACE("Web Page Opened Successfully");
-			ResizeEverything();
-		}
+		m_webView->add_NavigationCompleted(
+			Microsoft::WRL::Callback
+			<ICoreWebView2NavigationCompletedEventHandler>(this, &CHtml::OnNavigationComplete).Get(),
+			& m_navigationCompletedToken);
 	}
 	else
 	{
 		TRACE("Failed to create webview");
 	}
+	m_bInitialized = TRUE;
+	return S_OK;
+}
 
-	g_pTestDrive->LogInfo(_T("OnCreateCoreWebView2ControllerCompleted"));
+HRESULT CHtml::OnNewWindowRequested(ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args) {
+	// no implementation
+	return S_OK;
+}
+
+HRESULT CHtml::OnNavigationStart(ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args) {
+	if (m_pManager) {
+		wil::unique_cotaskmem_string uri;
+		args->get_Uri(&uri);
+		LPCTSTR lpszURL = m_pManager->OnHtmlBeforeNavigate(m_dwID, uri.get());
+
+		if (!lpszURL) {
+			args->put_Cancel(TRUE);
+		}
+	}
+	return S_OK;
+}
+
+HRESULT CHtml::OnNavigationComplete(ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) {
+	if (m_pManager) {
+		wil::unique_cotaskmem_string uri;
+		m_webView->get_Source(&uri);
+		m_pManager->OnHtmlDocumentComplete(m_dwID, uri.get());
+	}
+
 	return S_OK;
 }
 
@@ -141,27 +185,18 @@ void CHtml::ResizeEverything(void)
 		RECT availableBounds = { 0 };
 		m_pParent->GetClientRect(&availableBounds);
 
-		if (auto view = GetComponent<ViewComponent>())
-		{
-			view->SetBounds(availableBounds);
+		if (m_controller) {
+			m_controller->put_Bounds(availableBounds);
 		}
 	}
 }
 
 void CHtml::Navigate(LPCTSTR lpszURL, LPCTSTR lpszTargetFrame)
 {
-		/*if (m_webView && m_webView->NavigateToString(lpszURL) == S_OK) {
-			ResizeEverything();
-		}*/
+	if (m_webView && m_webView->Navigate(lpszURL) == S_OK) {
+		ResizeEverything();
+	}
 }
-/*
-int CHtml::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message){
-	// bypass CView doc/frame stuff
-	SetCurrentCopynPasteAction(TRUE);
-	return CWnd::OnMouseActivate(pDesktopWnd, nHitTest, message);
-	return 0;
-}*/
-
 
 void CHtml::OnBeforeNavigate2(	LPCTSTR lpszURL, DWORD nFlags,
 								LPCTSTR lpszTargetFrameName, CByteArray& baPostedData,
@@ -177,96 +212,28 @@ void CHtml::OnBeforeNavigate2(	LPCTSTR lpszURL, DWORD nFlags,
 	}*/
 }
 
-void CHtml::OnDocumentComplete(LPCTSTR lpszURL){
-	//if(m_pManager) m_pManager->OnHtmlDocumentComplete(m_dwID, lpszURL);
-}
-
 void CHtml::SetManager(ITDHtmlManager* pManager, DWORD dwID){
 	m_pManager	= pManager;
 	m_dwID		= dwID;
 }
 
 BOOL CHtml::CallJScript(LPCTSTR lpszScript){
-	/*HRESULT			hr;
-	IDispatch*		pDispatch;
-	IHTMLDocument2* pDocument;
-	IHTMLWindow2*	pWindow;
-	CComBSTR		lang = L"JScript";
-	CComBSTR		code = lpszScript;
-
-	if(pDispatch = GetHtmlDocument())
-	{
-		hr = pDispatch->QueryInterface(IID_IHTMLDocument2, (void**)&pDocument);
-
-		if(SUCCEEDED(hr))
-		{
-			hr = pDocument->get_parentWindow(&pWindow);
-
-			if(SUCCEEDED(hr))
-			{
-				VARIANT var;
-				hr = pWindow->execScript(code, lang, &var);
-				pWindow->Release();
-			}
-
-			pDocument->Release();
-		}
-
-		pDispatch->Release();
+	if (m_webView) {
+		m_webView->ExecuteScript(lpszScript,
+			Microsoft::WRL::Callback
+			<ICoreWebView2ExecuteScriptCompletedHandler>(
+				[this](HRESULT errorCode, LPCWSTR resultObjectAsJson)->HRESULT {
+					return S_OK;
+				}
+		).Get());
+		return TRUE;
 	}
-	return SUCCEEDED(hr);*/
-	return S_OK;
+
+	return FALSE;
 }
 
 void CHtml::SetBlockNewWindow(BOOL bBlock){
 	m_bBlockNewWindow = bBlock;
-}
-
-HRESULT CHtml::ExecFormCommand(const GUID *pGuid, long cmdID, long cmdExecOpt, VARIANT* pInVar, VARIANT* pOutVar) const 
-{ 
-	/*CComQIPtr <IHTMLDocument2> spDoc(GetHtmlDocument());
-	HRESULT hr = E_FAIL; 
-
-	if (spDoc) 
-	{ 
-		CComQIPtr <IOleCommandTarget> spCmdTarg = spDoc; 
-		if (spCmdTarg) 
-			hr = spCmdTarg-> Exec (pGuid, cmdID, cmdExecOpt, pInVar, pOutVar); 
-		else 
-			hr = E_NOINTERFACE; 
-	}
-	return hr;*/
-	return S_OK;
-}
-
-HRESULT CHtml::ExecFormCommand(long cmdID, long cmdExecOpt, VARIANT* pInVar, VARIANT* pOutVar) const 
-{ 
-	//return ExecFormCommand (&CGID_MSHTML, cmdID, cmdExecOpt, pInVar, pOutVar);
-	return S_OK;
-}
-
-BOOL CHtml::CheckVisible(void){
-	/*if (!IsWindowVisible()) {
-		SetCurrentCopynPasteAction(FALSE);
-		return FALSE;
-	}*/
-	return TRUE;
-}
-
-void CHtml::OnAccel(ACCEL_CODE code){
-	if(!CheckVisible()) return;
-	switch(code){
-	case ACCEL_CODE_COPY:		ExecFormCommand (IDM_COPY, OLECMDEXECOPT_DODEFAULT);		break;
-	case ACCEL_CODE_PASTE:		ExecFormCommand (IDM_PASTE, OLECMDEXECOPT_DODEFAULT);		break;
-	case ACCEL_CODE_CUT:		ExecFormCommand (IDM_CUT, OLECMDEXECOPT_DODEFAULT);			break;
-	case ACCEL_CODE_UNDO:		ExecFormCommand (IDM_UNDO, OLECMDEXECOPT_DODEFAULT);		break;
-	case ACCEL_CODE_SELECTALL:	ExecFormCommand (IDM_SELECTALL, OLECMDEXECOPT_DODEFAULT);	break;
-	//case ACCEL_CODE_PRINT:		ExecFormCommand (IDM_PRINTPREVIEW, OLECMDEXECOPT_PROMPTUSER);	break;
-	//case ACCEL_CODE_SAVE:		ExecFormCommand (IDM_SAVEAS, OLECMDEXECOPT_DODEFAULT);		break;
-	/*case ACCEL_CODE_TOGGLE_FULLSCREEN:
-		SetFullScreen(!GetFullScreen());	// ie 만 되는 컨트롤
-		break;*/
-	}
 }
 
 void CHtml::OnNewWindow2(LPDISPATCH* ppDisp, BOOL* Cancel){
@@ -278,488 +245,18 @@ void CHtml::OnNewWindow2(LPDISPATCH* ppDisp, BOOL* Cancel){
 	CHtmlView::OnNewWindow2(ppDisp, Cancel);*/
 }
 
-BOOL CHtml::PreTranslateMessage(MSG* pMsg) {
-	/*
-	if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE))
-	{
-		::TranslateMessage(pMsg);
-	}
-	return CHtmlView::PreTranslateMessage(pMsg);
-	*/
-	return S_OK;
-}
-
 BOOL CHtml::PutText(CString strFormName, CString strObjectID, CString strPutText){
-	/*CComPtr<IDispatch> pDisp = NULL;
-	CComPtr<IDispatch> pActiveDisp		= NULL;
-	CComPtr<IHTMLDocument2> pDispDoc2	= NULL;
-	CComPtr<IHTMLFormElement> pForm		= NULL;
-	HRESULT hr;
 
-	if(!(pDisp = GetHtmlDocument())){
-		return FALSE;
-	}
-// 	hr = m_pWebBrowser2->get_Document(&pDisp);
-// 	if(FAILED(hr) || !pDisp)
-// 		return FALSE;
-
-	hr = pDisp->QueryInterface(IID_IHTMLDocument2, (void**)&pDispDoc2);
-
-	long nForms = 0;
-	CComPtr<IHTMLElementCollection> pFormCollection=NULL;
-	hr = pDispDoc2->get_forms(&pFormCollection);
-	if(FAILED(hr) || !pFormCollection)
-		return FALSE;
-
-	hr = pFormCollection->get_length(&nForms);
-	if(FAILED(hr))
-		return FALSE;
-
-	CComPtr<IDispatch> pDispForm = NULL;
-
-	hr = pFormCollection->item(COleVariant(strFormName.AllocSysString(), VT_BSTR), COleVariant((long)0), &pDispForm);
-
-
-	if(FAILED(hr) || !pDispForm)
-	{
-		BOOL bSuccess = FALSE;
-		CComPtr<IOleContainer> pContainer = NULL;
-
-		//Get the container
-		hr = pDisp->QueryInterface(IID_IOleContainer, (void**)&pContainer);
-		if (FAILED(hr) || !pContainer)
-			return FALSE;
-
-		CComPtr<IEnumUnknown> pEnumerator = NULL;
-		//프레임 목록을 구한다
-		hr = pContainer->EnumObjects(OLECONTF_EMBEDDINGS, &pEnumerator);
-		if (FAILED(hr) || !pEnumerator)
-			return FALSE;
-
-		IUnknown* pUnk = NULL;
-		ULONG uFetched = 0;
-
-		//프레임목록을 순회
-		for (UINT i = 0; S_OK == pEnumerator->Next(1, &pUnk, &uFetched); i++)
-		{
-			CComPtr<IWebBrowser2> pBrowser = NULL;
-
-			hr = pUnk->QueryInterface(IID_IWebBrowser2, (void**)&pBrowser);
-
-			if (SUCCEEDED(hr) && pBrowser)
-			{
-
-				CComPtr<IDispatch> pFrameDisp = NULL;
-				CComPtr<IHTMLDocument2> pFrameDoc2 = NULL;
-				CComPtr<IHTMLElementCollection> pFrameFormCollection=NULL;
-				CComPtr<IDispatch> pFrameDispForm = NULL;
-
-				hr = pBrowser->get_Document(&pFrameDisp);
-				if(FAILED(hr) && !pFrameDisp)
-					continue;
-				hr = pFrameDisp->QueryInterface(IID_IHTMLDocument2, (void**)&pFrameDoc2);
-				if(FAILED(hr) || !pFrameDoc2)
-					continue;
-
-				hr = pFrameDoc2->get_forms(&pFrameFormCollection);
-				if(FAILED(hr) || !pFrameFormCollection)
-					continue;
-
-				hr = pFrameFormCollection->get_length(&nForms);
-				if(FAILED(hr))
-					continue;
-
-				hr = pFrameFormCollection->item(COleVariant(strFormName.AllocSysString(), VT_BSTR), COleVariant((long)0), &pFrameDispForm);
-				if(FAILED(hr) || !pFrameDispForm)
-					continue;
-
-				hr = pFrameDispForm->QueryInterface(IID_IHTMLFormElement, (void**)&pForm);
-				if(FAILED(hr) || !pForm)
-					continue;
-
-				bSuccess = TRUE;
-				break;
-			}
-
-			pUnk->Release();
-			pUnk = NULL;
-		}
-
-		if(!bSuccess)
-			return FALSE;
-	}
-	else
-	{
-		hr = pDispForm->QueryInterface(IID_IHTMLFormElement, (void**)&pForm);
-		if(FAILED(hr) || !pForm)
-			return FALSE;
-	}
-
-	if(!pForm)
-		return FALSE;
-
-	CComPtr<IHTMLInputTextElement> pInputElem = NULL;
-	CComPtr<IDispatch> pDispInputForm = NULL;
-
-	hr = pForm->item(COleVariant(strObjectID.AllocSysString()),COleVariant(long(0)),&pDispInputForm);
-	if(FAILED(hr) || !pDispInputForm)
-		return FALSE;
-	
-	hr = pDispInputForm->QueryInterface(IID_IHTMLInputTextElement, (void**)&pInputElem);
-	if(FAILED(hr) || !pInputElem)
-		return FALSE;
-
-	CComBSTR bstrPutText(strPutText);
-	pInputElem->select();
-	pInputElem->put_value( bstrPutText );//텍스트 입력
-	*/
 	return TRUE;
 }
 
 BOOL CHtml::GetText(CString strFormName, CString strObjectID, CString& lpszText){
-	/*
-	CComPtr<IDispatch> pDisp			= NULL;
-	CComPtr<IDispatch> pActiveDisp		= NULL;
-	CComPtr<IHTMLDocument2> pDispDoc2	= NULL;
-	CComPtr<IHTMLFormElement> pForm		= NULL;
-	HRESULT hr;
 
-	if(!(pDisp = GetHtmlDocument())){
-		return FALSE;
-	}
-	// 	hr = m_pWebBrowser2->get_Document(&pDisp);
-	// 	if(FAILED(hr) || !pDisp)
-	// 		return FALSE;
-
-	hr = pDisp->QueryInterface(IID_IHTMLDocument2, (void**)&pDispDoc2);
-
-	long nForms = 0;
-	CComPtr<IHTMLElementCollection> pFormCollection=NULL;
-	hr = pDispDoc2->get_forms(&pFormCollection);
-	if(FAILED(hr) || !pFormCollection)
-		return FALSE;
-
-	hr = pFormCollection->get_length(&nForms);
-	if(FAILED(hr))
-		return FALSE;
-
-	CComPtr<IDispatch> pDispForm = NULL;
-
-	hr = pFormCollection->item(COleVariant(strFormName.AllocSysString(), VT_BSTR), COleVariant((long)0), &pDispForm);
-
-
-	if(FAILED(hr) || !pDispForm)
-	{
-		BOOL bSuccess = FALSE;
-		CComPtr<IOleContainer> pContainer = NULL;
-
-		//Get the container
-		hr = pDisp->QueryInterface(IID_IOleContainer, (void**)&pContainer);
-		if (FAILED(hr) || !pContainer)
-			return FALSE;
-
-		CComPtr<IEnumUnknown> pEnumerator = NULL;
-		//프레임 목록을 구한다
-		hr = pContainer->EnumObjects(OLECONTF_EMBEDDINGS, &pEnumerator);
-		if (FAILED(hr) || !pEnumerator)
-			return NULL;
-
-		IUnknown* pUnk = NULL;
-		ULONG uFetched = 0;
-
-		//프레임목록을 순회
-		for (UINT i = 0; S_OK == pEnumerator->Next(1, &pUnk, &uFetched); i++)
-		{
-			CComPtr<IWebBrowser2> pBrowser = NULL;
-
-			hr = pUnk->QueryInterface(IID_IWebBrowser2, (void**)&pBrowser);
-
-			if (SUCCEEDED(hr) && pBrowser)
-			{
-
-				CComPtr<IDispatch> pFrameDisp = NULL;
-				CComPtr<IHTMLDocument2> pFrameDoc2 = NULL;
-				CComPtr<IHTMLElementCollection> pFrameFormCollection=NULL;
-				CComPtr<IDispatch> pFrameDispForm = NULL;
-
-				hr = pBrowser->get_Document(&pFrameDisp);
-				if(FAILED(hr) && !pFrameDisp)
-					continue;
-				hr = pFrameDisp->QueryInterface(IID_IHTMLDocument2, (void**)&pFrameDoc2);
-				if(FAILED(hr) || !pFrameDoc2)
-					continue;
-
-				hr = pFrameDoc2->get_forms(&pFrameFormCollection);
-				if(FAILED(hr) || !pFrameFormCollection)
-					continue;
-
-				hr = pFrameFormCollection->get_length(&nForms);
-				if(FAILED(hr))
-					continue;
-
-				hr = pFrameFormCollection->item(COleVariant(strFormName.AllocSysString(), VT_BSTR), COleVariant((long)0), &pFrameDispForm);
-				if(FAILED(hr) || !pFrameDispForm)
-					continue;
-
-				hr = pFrameDispForm->QueryInterface(IID_IHTMLFormElement, (void**)&pForm);
-				if(FAILED(hr) || !pForm)
-					continue;
-
-				bSuccess = TRUE;
-				break;
-			}
-
-			pUnk->Release();
-			pUnk = NULL;
-		}
-
-		if(!bSuccess)
-			return NULL;
-	}
-	else
-	{
-		hr = pDispForm->QueryInterface(IID_IHTMLFormElement, (void**)&pForm);
-		if(FAILED(hr) || !pForm)
-			return FALSE;
-	}
-
-	if(!pForm)
-		return FALSE;
-
-	CComPtr<IHTMLInputTextElement> pInputElem = NULL;
-	CComPtr<IDispatch> pDispInputForm = NULL;
-
-	hr = pForm->item(COleVariant(strObjectID.AllocSysString()),COleVariant(long(0)),&pDispInputForm);
-	if(FAILED(hr) || !pDispInputForm)
-		return FALSE;
-
-	hr = pDispInputForm->QueryInterface(IID_IHTMLInputTextElement, (void**)&pInputElem);
-	if(FAILED(hr) || !pInputElem)
-		return FALSE;
-
-	pInputElem->select();
-	{
-		CComBSTR bstrPutText;
-		pInputElem->get_value(&bstrPutText);
-		lpszText	= bstrPutText;
-	}
-	*/
 	return TRUE;
 }
 
 BOOL CHtml::ClickButton(LPCTSTR sObjectID)
 {
-	/*
-	CComPtr<IHTMLElement> pElement = NULL;
-	CComPtr<IDispatch> pDisp = NULL;
-	CComPtr<IHTMLDocument3> pDoc3 = NULL;
-	BOOL bSuccess = FALSE;
 
-	HRESULT hr;
-
-	//hr = m_pWebBrowser2->get_Document(&pDisp);
-	if(!(pDisp = GetHtmlDocument()))
-		return FALSE;
-
-
-	hr = pDisp->QueryInterface(IID_IHTMLDocument3, (void **)&pDoc3);
-	if(FAILED(hr) || !pDoc3)
-		return FALSE;
-
-	CComBSTR bstrClickObjectID(sObjectID);
-	hr = pDoc3->getElementById(bstrClickObjectID, &pElement);
-	if(SUCCEEDED(hr) && pElement)
-	{
-		pElement->click();
-		bSuccess = TRUE;
-	}
-	else
-	{
-		CComPtr<IOleContainer> pContainer = NULL;
-
-		//Get the container
-		hr = pDisp->QueryInterface(IID_IOleContainer, (void**)&pContainer);
-		if (FAILED(hr) || !pContainer)//4.64버전 수정
-			return FALSE;
-
-		CComPtr<IEnumUnknown> pEnumerator = NULL;
-		//프레임 목록을 구한다
-		hr = pContainer->EnumObjects(OLECONTF_EMBEDDINGS, &pEnumerator);
-		if (FAILED(hr) || !pEnumerator)
-			return FALSE;
-
-		IUnknown* pUnk = NULL;//CComPtr<IUnknown> pUnk으로 선언하는 경우 에러 발생...디버깅해보니 에러나는 경우 명시적으로 하라고 나와 있음..아마 명시적 메모리 해제 없이 반복문에 사용되다보니 그런게 아닌가 싶음...
-		ULONG uFetched = 0;
-
-		//프레임목록을 순회하면서 화면크기를 구하고 그 중 가장 큰 값을  nFrameWidth, nFrameHeight에 저장한다
-		for (UINT i = 0; S_OK == pEnumerator->Next(1, &pUnk, &uFetched); i++)
-		{
-			CComPtr<IWebBrowser2> pBrowser = NULL;
-
-			hr = pUnk->QueryInterface(IID_IWebBrowser2, (void**)&pBrowser);
-
-			if (SUCCEEDED(hr) && pBrowser)
-			{
-
-				CComPtr<IDispatch> pFrameDisp = NULL;
-				CComPtr<IHTMLDocument3> pFrameDoc = NULL;
-				CComPtr<IHTMLElement> pFrameElem = NULL;
-
-				hr = pBrowser->get_Document(&pFrameDisp);
-				if(FAILED(hr) && !pFrameDisp)
-					continue;
-				hr = pFrameDisp->QueryInterface(IID_IHTMLDocument3, (void**)&pFrameDoc);
-				if(FAILED(hr) || !pFrameDoc)
-					continue;
-
-				hr = pFrameDoc->getElementById(bstrClickObjectID, &pFrameElem);
-				if(FAILED(hr) || !pFrameElem)
-					continue;
-
-				pFrameElem->click();
-				bSuccess = TRUE;
-				break;
-			}
-
-			pUnk->Release();
-			pUnk = NULL;
-		}
-	}
-
-	return bSuccess;
-	*/
 	return S_OK;
-}
-
-BOOL CHtml::RunScript(LPCTSTR sScript){
-	/*
-	CComPtr<IHTMLElement> pElement = NULL;
-	CComPtr<IDispatch> pDisp = NULL;
-	DISPID dispid = NULL;
-	CComPtr<IHTMLDocument2> pDoc2 = NULL;
-	LPDISPATCH pScript = NULL;
-	CComBSTR bstrScriptName(sScript);
-	CStringArray paramArray;
-
-
-	BOOL bSuccess = FALSE;
-
-	HRESULT hr;
-
-	//hr = m_pWebBrowser2->get_Document(&pDisp);
-	if(!(pDisp = GetHtmlDocument()))
-		return FALSE;
-
-
-	hr = pDisp->QueryInterface(IID_IHTMLDocument2, (void **)&pDoc2);
-	if(FAILED(hr) || !pDoc2)
-		return FALSE;
-
-	hr = pDoc2->get_Script(&pScript);
-	if(FAILED(hr) || !pScript)
-		return FALSE;
-
-	hr = pScript->GetIDsOfNames(IID_NULL, &bstrScriptName, 1, LOCALE_SYSTEM_DEFAULT, &dispid);
-
-	if(FAILED(hr) || !pScript)
-	{
-		if(pScript)
-		{
-			pScript->Release();
-			pScript = NULL;
-		}
-
-		CComPtr<IOleContainer> pContainer = NULL;
-
-		//Get the container
-		hr = pDisp->QueryInterface(IID_IOleContainer, (void**)&pContainer);
-		if (FAILED(hr) || !pContainer)
-			return FALSE;
-
-		CComPtr<IEnumUnknown> pEnumerator = NULL;
-		//프레임 목록을 구한다
-		hr = pContainer->EnumObjects(OLECONTF_EMBEDDINGS, &pEnumerator);
-		if (FAILED(hr) || !pEnumerator)
-			return FALSE;
-
-		IUnknown* pUnk = NULL;//CComPtr<IUnknown> pUnk으로 선언하는 경우 에러 발생...디버깅해보니 에러나는 경우 명시적으로 하라고 나와 있음..아마 명시적 메모리 해제 없이 반복문에 사용되다보니 그런게 아닌가 싶음...
-		ULONG uFetched = 0;
-
-		//프레임목록을 순회하면서 화면크기를 구하고 그 중 가장 큰 값을  nFrameWidth, nFrameHeight에 저장한다
-		for (UINT i = 0; S_OK == pEnumerator->Next(1, &pUnk, &uFetched); i++)
-		{
-			CComPtr<IWebBrowser2> pBrowser = NULL;
-
-			hr = pUnk->QueryInterface(IID_IWebBrowser2, (void**)&pBrowser);
-
-			if (SUCCEEDED(hr) && pBrowser)
-			{
-
-				CComPtr<IDispatch> pFrameDisp = NULL;
-				CComPtr<IHTMLDocument2> pFrameDoc2 = NULL;
-				CComPtr<IHTMLElement> pFrameElem = NULL;
-
-				hr = pBrowser->get_Document(&pFrameDisp);
-				if(FAILED(hr) && !pFrameDisp)
-					continue;
-				hr = pFrameDisp->QueryInterface(IID_IHTMLDocument2, (void**)&pFrameDoc2);
-				if(FAILED(hr) || !pFrameDoc2)
-					continue;
-
-				hr = pFrameDoc2->get_Script(&pScript);
-				if(FAILED(hr) || !pScript)
-					continue;
-
-				hr = pScript->GetIDsOfNames(IID_NULL, &bstrScriptName, 1, LOCALE_SYSTEM_DEFAULT, &dispid);
-				if(FAILED(hr) || !pDisp)
-				{
-					pScript->Release();
-					pScript = NULL;
-					continue;
-				}
-
-				bSuccess = TRUE;
-				break;
-			}
-
-			pUnk->Release();
-			pUnk = NULL;
-		}
-
-	}
-
-	if(!pScript || !dispid)
-		return FALSE;
-
-	const int arraySize = (const int)paramArray.GetSize();
-
-	//Putting parameters
-	DISPPARAMS dispparams;
-	memset(&dispparams, 0, sizeof dispparams);
-	dispparams.cArgs      = arraySize;
-	dispparams.rgvarg     = new VARIANT[dispparams.cArgs];
-
-	for( int i = 0; i < arraySize; i++)
-	{
-		CComBSTR bstr = paramArray.GetAt(arraySize - 1 - i); // back reading
-		bstr.CopyTo(&dispparams.rgvarg[i].bstrVal);
-		dispparams.rgvarg[i].vt = VT_BSTR;
-	}
-
-	dispparams.cNamedArgs = 0;
-
-
-	EXCEPINFO excepInfo;
-	memset(&excepInfo, 0, sizeof excepInfo);
-	CComVariant vaResult;
-	UINT nArgErr = (UINT)-1; // initialize to invalid arg
-	//JavaScript 실행
-	hr = pScript->Invoke(dispid, IID_NULL, 0, DISPATCH_METHOD,&dispparams, &vaResult, &excepInfo, &nArgErr);
-	delete [] dispparams.rgvarg;
-	pScript->Release();
-
-	if(FAILED(hr))
-		return FALSE;
-	*/
-	return TRUE;
 }

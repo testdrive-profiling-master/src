@@ -6,7 +6,6 @@
 #include <functional>
 #include <ole2.h>
 #include <vector>
-#include "ComponentBase.h"
 
 class CHtmlCtrl;
 
@@ -16,8 +15,7 @@ class CHtmlCtrl;
 namespace winrtComp = winrt::Windows::UI::Composition;
 #endif
 
-class CHtml :
-	public AccelCodeDecoder
+class CHtml
 {
 public:
 	CHtml(void);
@@ -26,8 +24,6 @@ public:
 	void Initialize(CWnd* pParent);
 	void Navigate(LPCTSTR lpszURL, LPCTSTR lpszTargetFrame);
 
-	virtual void PostNcDestroy(){}
-	virtual void OnDocumentComplete(LPCTSTR lpszURL);
 	virtual void OnBeforeNavigate2(LPCTSTR lpszURL, DWORD nFlags,
 		LPCTSTR lpszTargetFrameName, CByteArray& baPostedData,
 		LPCTSTR lpszHeaders, BOOL* pbCancel);
@@ -38,10 +34,6 @@ public:
 	BOOL PutText(CString strFormName, CString strObjectID, CString strPutText);
 	BOOL GetText(CString strFormName, CString strObjectID, CString& lpszText);
 	BOOL ClickButton(LPCTSTR sObjectID);
-	BOOL RunScript(LPCTSTR sScript);
-
-	HRESULT ExecFormCommand(const GUID *pGuid, long cmdID, long cmdExecOpt, VARIANT* pInVar, VARIANT* pOutVar) const;
-	HRESULT ExecFormCommand(long cmdID, long cmdExecOpt, VARIANT* pInVar = NULL, VARIANT* pOutVar = NULL) const ;
 
 	ICoreWebView2Controller* GetWebViewController()
 	{
@@ -62,50 +54,31 @@ public:
 	void ResizeEverything(void);
 
 protected:
+	// creation
 	HRESULT OnCreateEnvironmentCompleted(HRESULT result, ICoreWebView2Environment* environment);
 	HRESULT OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebView2Controller* controller);
 
-	BOOL CheckVisible(void);
+	// event
+	EventRegistrationToken	m_NewWindowRequestedToken;
+	EventRegistrationToken	m_navigationStartingToken;
+	EventRegistrationToken	m_navigationCompletedToken;
+	HRESULT STDMETHODCALLTYPE OnNewWindowRequested(ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args);
+	HRESULT STDMETHODCALLTYPE OnNavigationStart(ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args);
+	HRESULT STDMETHODCALLTYPE OnNavigationComplete(ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args);
 
-	virtual void OnAccel(ACCEL_CODE code);
 	virtual void OnNewWindow2(LPDISPATCH* ppDisp, BOOL* Cancel);
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 	DWORD				m_dwID;
 	BOOL				m_bBlockNewWindow;
 	ITDHtmlManager*		m_pManager;
 	CWnd*				m_pParent;
+	BOOL				m_bInitialized;
 
-	//DECLARE_MESSAGE_MAP()
-	//afx_msg int OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message);
-
-	// WebView2
-	template <class ComponentType, class... Args> void NewComponent(Args&&... args);
-	template <class ComponentType> ComponentType* GetComponent();
-
-	DWORD m_creationModeId;
 	Microsoft::WRL::ComPtr<ICoreWebView2Environment> m_webViewEnvironment;
 	Microsoft::WRL::ComPtr<ICoreWebView2Controller> m_controller;
 	Microsoft::WRL::ComPtr<ICoreWebView2> m_webView;
 	Microsoft::WRL::ComPtr<IDCompositionDevice> m_dcompDevice;
-	std::vector<std::unique_ptr<ComponentBase>> m_components;
-	
+
+private:
 	HRESULT DCompositionCreateDevice2(IUnknown* renderingDevice, REFIID riid, void** ppv);
 };
-
-template <class ComponentType, class... Args> void CHtml::NewComponent(Args&&... args)
-{
-	m_components.emplace_back(new ComponentType(std::forward<Args>(args)...));
-}
-
-template <class ComponentType> ComponentType* CHtml::GetComponent()
-{
-	for (auto& component : m_components)
-	{
-		if (auto wanted = dynamic_cast<ComponentType*>(component.get()))
-		{
-			return wanted;
-		}
-	}
-	return nullptr;
-}

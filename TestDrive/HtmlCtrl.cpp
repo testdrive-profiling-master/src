@@ -24,20 +24,10 @@ CHtmlCtrl::~CHtmlCtrl(void)
 }
 
 BEGIN_MESSAGE_MAP(CHtmlCtrl, CViewObject)
-	//ON_WM_PAINT()
 END_MESSAGE_MAP()
-
-// void CHtmlCtrl::OnPaint(void){
-// 	m_Html.RedrawWindow();
-// }
 
 void CHtmlCtrl::UpdateLayout(void){
 	SetWindowPos(NULL, m_Layout.ViewX(), m_Layout.ViewY(), m_Layout.ViewWidth(), m_Layout.ViewHeight(), SWP_NOACTIVATE | SWP_NOZORDER);
-	/*if (IsWindow(m_Html.m_hWnd))
-	{
-		m_Html.SetWindowPos(NULL, 0, 0, m_Layout.ViewWidth(), m_Layout.ViewHeight(), SWP_NOACTIVATE | SWP_NOZORDER);
-		m_Html.UpdateWindow();
-	}*/
 	m_Html.ResizeEverything();
 }
 
@@ -50,14 +40,6 @@ BOOL CHtmlCtrl::Create(CWnd* pParentWnd){
 	m_Layout.GetViewRect(&rc);
 	if(!CWnd::Create(NULL, NULL, WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE | WS_CLIPSIBLINGS, rc, pParentWnd, GetLastWindowID(pParentWnd))) return FALSE;
 	BringWindowToTop();
-
-	/* {
-		RECT rc;
-		CWnd::GetClientRect(&rc);
-		m_Html.Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, rc, this, AFX_IDW_PANE_FIRST);
-		m_Html.SetSilent(TRUE);
-		m_Html.SetRegisterAsBrowser(TRUE);
-	}*/
 
 	m_Html.Initialize(this);
 
