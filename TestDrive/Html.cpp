@@ -155,7 +155,9 @@ HRESULT CHtml::OnNavigationStart(ICoreWebView2* sender, ICoreWebView2NavigationS
 	if (m_pManager) {
 		wil::unique_cotaskmem_string uri;
 		args->get_Uri(&uri);
-		LPCTSTR lpszURL = m_pManager->OnHtmlBeforeNavigate(m_dwID, uri.get());
+
+		CString	sURL(uri.get());
+		LPCTSTR lpszURL = m_pManager->OnHtmlBeforeNavigate(m_dwID, sURL);
 
 		if (!lpszURL) {
 			args->put_Cancel(TRUE);
@@ -166,9 +168,13 @@ HRESULT CHtml::OnNavigationStart(ICoreWebView2* sender, ICoreWebView2NavigationS
 
 HRESULT CHtml::OnNavigationComplete(ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) {
 	if (m_pManager) {
-		wil::unique_cotaskmem_string uri;
-		m_webView->get_Source(&uri);
-		m_pManager->OnHtmlDocumentComplete(m_dwID, uri.get());
+		BOOL success;
+		args->get_IsSuccess(&success);
+		if (success) {
+			wil::unique_cotaskmem_string uri;
+			m_webView->get_Source(&uri);
+			m_pManager->OnHtmlDocumentComplete(m_dwID, uri.get());
+		}
 	}
 
 	return S_OK;
