@@ -23,7 +23,8 @@ static char THIS_FILE[] = __FILE__;
 CHtml::CHtml(void) : m_pManager(NULL), m_dwID(0), m_bBlockNewWindow(FALSE), m_pParent(NULL), m_bInitialized(FALSE),
 	m_NewWindowRequestedToken({0}),
 	m_navigationStartingToken({0}),
-	m_navigationCompletedToken({0})
+	m_navigationCompletedToken({0}),
+	m_WebMessageReceivedToken({0})
 {
 }
 
@@ -137,6 +138,11 @@ HRESULT CHtml::OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebV
 			Microsoft::WRL::Callback
 			<ICoreWebView2NavigationCompletedEventHandler>(this, &CHtml::OnNavigationComplete).Get(),
 			& m_navigationCompletedToken);
+
+		m_webView->add_WebMessageReceived(
+			Microsoft::WRL::Callback
+			<ICoreWebView2WebMessageReceivedEventHandler>(this, &CHtml::OnWebMessageReceived).Get(),
+			&m_WebMessageReceivedToken);
 	}
 	else
 	{
@@ -177,6 +183,21 @@ HRESULT CHtml::OnNavigationComplete(ICoreWebView2* sender, ICoreWebView2Navigati
 		}
 	}
 
+	return S_OK;
+}
+
+HRESULT CHtml::OnWebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) {
+	if (m_pManager) {
+		wil::unique_cotaskmem_string uri;
+		args->get_Source(&uri);
+		wil::unique_cotaskmem_string messageRaw;
+		args->TryGetWebMessageAsString(&messageRaw);
+		CString	sMessage = messageRaw.get();
+		sMessage = m_pManager->OnHtmlWebMessageReceived(m_dwID, sMessage);
+		if (!sMessage.IsEmpty()) {
+			sender->PostWebMessageAsJson(sMessage);
+		}
+	}
 	return S_OK;
 }
 
