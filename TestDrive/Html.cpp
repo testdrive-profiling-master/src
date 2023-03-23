@@ -240,7 +240,7 @@ void CHtml::SetManager(ITDHtmlManager* pManager, DWORD dwID){
 }
 
 BOOL CHtml::CallJScript(LPCTSTR lpszScript){
-	if (m_webView) {
+	if (m_webView && m_bInitialized) {
 		m_webView->ExecuteScript(lpszScript,
 			Microsoft::WRL::Callback
 			<ICoreWebView2ExecuteScriptCompletedHandler>(
