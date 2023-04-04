@@ -459,20 +459,22 @@ void CRedirectExecute::AppendText(LPCTSTR Text)
 						}
 					}else{
 						int iID = (int)pToken->GetID();
-						// 음수(에러코드) 우선
-						if(!m_iErrorCode) m_iErrorCode	= iID;
-						else
-						if(iID < 0){
-							if(iID < m_iErrorCode)	m_iErrorCode	= iID;
-						}else
-						if(iID > 0){
-							if(m_iErrorCode > 0 && iID > m_iErrorCode)	m_iErrorCode	= iID;
+						if (iID != INT_MAX) {
+							// 음수(에러코드) 우선
+							if (!m_iErrorCode) m_iErrorCode = iID;
+							else if (iID < 0) {
+								if (iID < m_iErrorCode)	m_iErrorCode = iID;
+							}
+							else if (iID > 0) {
+								if (m_iErrorCode > 0 && iID > m_iErrorCode)	m_iErrorCode = iID;
+							}
 						}
 
 						if(m_fLogFunc) m_fLogFunc(msg, iID);
 						else{
-							m_pMsg->LogOut(msg, iID < 0 ? RGB(255, 0, 0) : RGB(0, 0, 255));
-							g_Output[COutput::TD_OUTPUT_NOTIFY].LogOut(msg, iID < 0 ? RGB(255, 0, 0) : RGB(0, 0, 255));
+							DWORD dwColor = (iID == INT_MAX) ? RGB(255,85,0) : (iID < 0 ? RGB(255, 0, 0) : RGB(0, 0, 255));
+							m_pMsg->LogOut(msg, dwColor);
+							g_Output[COutput::TD_OUTPUT_NOTIFY].LogOut(msg, dwColor);
 						}
 					}
 					break;

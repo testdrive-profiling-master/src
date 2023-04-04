@@ -304,7 +304,7 @@ DWORD StrGetBinary(TCHAR* token)
 
 BOOL CPaser::GetTokenInt(int* token_int)
 {
-	TCHAR temp[256];
+	TCHAR temp[1024];
 	TD_TOKEN_TYPE	type = GetToken(temp);
 	switch(type){
 	case TD_TOKEN_INT:

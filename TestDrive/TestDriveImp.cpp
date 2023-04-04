@@ -1365,7 +1365,19 @@ NO_PROFILE_NAME:
 										goto ERROR_OCCUR;
 									}
 									if(paser.TokenOut(TD_DELIMITER_COLON)){
-										paser.GetTokenInt(&error_code);
+										TCHAR sCode[MAX_PATH];
+										switch (paser.GetToken(sCode)) {
+										case TD_TOKEN_INT:
+											error_code	= StrToInt(temp);
+											break;
+										case TD_TOKEN_NAME:
+											if (!_tcscmp(sCode, _T("W"))) {
+												error_code = INT_MAX;
+											} else goto ERROR_OCCUR;
+											break;
+										default:
+											goto ERROR_OCCUR;
+										}
 									}
 									pExec->AddErrorToken(temp, error_code);
 								}

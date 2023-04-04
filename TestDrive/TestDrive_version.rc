@@ -1,6 +1,6 @@
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,4,2
- PRODUCTVERSION 2,1,4,2
+ FILEVERSION 2,1,4,3
+ PRODUCTVERSION 2,1,4,3
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -17,12 +17,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "HyungKi Jeong (clonextop@gmail.com)"
             VALUE "FileDescription", "TestDrive Profiling Master 2nd Edition"
-            VALUE "FileVersion", "2.1.4 - 2nd release"
+            VALUE "FileVersion", "2.1.4 - 3rd release"
             VALUE "InternalName", "TestDrive.exe"
             VALUE "LegalCopyright", "HyungKi Jeong (clonextop@gmail.com).  All rights reserved."
             VALUE "OriginalFilename", "TestDrive.exe"
             VALUE "ProductName", "TestDrive Profiling Master 2nd Edition"
-            VALUE "ProductVersion", "2.1.4 - 2nd release"
+            VALUE "ProductVersion", "2.1.4 - 3rd release"
         END
     END
     BLOCK "VarFileInfo"
@@ -34,5 +34,5 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_PROJECT_VERSION      "2.1.4 - 2nd release"
+    ID_PROJECT_VERSION      "2.1.4 - 3rd release"
 END
