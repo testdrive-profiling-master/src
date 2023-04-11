@@ -269,13 +269,13 @@ RETREAT_MES:
 			//	Append the output to the CEdit control.
 			if(!m_bStopped) AppendText(PipeData);
 			//	Peek and pump messages.
-			PeekAndPump();
+			if (!PeekAndPump()) m_bStopped = TRUE;
 		}else{
 			//	If the child process has completed, break out.
 			if ( WaitForSingleObject(ProcessInfo.hProcess, 0) == WAIT_OBJECT_0 ) break;	//lint !e1924 (warning about C-style cast)
 
 			//	Peek and pump messages.
-			PeekAndPump();
+			if (!PeekAndPump()) m_bStopped = TRUE;
 
 			//	If the user canceled the operation, terminate the process.
 			if ( m_bStopped )
@@ -381,7 +381,7 @@ void CRedirectExecute::ShowLastError(LPCTSTR szText)
 	AppendText(Msg);
 }
 
-void CRedirectExecute::PeekAndPump()
+BOOL CRedirectExecute::PeekAndPump()
 {
 	MSG Msg;
 
@@ -407,13 +407,16 @@ void CRedirectExecute::PeekAndPump()
 			SendKey((char)Msg.wParam);
 		}
 
-		//if(!theApp.PreTranslateMessage(&Msg))
 		if (!g_pMainFrame->PreTranslateMessage(&Msg))
 		{
 			::TranslateMessage(&Msg);
 			::DispatchMessage(&Msg);
 		}
 	}
+
+	if (GetKeyState(VK_CONTROL) < 0 && GetKeyState(_T('Q')) < 0) return FALSE;
+
+	return TRUE;
 }
 
 void CRedirectExecute::AppendText(LPCTSTR Text)

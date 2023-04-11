@@ -26,7 +26,7 @@ public:
 protected:
 	//	member functions
 	void			AppendText(LPCTSTR Text);
-	void			PeekAndPump();
+	BOOL			PeekAndPump();
 	void			SetSleepInterval(DWORD dwMilliseconds);
 	void			ShowLastError(LPCTSTR szText);
 

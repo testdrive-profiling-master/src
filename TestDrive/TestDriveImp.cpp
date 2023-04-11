@@ -744,13 +744,14 @@ BOOL CTestDrive::CppCheck(LPCTSTR lpszPath, LPCTSTR lpszArgs){
 	return TRUE;
 }
 
+#include "MainFrm.h"
 void CTestDrive::PeekAndPumpMessage(void){
 	MSG Msg;
 
 	// mfc ¿ë
 	while(::PeekMessage(&Msg, NULL, 0, 0, PM_NOREMOVE)) {
 	//while(::PeekMessage(&Msg, AfxGetApp()->GetMainWnd()->m_hWnd, 0, 0, PM_NOREMOVE)) {
-		if(!AfxGetApp()->PumpMessage()) {
+		if(!g_pMainFrame->PreTranslateMessage(&Msg)) {
 			//::PostQuitMessage(0);
 			return;
 		}
