@@ -67,7 +67,7 @@ BOOL CDocumentView::Create(CWnd* pParent, LPCTSTR lpszName, CPaser* pPaser){
 	g_PropertyGrid.AddProperty(m_pProperty);
 	m_pProperty->Show(FALSE);
 
-	if(!CWnd::Create(NULL, NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, CRect(0,0,300,300), pParent, 1))
+	if(!CWnd::Create(NULL, NULL, WS_CHILD | WS_VISIBLE | ES_MULTILINE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, CRect(0,0,300,300), pParent, GetLastWindowID(pParent)))
 		return FALSE;
 
 	g_pDocumentList->Add(this);
