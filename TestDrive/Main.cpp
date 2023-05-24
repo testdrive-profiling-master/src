@@ -157,7 +157,15 @@ BOOL CTestDriveApp::InitRegistries(void) {
 		sTESTDRIVE_DIR.Replace(_T('\\'), _T('/'));
 	}
 	// 새로운 변경사항 체크
-	if (GetGlobalEnvironmentVariable(_T("TESTDRIVE_DIR")).Compare(sTESTDRIVE_DIR)) {
+	BOOL bMustElevate = GetGlobalEnvironmentVariable(_T("TESTDRIVE_DIR")).Compare(sTESTDRIVE_DIR);
+	
+	if(!bMustElevate){
+		CString sGTKWavePath;
+		sGTKWavePath.Format(_T("%sbin\\msys64\\ucrt64\\bin\\gtkwave.exe"), InstalledPath());
+		bMustElevate = GetRegistryString(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers"), (LPCTSTR)sGTKWavePath) != _T("~ HIGHDPIAWARE");
+	}
+
+	if (bMustElevate) {
 		// UAC 획득되어야 함.
 		BOOL bElevated = FALSE;
 		UACElevate UAC;
@@ -169,7 +177,6 @@ BOOL CTestDriveApp::InitRegistries(void) {
 				UAC.SelfExecuteWithElevation();
 				return FALSE;
 			}
-
 		}
 	}
 
@@ -196,14 +203,17 @@ BOOL CTestDriveApp::InitRegistries(void) {
 		SetRegistryString(HKEY_CLASSES_ROOT, _T("*\\shell\\hexedit\\command"), NULL, sCommand);
 
 		SetRegistryDWORD(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION"), _T("TestDrive.exe"), 10000);
+
+		CString sProgramPath;
+		sProgramPath.Format(_T("%sbin\\msys64\\ucrt64\\bin\\gtkwave.exe"), InstalledPath());
+		SetRegistryString(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers"), (LPCTSTR)sProgramPath, _T("~ HIGHDPIAWARE"));
+		sProgramPath.Format(_T("%sbin\\HexEdit.exe"), InstalledPath());
+		SetRegistryString(HKEY_CURRENT_USER, _T("Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers"), (LPCTSTR)sProgramPath, _T("~ HIGHDPIAWARE"));
 	}
 	// MinGW 환경 추가
 	ModifyGlobalEnvironmentPath(CString(InstalledPath()) + _T("bin\\msys64\\usr\\bin"), _T("\\msys64\\usr\\bin"));
 	ModifyGlobalEnvironmentPath(CString(InstalledPath()) + _T("bin\\msys64\\mingw64\\bin"), _T("\\msys64\\mingw64\\bin"));
 	ModifyGlobalEnvironmentPath(CString(InstalledPath()) + _T("bin\\msys64\\ucrt64\\bin"), _T("\\msys64\\ucrt64\\bin"));
-
-	// 이전 deprecated 제거
-	//ModifyGlobalEnvironmentPath(NULL, CString(InstalledPath()) + _T("bin\\MinGW\\bin"));
 
 	return TRUE;
 }

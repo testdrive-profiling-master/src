@@ -53,6 +53,33 @@ BOOL SetRegistryDWORD(HKEY hKey, LPCTSTR sKeyPath, LPCTSTR sName, DWORD dwValue)
 	return TRUE;
 }
 
+CString GetRegistryString(HKEY hKey, LPCTSTR sKeyPath, LPCTSTR sName)
+{
+	CString sValue;
+	HKEY key;
+	if (RegOpenKeyEx(hKey, sKeyPath, 0, KEY_ALL_ACCESS, &key) != ERROR_SUCCESS) {
+		if (RegCreateKeyEx(hKey, sKeyPath, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, NULL) != ERROR_SUCCESS)
+			return FALSE;
+	}
+	{
+		DWORD type;
+		TCHAR sData[4096];
+		DWORD ret_size = sizeof(TCHAR) * 4096;
+
+#ifdef XP_COMPATIBILITY
+		if (SHRegGetValue(key, NULL, sName, SRRF_RT_REG_SZ, &type, sData, &ret_size) != ERROR_SUCCESS)
+#else
+		if (RegGetValue(key, NULL, sName, RRF_RT_REG_SZ, &type, sData, &ret_size) != ERROR_SUCCESS)
+#endif
+			sData[0] = NULL;
+			
+		sValue = sData;
+
+		RegCloseKey(key);
+	}
+	return sValue;
+}
+
 BOOL SetRegistryString(HKEY hKey, LPCTSTR sKeyPath, LPCTSTR sName, LPCTSTR sValue){
 	CString sNewValue(sValue);
 	HKEY key;
@@ -63,17 +90,17 @@ BOOL SetRegistryString(HKEY hKey, LPCTSTR sKeyPath, LPCTSTR sName, LPCTSTR sValu
 	{
 		DWORD type;
 		BOOL bUpdate	= FALSE;
-		TCHAR path[1024];
-		DWORD ret_size	= sizeof(TCHAR)*1024;
+		TCHAR sData[4096];
+		DWORD ret_size	= sizeof(TCHAR)* 4096;
 
 #ifdef XP_COMPATIBILITY
-		if(SHRegGetValue(key, NULL, sName, SRRF_RT_REG_SZ, &type, path, &ret_size) != ERROR_SUCCESS)
+		if(SHRegGetValue(key, NULL, sName, SRRF_RT_REG_SZ, &type, sData, &ret_size) != ERROR_SUCCESS)
 #else
-		if(RegGetValue(key, NULL, sName, RRF_RT_REG_SZ, &type, path, &ret_size) != ERROR_SUCCESS)
+		if(RegGetValue(key, NULL, sName, RRF_RT_REG_SZ, &type, sData, &ret_size) != ERROR_SUCCESS)
 #endif
-			path[0] = NULL;
+			sData[0] = NULL;
 
-		if(sNewValue.Compare(path)){
+		if(sNewValue.Compare(sData)){
 			RegSetValueEx(key, sName, 0, REG_SZ, (const BYTE*)((LPCTSTR)sNewValue), (sNewValue.GetLength()+1)*sizeof(TCHAR));
 			bUpdate	= TRUE;
 		}

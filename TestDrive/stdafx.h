@@ -66,6 +66,7 @@
 #define SAFE_FREE(p)			{ if(p) { free(p); (p) = NULL; } }
 
 BOOL SetRegistryDWORD(HKEY hKey, LPCTSTR sKeyPath, LPCTSTR sName, DWORD dwValue);
+CString GetRegistryString(HKEY hKey, LPCTSTR sKeyPath, LPCTSTR sName);
 BOOL SetRegistryString(HKEY hKey, LPCTSTR sKeyPath, LPCTSTR sName, LPCTSTR sValue);
 void SetGlobalEnvironmentVariable(LPCTSTR sName, LPCTSTR sValue);
 CString GetGlobalEnvironmentVariable(LPCTSTR sName);
