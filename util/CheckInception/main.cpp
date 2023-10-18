@@ -16,8 +16,8 @@ typedef enum{
 }TEXT_ENCODING;
 
 typedef struct{
-	int		iSize;
-	char	sBOMCodes[8];
+	int				iSize;
+	unsigned char	sBOMCodes[8];
 }ENCODING_STRUCT;
 
 ENCODING_STRUCT	g_Encoding[TEXT_ENCODING_SIZE]={
@@ -196,7 +196,7 @@ TEXT_ENCODING CheckBOM(FILE* fp){
 		BOOL bFound	= TRUE;
 		fseek(fp, 0, SEEK_SET);
 		for(int t=0;t<g_Encoding[i].iSize;t++){
-			char cData;
+			char cData = 0;
 			fread(&cData, 1, 1,fp);
 			if(cData != g_Encoding[i].sBOMCodes[t]){
 				bFound	= FALSE;
@@ -232,7 +232,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	setlocale(LC_ALL, "English");
 	{	// 문법 읽기
 		FILE*	fp	= fopen(__env.sInception, "rt");
-		char	line[4096];
+		char	line[8192];
 		char	sYear[MAX_PATH];
 		char	sDate[MAX_PATH];
 		char	sTime[MAX_PATH];
@@ -254,11 +254,11 @@ int _tmain(int argc, _TCHAR* argv[])
 			return 0;
 		}
 
-		while(fgets(line, 4096, fp)){
+		while(fgets(line, 8192, fp)){
 			CString* sCheck		= &inception.line[inception.dwCount].check;
 			CString* sExchange	= &inception.line[inception.dwCount].exchange;
 			*sCheck	= line;
-			sCheck->Trim("\r\n");
+			sCheck->TrimRight(" \t\r\n");
 			if(!sCheck->GetLength()) continue;
 
 			*sExchange	= *sCheck;
@@ -306,18 +306,20 @@ int _tmain(int argc, _TCHAR* argv[])
 			if(string_size){
 				{	// 인셉션 비교
 					int		cur_pos	= ftell(fp);
-					char	line[4096];
+					char	line[8192];
 
 					for(DWORD i=0;i<inception.dwCount;i++){
-						if(fgets(line, 4096, fp)){
+						if(fgets(line, 8192, fp)){
 							CString str(line);
-							str.Trim("\r\n");
+							//printf("pre str : '%s'\n", (const char*)str);
+							str.TrimRight(" \t\r\n");
 
 							if(!str.Find(inception.line[i].check)){
 								// check string 일치
 								cur_pos	= ftell(fp);
-								if(str.Compare(inception.line[i].exchange))
-									bModified	= TRUE;
+								if (str.Compare(inception.line[i].exchange)) {
+									bModified = TRUE;
+								}
 							}else{
 								// check string 불일치
 								bModified	= TRUE;
@@ -332,6 +334,12 @@ int _tmain(int argc, _TCHAR* argv[])
 					string_size	-= cur_pos;
 				}
 
+				if (!bModified) {
+					// 아무런 변경사항이 없음.
+					fclose(fp);
+					return 0;
+				}
+
 				if(string_size>0)
 				{	// inception 을 제외한 본문 읽기
 					char* pMem = new char[string_size+1];
@@ -344,11 +352,6 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			
 			fclose(fp);
-		}
-
-		if(!bModified){
-			// 아무런 변경사항이 없음.
-			return 0;
 		}
 
 		{
