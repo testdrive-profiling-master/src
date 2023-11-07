@@ -15,8 +15,9 @@ CMemory::CMemory(void){
 	m_pNext			= NULL;
 
 	// add linked list
-	if(!m_pHead) m_pHead = this;
-	else{
+	if (!m_pHead) {
+		m_pHead = this;
+	} else {
 		CMemory* pMemory = m_pHead;
 		while(pMemory){
 			if(!pMemory->m_pNext){
@@ -31,8 +32,10 @@ CMemory::CMemory(void){
 CMemory::~CMemory(void){
 	Release();
 	// eject linked list
-	if(m_pHead == this) m_pHead = m_pNext;
-	else{
+	if (m_pHead == this) {
+		m_pHead = m_pNext;
+		SetEnvironmentVariable(_T("TESTDRIVE_MEMORY"), NULL);
+	} else {
 		CMemory* pMemory = m_pHead;
 		while(pMemory){
 			if(pMemory->m_pNext == this){
@@ -67,7 +70,12 @@ BOOL CMemory::Create(uint64_t dwByteSize, LPCTSTR lpszName)
 	
 	Release();
 	m_dwMemorySize	= dwByteSize;
-	if(lpszName) m_sName	= lpszName;
+	if (lpszName) {
+		m_sName = lpszName;
+		if (m_pHead == this) {	// first memory
+			SetEnvironmentVariable(_T("TESTDRIVE_MEMORY"), lpszName);
+		}
+	}
 
 	{
 //RETRY_CREATE_MAP:

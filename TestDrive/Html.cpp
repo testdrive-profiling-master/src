@@ -153,7 +153,20 @@ HRESULT CHtml::OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebV
 }
 
 HRESULT CHtml::OnNewWindowRequested(ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args) {
-	// no implementation
+	if (m_pManager) {
+		wil::unique_cotaskmem_string uri;
+		args->get_Uri(&uri);
+
+		BOOL bUserInit;
+		args->get_IsUserInitiated(&bUserInit);
+
+		CString	sURL(uri.get());
+		LPCTSTR lpszURL = m_pManager->OnHtmlNewWindowRequest(m_dwID, sURL, bUserInit);
+
+		if (!lpszURL) {
+			args->put_Handled(TRUE);	// cancel default behaviour
+		}
+	}
 	return S_OK;
 }
 
