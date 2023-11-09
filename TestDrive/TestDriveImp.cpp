@@ -1836,3 +1836,42 @@ ERROR_OCCUR:
 
 		return FALSE;
 }
+
+static LPCTSTR __sAppName		= _T("TESTDRIVE");
+static LPCTSTR __sConfigFile	= _T("%s/testdrive.ini");
+
+int CTestDrive::GetConfigInt(LPCTSTR sKey, int iDefault) {
+	CString sConfigPath;
+	sConfigPath.Format(__sConfigFile, InstalledPath());
+
+	return GetPrivateProfileInt(__sAppName, sKey, iDefault, sConfigPath);
+}
+
+void CTestDrive::SetConfigInt(LPCTSTR sKey, int iData) {
+	CString sConfigPath, sData;
+	sConfigPath.Format(__sConfigFile, InstalledPath());
+	sData.Format(_T("%d"), iData);
+
+	WritePrivateProfileString(__sAppName, sKey, sData, sConfigPath);
+}
+
+CString CTestDrive::GetConfigString(LPCTSTR sKey) {
+	CString sConfigPath, sRet;
+	sConfigPath.Format(__sConfigFile, InstalledPath());
+
+	int iSize = GetPrivateProfileString(__sAppName, sKey, NULL, NULL, 0, sConfigPath);
+
+	if (iSize > 0) {
+		GetPrivateProfileString(__sAppName, sKey, NULL, sRet.GetBuffer(iSize + 1), iSize + 1, sConfigPath);
+		return (LPCTSTR)sRet;
+	}
+
+	return _T("");
+}
+
+void CTestDrive::SetConfigString(LPCTSTR sKey, LPCTSTR sData) {
+	CString sConfigPath;
+	sConfigPath.Format(__sConfigFile, InstalledPath());
+	
+	WritePrivateProfileString(__sAppName, sKey, sData, sConfigPath);
+}

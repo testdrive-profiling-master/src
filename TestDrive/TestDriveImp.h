@@ -66,6 +66,13 @@ public:
 	STDMETHOD_(BOOL, ReplaceText)(LPCTSTR lpszTargetFile, LPCTSTR lpszReplaceDescFile);
 	STDMETHOD_(BOOL, SearchSubPathFile)(LPCTSTR sSearchPath, LPCTSTR sFileName, SEARCH_FILE_FUNCTION SearchFunc, LPVOID pData);
 
+	// Config
+	STDMETHOD_(int, GetConfigInt)(LPCTSTR sKey, int iDefault = 0);
+	STDMETHOD_(void, SetConfigInt)(LPCTSTR sKey, int iData);
+	STDMETHOD_(CString, GetConfigString)(LPCTSTR sKey);
+	STDMETHOD_(void, SetConfigString)(LPCTSTR sKey, LPCTSTR sData);
+
+
 	// project
 	BOOL OpenProject(LPCTSTR szFileName = NULL);
 	BOOL CloseProject(BOOL bPreserveMessage = FALSE);
