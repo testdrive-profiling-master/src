@@ -102,6 +102,9 @@ protected:	// local
 
 	BOOL				m_bRunning;
 	BOOL				m_bProjectOpen;
+
+private:
+	BOOL GetEnvString(LPCTSTR sKey, CString& sAppName, CString& sKeyName, CString& sEnvPath);
 };
 
 // Single TestDrive object

@@ -1839,39 +1839,54 @@ ERROR_OCCUR:
 
 static LPCTSTR __sAppName		= _T("TESTDRIVE");
 static LPCTSTR __sConfigFile	= _T("%s/testdrive.ini");
+static LPCTSTR __sEnvDelim		= _T("@");
+
+BOOL CTestDrive::GetEnvString(LPCTSTR sKey, CString& sAppName, CString& sKeyName, CString& sEnvPath) {
+	if (!sKey) return FALSE;
+	CString sCode(sKey);
+	sEnvPath.Format(__sConfigFile, InstalledPath());
+	int iPos = 0;
+	sKeyName = sCode.Tokenize(__sEnvDelim, iPos);
+	sAppName = sCode.Tokenize(__sEnvDelim, iPos);
+	if (sKeyName.IsEmpty()) return FALSE;
+	if (sAppName.IsEmpty()) sAppName = __sAppName;
+
+	return TRUE;
+}
 
 int CTestDrive::GetConfigInt(LPCTSTR sKey, int iDefault) {
-	CString sConfigPath;
-	sConfigPath.Format(__sConfigFile, InstalledPath());
+	CString sAppName, sKeyName, sEnvPath;
+	if (!GetEnvString(sKey, sAppName, sKeyName, sEnvPath)) return iDefault;
 
-	return GetPrivateProfileInt(__sAppName, sKey, iDefault, sConfigPath);
+	return GetPrivateProfileInt(sAppName, sKeyName, iDefault, sEnvPath);
 }
 
 void CTestDrive::SetConfigInt(LPCTSTR sKey, int iData) {
-	CString sConfigPath, sData;
-	sConfigPath.Format(__sConfigFile, InstalledPath());
+	CString sAppName, sKeyName, sEnvPath;
+	if (!GetEnvString(sKey, sAppName, sKeyName, sEnvPath)) return;
+
+	CString sData;
 	sData.Format(_T("%d"), iData);
 
-	WritePrivateProfileString(__sAppName, sKey, sData, sConfigPath);
+	WritePrivateProfileString(sAppName, sKeyName, sData, sEnvPath);
 }
 
 CString CTestDrive::GetConfigString(LPCTSTR sKey) {
-	CString sConfigPath, sRet;
-	sConfigPath.Format(__sConfigFile, InstalledPath());
+	CString sAppName, sKeyName, sEnvPath;
+	if (sKey && GetEnvString(sKey, sAppName, sKeyName, sEnvPath)) {
+		CString sRet;
 
-	int iSize = GetPrivateProfileString(__sAppName, sKey, NULL, NULL, 0, sConfigPath);
-
-	if (iSize > 0) {
-		GetPrivateProfileString(__sAppName, sKey, NULL, sRet.GetBuffer(iSize + 1), iSize + 1, sConfigPath);
-		return (LPCTSTR)sRet;
+		if (GetPrivateProfileString(sAppName, sKeyName, NULL, sRet.GetBuffer(1024 * 64), 1024 * 64, sEnvPath)) {
+			return (LPCTSTR)sRet;
+		}
 	}
 
 	return _T("");
 }
 
 void CTestDrive::SetConfigString(LPCTSTR sKey, LPCTSTR sData) {
-	CString sConfigPath;
-	sConfigPath.Format(__sConfigFile, InstalledPath());
-	
-	WritePrivateProfileString(__sAppName, sKey, sData, sConfigPath);
+	CString sAppName, sKeyName, sEnvPath;
+	if (sKey && GetEnvString(sKey, sAppName, sKeyName, sEnvPath)) {
+		WritePrivateProfileString(sAppName, sKeyName, sData, sEnvPath);
+	}
 }
