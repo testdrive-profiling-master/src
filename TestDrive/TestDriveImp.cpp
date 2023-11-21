@@ -1838,7 +1838,7 @@ ERROR_OCCUR:
 }
 
 static LPCTSTR __sAppName		= _T("TESTDRIVE");
-static LPCTSTR __sConfigFile	= _T("%s/testdrive.ini");
+static LPCTSTR __sConfigFile	= _T("%stestdrive.ini");
 static LPCTSTR __sEnvDelim		= _T("@");
 
 BOOL CTestDrive::GetEnvString(LPCTSTR sKey, CString& sAppName, CString& sKeyName, CString& sEnvPath) {
@@ -1871,12 +1871,12 @@ void CTestDrive::SetConfigInt(LPCTSTR sKey, int iData) {
 	WritePrivateProfileString(sAppName, sKeyName, sData, sEnvPath);
 }
 
-CString CTestDrive::GetConfigString(LPCTSTR sKey) {
+LPCTSTR CTestDrive::GetConfigString(LPCTSTR sKey) {
 	CString sAppName, sKeyName, sEnvPath;
 	if (sKey && GetEnvString(sKey, sAppName, sKeyName, sEnvPath)) {
-		CString sRet;
+		static CString sRet;
 
-		if (GetPrivateProfileString(sAppName, sKeyName, NULL, sRet.GetBuffer(1024 * 64), 1024 * 64, sEnvPath)) {
+		if (GetPrivateProfileString(sAppName, sKeyName, _T(""), sRet.GetBuffer(1024 * 64), 1024 * 64, sEnvPath)) {
 			return (LPCTSTR)sRet;
 		}
 	}

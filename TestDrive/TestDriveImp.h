@@ -69,7 +69,7 @@ public:
 	// Config
 	STDMETHOD_(int, GetConfigInt)(LPCTSTR sKey, int iDefault = 0);
 	STDMETHOD_(void, SetConfigInt)(LPCTSTR sKey, int iData);
-	STDMETHOD_(CString, GetConfigString)(LPCTSTR sKey);
+	STDMETHOD_(LPCTSTR, GetConfigString)(LPCTSTR sKey);
 	STDMETHOD_(void, SetConfigString)(LPCTSTR sKey, LPCTSTR sData);
 
 
