@@ -63,10 +63,13 @@ protected:
 	EventRegistrationToken	m_navigationStartingToken;
 	EventRegistrationToken	m_navigationCompletedToken;
 	EventRegistrationToken	m_WebMessageReceivedToken;
+	EventRegistrationToken	m_HistoryChangedToken;
 	HRESULT STDMETHODCALLTYPE OnNewWindowRequested(ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args);
 	HRESULT STDMETHODCALLTYPE OnNavigationStart(ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args);
 	HRESULT STDMETHODCALLTYPE OnNavigationComplete(ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args);
 	HRESULT STDMETHODCALLTYPE OnWebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args);
+	HRESULT STDMETHODCALLTYPE OnHistoryChanged(ICoreWebView2* sender, IUnknown* args);
+
 
 	virtual void OnNewWindow2(LPDISPATCH* ppDisp, BOOL* Cancel);
 

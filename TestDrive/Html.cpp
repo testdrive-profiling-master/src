@@ -24,7 +24,8 @@ CHtml::CHtml(void) : m_pManager(NULL), m_dwID(0), m_bBlockNewWindow(FALSE), m_pP
 	m_NewWindowRequestedToken({0}),
 	m_navigationStartingToken({0}),
 	m_navigationCompletedToken({0}),
-	m_WebMessageReceivedToken({0})
+	m_WebMessageReceivedToken({0}),
+	m_HistoryChangedToken({0})
 {
 }
 
@@ -143,6 +144,11 @@ HRESULT CHtml::OnCreateCoreWebView2ControllerCompleted(HRESULT result, ICoreWebV
 			Microsoft::WRL::Callback
 			<ICoreWebView2WebMessageReceivedEventHandler>(this, &CHtml::OnWebMessageReceived).Get(),
 			&m_WebMessageReceivedToken);
+
+		m_webView->add_HistoryChanged(
+			Microsoft::WRL::Callback
+			<ICoreWebView2HistoryChangedEventHandler>(this, &CHtml::OnHistoryChanged).Get(),
+			&m_HistoryChangedToken);
 	}
 	else
 	{
@@ -210,6 +216,18 @@ HRESULT CHtml::OnWebMessageReceived(ICoreWebView2* sender, ICoreWebView2WebMessa
 		if (!sMessage.IsEmpty()) {
 			sender->PostWebMessageAsJson(sMessage);
 		}
+	}
+	return S_OK;
+}
+
+HRESULT CHtml::OnHistoryChanged(ICoreWebView2* sender, IUnknown* args)
+{
+	if (m_pManager) {
+		BOOL canGoBack;
+		BOOL canGoForward;
+		sender->get_CanGoBack(&canGoBack);
+		sender->get_CanGoForward(&canGoForward);
+		//do something...
 	}
 	return S_OK;
 }
