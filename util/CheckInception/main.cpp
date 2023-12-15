@@ -271,6 +271,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			*sCheck	= line;
 			sCheck->TrimRight(" \t\r\n");
 			if(!sCheck->GetLength()) continue;
+			if (__bLua)
+				while (sCheck->Replace("//", "--"));
 
 			*sExchange	= *sCheck;
 			
@@ -287,8 +289,6 @@ int _tmain(int argc, _TCHAR* argv[])
 			while(sExchange->Replace(__TAG[TAG_TIME], sTime));					// time
 			while(sExchange->Replace(__TAG[TAG_AUTHOR], __env.sAuthor));		// author
 			while(sExchange->Replace(__TAG[TAG_VERSION], __env.sVersion));		// version
-			if(__bLua) 
-				while (sExchange->Replace("//", "--"));
 
 			inception.dwCount++;
 		}
