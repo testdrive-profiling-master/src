@@ -67,6 +67,7 @@ struct{
 	TCHAR		sInception[4096];
 }__env;
 
+bool	__bLua	= false;
 LPCTSTR __APP__ = _T("INCEPTION");
 
 void ShowHelp(void){
@@ -161,7 +162,17 @@ BOOL CheckSubPath(void){
 		TCHAR	sSearchPath[4096];
 		TCHAR*	pFilePart;
 		GetFullPathName(__env.sTargetFile, 4096, sSearchPath, &pFilePart);
-		if(pFilePart) *pFilePart = _T('\0');
+		if (pFilePart) {
+			// check none C/C++ file
+			{
+				CString		sFileName(pFilePart);
+				sFileName.MakeLower();
+				sFileName.Delete(0, sFileName.GetLength() - 4);
+
+				if (sFileName == ".lua") __bLua = true;
+			}
+			*pFilePart = _T('\0');
+		}
 		sSourcePath	= sSearchPath;
 		sSourcePath.TrimRight(_T('\\'));
 	}
@@ -276,6 +287,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			while(sExchange->Replace(__TAG[TAG_TIME], sTime));					// time
 			while(sExchange->Replace(__TAG[TAG_AUTHOR], __env.sAuthor));		// author
 			while(sExchange->Replace(__TAG[TAG_VERSION], __env.sVersion));		// version
+			if(__bLua) 
+				while (sExchange->Replace("//", "--"));
 
 			inception.dwCount++;
 		}
