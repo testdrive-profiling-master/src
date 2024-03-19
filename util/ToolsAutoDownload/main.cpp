@@ -5,28 +5,6 @@ typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
 LPFN_ISWOW64PROCESS fnIsWow64Process;
 
-BOOL IsWow64(void)
-{
-#if defined(_WIN64)
-	return TRUE;
-#elif define(_WIN32)
-	BOOL bIsWow64 = FALSE;
-	fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(TEXT("Kernel32")), "IsWow64Process");
-
-	if(fnIsWow64Process != NULL)
-	{
-		if( !fnIsWow64Process(GetCurrentProcess(), &bIsWow64) )
-		{
-			// handle error
-		}
-	}
-
-	return bIsWow64;
-#else
-	return FALSE;
-#endif
-}
-
 int GetFileSize(char* sPath)
 {
 	int rst = 0;
@@ -41,7 +19,7 @@ int GetFileSize(char* sPath)
 	return rst;
 }
 
-bool GetDownloadPathEclipse(char* sPath, BOOL b64 = TRUE){
+bool GetDownloadPathEclipse(char* sPath){
 	bool	bFound	= false;
 	FILE*	fp		= fopen("download.html", "rt");
 
@@ -57,7 +35,7 @@ bool GetDownloadPathEclipse(char* sPath, BOOL b64 = TRUE){
 				break;
 			case 1:
 				if (!strstr(sLine, "cpp")) break;
-				if (!strstr(sLine, b64 ? "win32-x86_64.zip" : "win32.zip")) break;
+				if (!strstr(sLine, "win32-x86_64.zip")) break;
 				{
 					char* sTok = strstr(sLine, ".zip");
 					sTok[4] = NULL;
@@ -66,10 +44,16 @@ bool GetDownloadPathEclipse(char* sPath, BOOL b64 = TRUE){
 						strcpy(sPath, sTok);
 					}
 					else {
-						sTok = strstr(sLine, "href=\"");
-						sprintf(sPath, "www.eclipse.org/downloads/%s", sTok + 6);
-					}
+						if ((sTok = strstr(sLine, "href=\"")) != NULL) {
+							sTok += 6;
 
+							if ((sTok = strstr(sLine, "file=")) != NULL) {
+								sTok += 5;
+								sprintf(sPath, "mirror.kakao.com/eclipse/%s", sTok);
+							}
+						}
+					}
+					
 					bFound = true;
 				}
 				break;
@@ -257,7 +241,7 @@ bool GetDownloadPathMinGW(char* sPath){
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	char sPath[2048], sCommand[2048];
+	char sPath[4096], sCommand[4096];
 	if(argc != 2){
 		printf("Eclipse CDT/Notepad++ auto download. (" __DATE__ " : clonextop@gmail.com)\n\n");
 		printf(
@@ -274,11 +258,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	if(!strcmp(argv[1], "eclipse")){
 		system("curl https://www.eclipse.org/downloads/packages/ -o download.html");
 
-		if(GetDownloadPathEclipse(sPath, IsWow64()))
+		if(GetDownloadPathEclipse(sPath))
 		{
-			sprintf(sCommand, "curl -L \"http://%s&r=1\" -o eclipse.zip", sPath);
+			sprintf(sCommand, "curl -L \"https://%s&r=1\" -o eclipse.zip", sPath);
 
-			printf("Downloading Eclipse for %s\n:'http://%s'\n\n", IsWow64() ? "x64" : "x86", sPath);
+			printf("Downloading Eclipse for x64\n:'https://%s'\n\n", sPath);
 			system(sCommand);
 		}else{
 			printf("*E : Failed to access to Eclipse page...\n");
@@ -312,7 +296,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}else
 	if(!strcmp(argv[1], "mingw")){
-		sprintf(sCommand, "wget --no-check-certificate \"https://github.com/msys2/msys2-installer/releases\" -O download.html", sPath);
+		sprintf(sCommand, "wget --no-check-certificate \"https://github.com/msys2/msys2-installer/releases\" -O download.html");
 		system(sCommand);
 		if (GetDownloadPathMinGW(sPath)) {
 			sprintf(sCommand, "wget --no-check-certificate \"%s\" -O msys2.tar.xz", sPath);
