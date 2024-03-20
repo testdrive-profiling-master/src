@@ -33,6 +33,15 @@ void TokenLink::SetToken(LPCTSTR lpszToken, DWORD_PTR dwID){
 				int		iParamterOffset;
 				iParamterOffset		= (int)(sParam - lpszToken);
 				m_sParamToken		= m_sToken.Left(iParamterOffset);
+				if (m_sToken.GetAt(iParamterOffset) == _T('%')) {	// %.10lf -> %lf 로 변경해야 한다. 일부 로케일에서 비정상 동작하므로.
+					for (int i = iParamterOffset + 1; i < m_sToken.GetLength(); i++) {
+						TCHAR	ch	= m_sToken.GetAt(i);
+
+						if (isdigit(ch) || ch == _T('-') || ch == _T('+') || ch == _T('.')) {
+							m_sToken.Delete(i); i--;
+						} else break;
+					}
+				}
 				m_bParamterize		= TRUE;
 			}else{
 				m_sParamToken		= m_sToken;
