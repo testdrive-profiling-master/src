@@ -82,8 +82,8 @@ static char THIS_FILE[] = __FILE__;
 #define CHARTCTRL_CLASSNAME    _T("ChartCtrl")  // Window class name
 
 
-COLORREF pSeriesColorTable[] = { RGB(255,0,0), RGB(0,150,0), RGB(0,0,255), RGB(255,255,0), RGB(0,255,255), 
-								 RGB(255,128,0), RGB(128,0,128), RGB(128,128,0), RGB(255,0,255), RGB(64,128,128)};
+COLORREF pSeriesColorTable[] = { RGB(255,0,0), RGB(0,150,0), RGB(0,0,255), RGB(200,200,0), RGB(0,200,200), 
+								 RGB(255,128,0), RGB(128,0,128), RGB(128,128,0), RGB(200,0,200), RGB(64,128,128)};
 
 /////////////////////////////////////////////////////////////////////////////
 // CChartCtrl
