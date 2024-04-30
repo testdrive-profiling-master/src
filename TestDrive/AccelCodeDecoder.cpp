@@ -9,6 +9,7 @@ AccelCodeDecoder::AccelCodeDecoder(void)
 
 AccelCodeDecoder::~AccelCodeDecoder(void)
 {
+	SetCurrentCopynPasteAction(FALSE);
 }
 
 void AccelCodeDecoder::DoAccel(ACCEL_CODE code){
