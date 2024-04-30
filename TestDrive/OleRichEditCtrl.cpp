@@ -40,10 +40,6 @@ COleRichEditCtrl::~COleRichEditCtrl()
 BEGIN_MESSAGE_MAP(COleRichEditCtrl, CRichEditCtrl)
 	//{{AFX_MSG_MAP(COleRichEditCtrl)
 	ON_WM_CREATE()
-	ON_WM_LBUTTONDOWN()
-	ON_WM_LBUTTONUP()
-	ON_WM_RBUTTONDOWN()
-	ON_WM_RBUTTONUP()
 	ON_WM_SETFOCUS()
 	ON_WM_KILLFOCUS()
 	ON_WM_MOUSEWHEEL()
@@ -75,22 +71,21 @@ void COleRichEditCtrl::PostInitialize(void) {
 
 void COleRichEditCtrl::OnAccel(ACCEL_CODE code){
 	switch(code){
-	case ACCEL_CODE_COPY:		Copy();			break;
-	case ACCEL_CODE_PASTE:		Paste();		break;
-	case ACCEL_CODE_CUT:		Cut();			break;
-	case ACCEL_CODE_UNDO:		Undo();			break;
-	case ACCEL_CODE_SELECTALL:	SetSel(0, -1);	break;
+	case ACCEL_CODE_COPY:		Copy();							break;
+	case ACCEL_CODE_PASTE:		if (m_bEditable) Paste();		break;
+	case ACCEL_CODE_CUT:		if (m_bEditable) Cut();			break;
+	case ACCEL_CODE_UNDO:		if (m_bEditable) Undo();		break;
+	case ACCEL_CODE_SELECTALL:	SetSel(0, -1);					break;
 	}
 }
 
 void COleRichEditCtrl::OnSetFocus(CWnd* pOldWnd){
-	if(m_bEditable){
-		SetCurrentCopynPasteAction(TRUE);
-		CRichEditCtrl::OnSetFocus(pOldWnd);
-	}
-	else{
-		GetParent()->GetParent()->SetFocus();
-	}
+	//if(m_bEditable){
+	SetCurrentCopynPasteAction(TRUE);
+	CRichEditCtrl::OnSetFocus(pOldWnd);
+	//} else {
+	//	GetParent()->GetParent()->SetFocus();
+	//}
 	//SendMessage(EM_SETZOOM, 20, 100);
 
 	//SendMessage(EM_GETZOOM,(WPARAM)&d1, (LPARAM)&d2);
@@ -104,23 +99,6 @@ void COleRichEditCtrl::OnKillFocus(CWnd* pNewWnd){
 BOOL COleRichEditCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt){
 	// Prevent self-zoom control
 	return (nFlags&MK_CONTROL)!=0;
-}
-
-void COleRichEditCtrl::OnLButtonDown(UINT nFlags, CPoint point){
-	if(m_bEditable) CRichEditCtrl::OnLButtonDown(nFlags,point);;
-}
-
-void COleRichEditCtrl::OnLButtonUp(UINT nFlags, CPoint point){
-	if(m_bEditable) CRichEditCtrl::OnLButtonUp(nFlags,point);
-	//GetParent()->SendMessage(WM_LBUTTONUP,0,0);
-}
-
-void COleRichEditCtrl::OnRButtonDown(UINT nFlags, CPoint point){
-	if(m_bEditable) CRichEditCtrl::OnRButtonDown(nFlags,point);;
-}
-
-void COleRichEditCtrl::OnRButtonUp(UINT nFlags, CPoint point){
-	if(m_bEditable) CRichEditCtrl::OnRButtonUp(nFlags,point);
 }
 
 void COleRichEditCtrl::Test(void){

@@ -32,6 +32,7 @@ BEGIN_MESSAGE_MAP(COutput, CListBox)
 	ON_NOTIFY_REFLECT_EX(EN_LINK, OnLink)
 	ON_WM_SETFOCUS()
 	ON_WM_KILLFOCUS()
+	ON_WM_MOUSEWHEEL()
 	//ON_WM_CONTEXTMENU()
 	//ON_WM_COPYDATA()
 	//ON_COMMAND(ID_EDIT_COPY, OnEditCopy)
@@ -60,7 +61,6 @@ END_MESSAGE_MAP()
 	SetFocus();
 }*/
 
-
 void COutput::OnEditCopy()
 {
 	/*CString str = GetSelText();
@@ -69,29 +69,12 @@ void COutput::OnEditCopy()
 		HGLOBAL hClipboardData;
 		hClipboardData = GlobalAlloc(GMEM_DDESHARE,  (str.GetLength()+1)*sizeof(TCHAR));
 		TCHAR * pchData = (TCHAR*)GlobalLock(hClipboardData);
-		strcpy(pchData, LPCSTR(strData));
+		_tcscpy(pchData, str);
 		GlobalUnlock(hClipboardData);
 		SetClipboardData(CF_TEXT,hClipboardData);
 		CloseClipboard();
 	}*/
 	//AfxMessageBox(_T("출력 복사"));
-}
-
-void COutput::OnAccel(ACCEL_CODE code){
-	switch(code){
-	case ACCEL_CODE_COPY:		Copy();	break;
-	case ACCEL_CODE_SELECTALL:	SetSel(0, -1); break;
-	}
-}
-
-void COutput::OnSetFocus(CWnd* pOldWnd){
-	SetCurrentCopynPasteAction(TRUE);
-	COleRichEditCtrl::OnSetFocus(pOldWnd);
-}
-
-void COutput::OnKillFocus(CWnd* pNewWnd){
-	SetCurrentCopynPasteAction(FALSE);
-	COleRichEditCtrl::OnKillFocus(pNewWnd);
 }
 
 BOOL COutput::Create(COutputWnd* pPaneWnd, CWnd* pParentWnd, CFont* pFont, UINT nID){
@@ -103,7 +86,7 @@ BOOL COutput::Create(COutputWnd* pPaneWnd, CWnd* pParentWnd, CFont* pFont, UINT 
 
 	PostInitialize();
 	SetOptions(ECOOP_OR, ECO_AUTOWORDSELECTION|ECO_READONLY|ECO_AUTOVSCROLL|ECO_AUTOHSCROLL);
-	SetFont(pFont);
+	//SetFont(pFont);
 
 	m_pParent = pPaneWnd;
 
@@ -120,13 +103,16 @@ BOOL COutput::Create(COutputWnd* pPaneWnd, CWnd* pParentWnd, CFont* pFont, UINT 
 			pDC->Detach();
 		}
 	}
+
 	// 고정 폭 글꼴
 	switch(g_Localization.CurrentLocale()->dwLangID){
-	case LANG_KOREAN:		_tcscpy(m_cf.szFaceName, _T("돋움체"));			break;
-	default:				_tcscpy(m_cf.szFaceName, _T("Courier New"));	break;
+	case LANG_KOREAN:		_tcscpy(m_cf.szFaceName, _T("Dotumche"));			break;
+	default:				_tcscpy(m_cf.szFaceName, _T("Cascadia Mono"));		break;
 	}
 	CRichEditCtrl::SetSel(0, -1);
+	SetSelectionCharFormat(m_cf);
 	Clear();
+
 	return bRet;
 }
 

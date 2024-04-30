@@ -28,7 +28,7 @@ public:
 	void Clear(void);
 
 protected:
-	virtual void OnAccel(ACCEL_CODE code);
+	//virtual void OnAccel(ACCEL_CODE code);
 
 	COutputWnd*	m_pParent;
 
@@ -36,8 +36,8 @@ protected:
 	//afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnEditCopy();
 	afx_msg BOOL OnLink(NMHDR *pNotifyHeader, LRESULT *pResult);
-	afx_msg void OnSetFocus(CWnd* pOldWnd);
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
+	//afx_msg void OnSetFocus(CWnd* pOldWnd);
+	//afx_msg void OnKillFocus(CWnd* pNewWnd);
 
 	DECLARE_MESSAGE_MAP()
 };

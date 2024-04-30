@@ -52,6 +52,13 @@ BOOL CReportView::Create(CWnd* pParentWnd){
 	m_Edit.LimitText(-1);	//Set the control to accept the maximum amount of text
 	//m_Edit.SetOptions(ECOOP_OR, ECO_AUTOVSCROLL | ECO_AUTOHSCROLL | ECO_NOHIDESEL | ECO_SAVESEL | ECO_SELECTIONBAR);
 
+	// °íÁ¤ Æø ±Û²Ã
+	/*switch (g_Localization.CurrentLocale()->dwLangID) {
+	case LANG_KOREAN:		SetFont(_T("Dotumche"));			break;
+	default:				SetFont(_T("Cascadia Mono"));		break;
+	}*/
+	SetFont(_T("Cascadia Mono"));
+
 	return bRet;
 }
 
