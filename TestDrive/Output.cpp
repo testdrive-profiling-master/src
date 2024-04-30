@@ -105,10 +105,11 @@ BOOL COutput::Create(COutputWnd* pPaneWnd, CWnd* pParentWnd, CFont* pFont, UINT 
 	}
 
 	// °íÁ¤ Æø ±Û²Ã
-	switch(g_Localization.CurrentLocale()->dwLangID){
+	/*switch (g_Localization.CurrentLocale()->dwLangID) {
 	case LANG_KOREAN:		_tcscpy(m_cf.szFaceName, _T("Dotumche"));			break;
 	default:				_tcscpy(m_cf.szFaceName, _T("Cascadia Mono"));		break;
-	}
+	}*/
+	_tcscpy(m_cf.szFaceName, _T("Cascadia Mono"));
 	CRichEditCtrl::SetSel(0, -1);
 	SetSelectionCharFormat(m_cf);
 	Clear();
