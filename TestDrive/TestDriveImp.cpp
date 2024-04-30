@@ -1536,7 +1536,14 @@ NO_PROFILE_NAME:
 							if(!*mem_name) _tcscpy(mem_name, MMFileName);
 
 							pMsg->LogOut(_S(CREATE_MEMORY_MODEL), RGB(0,0,255));
-							pMsg->LogOut(_TEXT_(_T("'%s' : %lld Bytes "), mem_name, mem_size), RGB(0,0,255), CFE_BOLD);
+							{
+								CString sBytes;	// 1000 자리 구분자 ',' 추가
+								sBytes.Format(_T("%lld"), mem_size);
+								for (int i = sBytes.GetLength() - 3; i > 0; i -= 3) {
+									sBytes.Insert(i, _T(','));
+								}
+								pMsg->LogOut(_TEXT_(_T("'%s' : %s Bytes "), mem_name, (LPCTSTR)sBytes), RGB(0, 0, 255), CFE_BOLD);
+							}
 
 							if((mem_size/0x100000))		pMsg->LogOut(_TEXT_(_T("(%.1fMB)\n"), (float)mem_size/0x100000), RGB(0,0,255), CFE_BOLD);
 							else if((mem_size/0x400))	pMsg->LogOut(_TEXT_(_T("(%.1fKB)\n"), (float)mem_size/0x400), RGB(0,0,255), CFE_BOLD);
