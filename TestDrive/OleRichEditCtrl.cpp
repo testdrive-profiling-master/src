@@ -23,6 +23,7 @@ COleRichEditCtrl::COleRichEditCtrl() : m_szFileName(_T("")), m_bOpen(FALSE)
 {
 	m_bCallbackSet	= FALSE;
 	m_bEditable		= FALSE;
+	m_pIRichEditOleCallback = NULL;
 
 	if(!m_hInstRichEdit50W)
 		m_hInstRichEdit50W = LoadLibrary(_T("msftedit.dll"));
@@ -142,7 +143,9 @@ void COleRichEditCtrl::Test(void){
 }
 
 LRESULT COleRichEditCtrl::OnUpdate(WPARAM wParam, LPARAM lParam){
-// Get the IRichEditOle interface.
+	if (!m_bOpen) return 0;
+
+	// Get the IRichEditOle interface.
 	if(wParam==0){
 		//AfxMessageBox(m_WatchDogFolderList.front()->GetFileName());
 		Open(m_WatchDogFolderList.front()->GetPath(), TRUE);
