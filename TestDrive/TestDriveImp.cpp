@@ -181,6 +181,15 @@ BOOL CTestDrive::OpenProject(LPCTSTR szFileName)
 	m_Lua.Initialize();
 
 	// TestDrive project initialization
+	{	// initialization script
+		CString sInitializeLuaPath(g_pTestDrive->InstalledPath());
+		sInitializeLuaPath += _T("bin\\testdrive_initialize.lua");
+
+		if (!m_Lua.Run(CStringA(sInitializeLuaPath))) {
+			g_pTestDrive->LogError(_T("Can't run initial Lua script : '%s'"), (LPCTSTR)sInitializeLuaPath);
+			return false;
+		}
+	}
 	g_pTestDrive->Build((LPCTSTR)(CString(InstalledPath()) + _T("bin\\testdrive_initialize.profile")), &g_Output[COutput::TD_OUTPUT_SYSTEM]);
 
 	// run initialization profile

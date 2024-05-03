@@ -3,6 +3,7 @@
 #include "TestDriveImp.h"
 #include "ViewTree.h"
 #include "SplashScreenEx.h"
+#include "FullPath.h"
 
 using namespace luabridge;
 
@@ -163,7 +164,51 @@ bool TestDriveLua::Initialize(void){
 				SetCurrentDirectory(cur_path);
 				return bRet;
 			}))
+		.addFunction("Execute", std::function<int(const char* sCmd, const char* sArg, const char* sWorkPath)>([](const char* sCmd, const char* sArg, const char* sWorkPath) -> int {
+				if (!sCmd) return -1;
+				if (!sArg) sArg = "";
+				if (!sWorkPath) sWorkPath = "";
 
+				CFullPath	work_path(CString(sWorkPath));
+
+				// run batch file
+				//CRedirectExecute* pExec = new CRedirectExecute(CString(sCmd), g_pTestDrive->GetMsgOutput(), sArg ? CString(sArg) : NULL, (LPCTSTR)work_path);
+				// 에러 문자열 지정
+				/*while (paser.TokenOut(TD_DELIMITER_COMMA)) {
+					int error_code = -1;
+					if (!paser.GetTokenString(temp)) {
+						SAFE_DELETE(pExec);
+						goto ERROR_OCCUR;
+					}
+					if (paser.TokenOut(TD_DELIMITER_COLON)) {
+						TCHAR sCode[MAX_PATH];
+						switch (paser.GetToken(sCode)) {
+						case TD_TOKEN_INT:
+							error_code = StrToInt(temp);
+							break;
+						case TD_TOKEN_NAME:
+							if (!_tcscmp(sCode, _T("W"))) {
+								error_code = INT_MAX;
+							}
+							else goto ERROR_OCCUR;
+							break;
+						default:
+							goto ERROR_OCCUR;
+						}
+					}
+					pExec->AddErrorToken(temp, error_code);
+				}*/
+				/*pExec->AddErrorToken(_T("##"), 0);
+				if (!pExec->Run()) {
+					SAFE_DELETE(pExec);
+					return -1;
+				}
+				int iRet = pExec->GetErrorCode();
+				SAFE_DELETE(pExec);
+
+				return iRet;*/
+				return 0;
+			}))
 		.addFunction("SetProfilePath", std::function<bool(const char* sID, const char* sPath)>([](const char* sID, const char* sPath) -> bool {
 				if (!sID) sID = "root";
 
