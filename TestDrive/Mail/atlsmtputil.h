@@ -63,13 +63,13 @@ namespace ATL
 //=======================================================================
 //A list of recipients in a string must by separated by one
 //of the following characters
-inline BOOL AtlSmtpIsRecipientDelimiter(char ch) throw()
+inline BOOL AtlSmtpIsRecipientDelimiter(char ch)
 {
 	return (ch == ',' || ch == ';' || ch == ' ' || ch == '\0');
 }
 
 //Send data to hFile and wait for it to finish sending
-inline BOOL AtlSmtpSendAndWait(HANDLE hFile, LPCSTR lpData, int nDataLength, LPOVERLAPPED pOverlapped) throw()
+inline BOOL AtlSmtpSendAndWait(HANDLE hFile, LPCSTR lpData, int nDataLength, LPOVERLAPPED pOverlapped)
 {
 	ATLASSERT(lpData != NULL);
 	ATLENSURE_RETURN_VAL(pOverlapped != NULL, FALSE);
@@ -197,7 +197,7 @@ inline BOOL AtlSmtpSendOverlapped(HANDLE hFile, LPCSTR lpData, int nDataLength, 
 //Send a SMTP command and read the response
 //return TRUE if it matches szResponse, FALSE otherwise
 inline BOOL AtlSmtpSendAndCheck(__in HANDLE hFile, __in LPCSTR lpData, __in int nDataLength, __out_ecount_part(nMaxResponseLength, *pnResponseLength) LPSTR lpResponse, __out int* pnResponseLength, __in int nMaxResponseLength, 
-							 __in_z LPCSTR szResponse, __in LPOVERLAPPED pOverlapped) throw()
+							 __in_z LPCSTR szResponse, __in LPOVERLAPPED pOverlapped)
 {
 	ATLASSERT(lpData != NULL);
 	ATLASSERT(lpResponse != NULL);

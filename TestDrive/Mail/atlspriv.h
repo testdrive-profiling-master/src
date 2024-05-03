@@ -47,7 +47,7 @@ namespace ATL{
 class _AtlWSAInit
 {
 public:
-	_AtlWSAInit() throw()
+	_AtlWSAInit()
 	{
 		m_dwErr = WSAEFAULT;
 	}
@@ -62,7 +62,7 @@ public:
 
 	bool IsStarted(){ return m_dwErr == 0; }
 
-	~_AtlWSAInit() throw()
+	~_AtlWSAInit()
 	{
 		if (!m_dwErr)
 			WSACleanup();
@@ -80,23 +80,23 @@ public:
 class ZEvtSyncSocket
 {
 public:
-	ZEvtSyncSocket() throw();
-	~ZEvtSyncSocket() throw();
-	operator SOCKET() throw();
-	void Close() throw();
-	void Term() throw();
-	bool Create(const ADDRINFOT* pAI, WORD wFlags=0) throw();
-	bool Create(int af, int st, int proto, WORD wFlags=0) throw();
-	bool Connect(LPCTSTR szAddr, unsigned short nPort) throw();
-	bool Connect(const SOCKADDR* psa, int len) throw();
-	bool Connect(const ADDRINFOT *pAI) throw();
-	bool Write(WSABUF *pBuffers, int nCount, DWORD *pdwSize) throw();
-	bool Write(const unsigned char *pBuffIn, DWORD *pdwSize) throw();
-	bool Read(const unsigned char *pBuff, DWORD *pdwSize) throw();
-	bool Init(SOCKET hSocket, void * /*pData=NULL*/) throw();
-	DWORD GetSocketTimeout() throw();
-	DWORD SetSocketTimeout(DWORD dwNewTimeout) throw();
-	bool SupportsScheme(ATL_URL_SCHEME scheme) throw();
+	ZEvtSyncSocket();
+	~ZEvtSyncSocket();
+	operator SOCKET();
+	void Close();
+	void Term();
+	bool Create(const ADDRINFOT* pAI, WORD wFlags=0);
+	bool Create(int af, int st, int proto, WORD wFlags=0);
+	bool Connect(LPCTSTR szAddr, unsigned short nPort);
+	bool Connect(const SOCKADDR* psa, int len);
+	bool Connect(const ADDRINFOT *pAI);
+	bool Write(WSABUF *pBuffers, int nCount, DWORD *pdwSize);
+	bool Write(const unsigned char *pBuffIn, DWORD *pdwSize);
+	bool Read(const unsigned char *pBuff, DWORD *pdwSize);
+	bool Init(SOCKET hSocket, void * /*pData=NULL*/);
+	DWORD GetSocketTimeout();
+	DWORD SetSocketTimeout(DWORD dwNewTimeout);
+	bool SupportsScheme(ATL_URL_SCHEME scheme);
 
 protected:
 	DWORD m_dwCreateFlags;
@@ -196,7 +196,7 @@ inline BOOL AtlMimeMakeRecipientsString(_In_ LPCSTR szNames, _Out_z_cap_post_cou
 	#define ATLSMTP_DEFAULT_CSET "iso-8859-1"
 #endif
 
-inline BOOL AtlMimeCharsetFromCodePage(_Out_z_cap_(cch) LPSTR szCharset, _In_ UINT uiCodePage, _In_opt_ IMultiLanguage* pMultiLanguage, _In_ size_t cch) throw()
+inline BOOL AtlMimeCharsetFromCodePage(_Out_z_cap_(cch) LPSTR szCharset, _In_ UINT uiCodePage, _In_opt_ IMultiLanguage* pMultiLanguage, _In_ size_t cch)
 {
 	ATLASSERT(szCharset != NULL);
 
@@ -261,7 +261,7 @@ inline BOOL AtlMimeConvertStringW(
 	_In_ UINT uiCodePage,
 	_In_ LPCWSTR wszIn, 
 	_Out_z_cap_post_count_(*pnLen, *pnLen) LPSTR *ppszOut, 
-	_Inout_ UINT *pnLen) throw()
+	_Inout_ UINT *pnLen)
 {
 	ATLENSURE_RETURN_VAL( pMultiLanguage != NULL, FALSE );
 	ATLENSURE_RETURN_VAL( wszIn != NULL, FALSE );
@@ -305,7 +305,7 @@ inline BOOL AtlMimeConvertStringA(
 	_In_ UINT uiCodePage,
 	_In_ LPCSTR szIn, 
 	_Out_z_cap_post_count_(*pnLen, *pnLen) LPSTR *ppszOut, 
-	_Inout_ UINT *pnLen) throw()
+	_Inout_ UINT *pnLen)
 {
 	_ATLTRY
 	{
@@ -328,7 +328,7 @@ class CStreamOnSequentialStream :
 {
 	CComPtr<ISequentialStream> m_spStream;
 public:
-	CStreamOnSequentialStream(ISequentialStream *pStream) throw()
+	CStreamOnSequentialStream(ISequentialStream *pStream)
 	{
 		ATLASSERT(pStream);
 		m_spStream = pStream;
@@ -337,68 +337,68 @@ public:
 	{
 	}
 
-	STDMETHOD(Read)(void *pv, ULONG cb, ULONG *pcbRead) throw()
+	STDMETHOD(Read)(void *pv, ULONG cb, ULONG *pcbRead)
 	{
 		if (!m_spStream)
 			return E_UNEXPECTED;
 		return m_spStream->Read(pv, cb, pcbRead);
 	}
 
-	STDMETHOD(Write)(const void *pv, ULONG cb, ULONG *pcbWritten) throw()
+	STDMETHOD(Write)(const void *pv, ULONG cb, ULONG *pcbWritten)
 	{
 		if (!m_spStream)
 			return E_UNEXPECTED;
 		return m_spStream->Write(pv, cb, pcbWritten);
 	}
 
-	STDMETHOD(Seek)(LARGE_INTEGER , DWORD , ULARGE_INTEGER *) throw()
+	STDMETHOD(Seek)(LARGE_INTEGER , DWORD , ULARGE_INTEGER *)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(SetSize)(ULARGE_INTEGER ) throw()
+	STDMETHOD(SetSize)(ULARGE_INTEGER )
 	{
 		return E_NOTIMPL;
 	}
 
 	STDMETHOD(CopyTo)(IStream *, ULARGE_INTEGER , ULARGE_INTEGER *,
-		ULARGE_INTEGER *) throw()
+		ULARGE_INTEGER *)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Commit)(DWORD ) throw()
+	STDMETHOD(Commit)(DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Revert)( void) throw()
+	STDMETHOD(Revert)( void)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(LockRegion)(ULARGE_INTEGER , ULARGE_INTEGER , DWORD ) throw()
+	STDMETHOD(LockRegion)(ULARGE_INTEGER , ULARGE_INTEGER , DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
 	STDMETHOD(UnlockRegion)(ULARGE_INTEGER , ULARGE_INTEGER ,
-		DWORD ) throw()
+		DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Stat)(STATSTG *, DWORD ) throw()
+	STDMETHOD(Stat)(STATSTG *, DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Clone)(IStream **) throw()
+	STDMETHOD(Clone)(IStream **)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(QueryInterface)(REFIID iid, void **ppUnk) throw()
+	STDMETHOD(QueryInterface)(REFIID iid, void **ppUnk)
 	{
 		*ppUnk = NULL;
 		if (::InlineIsEqualGUID(iid, IID_IUnknown) ||
@@ -412,12 +412,12 @@ public:
 		return E_NOINTERFACE;
 	}
 
-	ULONG STDMETHODCALLTYPE AddRef( void) throw() 
+	ULONG STDMETHODCALLTYPE AddRef( void) 
 	{
 		return (ULONG)1;
 	}
 
-	ULONG STDMETHODCALLTYPE Release( void) throw() 
+	ULONG STDMETHODCALLTYPE Release( void) 
 	{
 		return (ULONG)1;
 	}
@@ -430,14 +430,14 @@ public:
 	BYTE *m_pArray;
 	DWORD m_dwRead;
 
-	CStreamOnByteArray(BYTE *pBytes) throw()
+	CStreamOnByteArray(BYTE *pBytes)
 	{
 		ATLASSERT(pBytes);
 		m_pArray = pBytes;
 		m_dwRead = 0;
 	}
 
-	STDMETHOD(Read)(void *pv, ULONG cb, ULONG *pcbRead) throw()
+	STDMETHOD(Read)(void *pv, ULONG cb, ULONG *pcbRead)
 	{
 		if (!pv)
 			return E_INVALIDARG;
@@ -457,59 +457,59 @@ public:
 		return S_OK;
 	}
 
-	STDMETHOD(Write)(const void* , ULONG , ULONG* ) throw()
+	STDMETHOD(Write)(const void* , ULONG , ULONG* )
 	{
 		return E_UNEXPECTED;
 	}
 
-	STDMETHOD(Seek)(LARGE_INTEGER , DWORD , ULARGE_INTEGER *) throw()
+	STDMETHOD(Seek)(LARGE_INTEGER , DWORD , ULARGE_INTEGER *)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(SetSize)(ULARGE_INTEGER ) throw()
+	STDMETHOD(SetSize)(ULARGE_INTEGER )
 	{
 		return E_NOTIMPL;
 	}
 
 	STDMETHOD(CopyTo)(IStream *, ULARGE_INTEGER , ULARGE_INTEGER *,
-		ULARGE_INTEGER *) throw()
+		ULARGE_INTEGER *)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Commit)(DWORD ) throw()
+	STDMETHOD(Commit)(DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Revert)( void) throw()
+	STDMETHOD(Revert)( void)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(LockRegion)(ULARGE_INTEGER , ULARGE_INTEGER , DWORD ) throw()
+	STDMETHOD(LockRegion)(ULARGE_INTEGER , ULARGE_INTEGER , DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
 	STDMETHOD(UnlockRegion)(ULARGE_INTEGER , ULARGE_INTEGER ,
-		DWORD ) throw()
+		DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Stat)(STATSTG *, DWORD ) throw()
+	STDMETHOD(Stat)(STATSTG *, DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Clone)(IStream **) throw()
+	STDMETHOD(Clone)(IStream **)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(QueryInterface)(REFIID iid, void **ppUnk) throw()
+	STDMETHOD(QueryInterface)(REFIID iid, void **ppUnk)
 	{
 		*ppUnk = NULL;
 		if (::InlineIsEqualGUID(iid, IID_IUnknown) ||
@@ -523,12 +523,12 @@ public:
 		return E_NOINTERFACE;
 	}
 
-	ULONG STDMETHODCALLTYPE AddRef( void)  throw()
+	ULONG STDMETHODCALLTYPE AddRef( void)
 	{
 		return (ULONG)1;
 	}
 
-	ULONG STDMETHODCALLTYPE Release( void)  throw()
+	ULONG STDMETHODCALLTYPE Release( void)
 	{
 		return (ULONG)1;
 	}
@@ -538,7 +538,7 @@ class CVariantStream :
 	public IStream
 {
 public:
-	CVariantStream() throw()
+	CVariantStream()
 	{
 		m_nCurrRead = 0;
 		m_nVariantSize = 0;
@@ -549,7 +549,7 @@ public:
 	}
 
 	// input variant is put into contained BYTE array.
-	HRESULT InsertVariant(const VARIANT *pVarIn) throw()
+	HRESULT InsertVariant(const VARIANT *pVarIn)
 	{
 		CComVariant vIn;
 		HRESULT hr = E_FAIL;
@@ -566,7 +566,7 @@ public:
 
 	// variant is read from contained byte array into
 	// out variant.
-	HRESULT RetrieveVariant(VARIANT *pVarOut) throw()
+	HRESULT RetrieveVariant(VARIANT *pVarOut)
 	{
 		CComVariant vOut;
 		HRESULT hr = vOut.ReadFromStream(static_cast<IStream*>(this));
@@ -577,7 +577,7 @@ public:
 		return hr;
 	}
 
-	HRESULT LoadFromStream(ISequentialStream *stream) throw()
+	HRESULT LoadFromStream(ISequentialStream *stream)
 	{
 		m_nCurrRead = 0;
 		CStreamOnSequentialStream stm(stream);
@@ -588,19 +588,19 @@ public:
 		return hr;
 	}
 
-	ISequentialStream* GetStream() throw()
+	ISequentialStream* GetStream()
 	{
 		return static_cast<ISequentialStream*>(this);
 	}
 
-	size_t GetVariantSize() throw()
+	size_t GetVariantSize()
 	{
 		return m_nVariantSize;
 	}
 
 // Implementation
 	// IStream implementation;
-	STDMETHOD(Read)(void *pv, ULONG cb, ULONG *pcbRead) throw()
+	STDMETHOD(Read)(void *pv, ULONG cb, ULONG *pcbRead)
 	{
 		if (!pv)
 			return E_INVALIDARG;
@@ -629,7 +629,7 @@ public:
 		return S_OK;
 	}
 
-	STDMETHOD(Write)(const void *pv, ULONG cb, ULONG *pcbWritten) throw()
+	STDMETHOD(Write)(const void *pv, ULONG cb, ULONG *pcbWritten)
 	{
 		HRESULT hr = E_OUTOFMEMORY;
 		if (!pv)
@@ -660,54 +660,54 @@ public:
 		return hr;
 	}
 
-	STDMETHOD(Seek)(LARGE_INTEGER , DWORD , ULARGE_INTEGER *) throw()
+	STDMETHOD(Seek)(LARGE_INTEGER , DWORD , ULARGE_INTEGER *)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(SetSize)(ULARGE_INTEGER ) throw()
+	STDMETHOD(SetSize)(ULARGE_INTEGER )
 	{
 		return E_NOTIMPL;
 	}
 
 	STDMETHOD(CopyTo)(IStream *, ULARGE_INTEGER , ULARGE_INTEGER *,
-		ULARGE_INTEGER *) throw()
+		ULARGE_INTEGER *)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Commit)(DWORD ) throw()
+	STDMETHOD(Commit)(DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Revert)( void) throw()
+	STDMETHOD(Revert)( void)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(LockRegion)(ULARGE_INTEGER , ULARGE_INTEGER , DWORD ) throw()
+	STDMETHOD(LockRegion)(ULARGE_INTEGER , ULARGE_INTEGER , DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
 	STDMETHOD(UnlockRegion)(ULARGE_INTEGER , ULARGE_INTEGER ,
-		DWORD ) throw()
+		DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Stat)(STATSTG *, DWORD ) throw()
+	STDMETHOD(Stat)(STATSTG *, DWORD )
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(Clone)(IStream **) throw()
+	STDMETHOD(Clone)(IStream **)
 	{
 		return E_NOTIMPL;
 	}
 
-	STDMETHOD(QueryInterface)(REFIID iid, void **ppUnk) throw()
+	STDMETHOD(QueryInterface)(REFIID iid, void **ppUnk)
 	{
 		*ppUnk = NULL;
 		if (::InlineIsEqualGUID(iid, IID_IUnknown))
@@ -731,12 +731,12 @@ public:
 		return E_NOINTERFACE;
 	}
 
-	ULONG STDMETHODCALLTYPE AddRef( void) throw()
+	ULONG STDMETHODCALLTYPE AddRef( void)
 	{
 		return (ULONG)1;
 	}
 
-	ULONG STDMETHODCALLTYPE Release( void) throw()
+	ULONG STDMETHODCALLTYPE Release( void)
 	{
 		return (ULONG)1;
 	}

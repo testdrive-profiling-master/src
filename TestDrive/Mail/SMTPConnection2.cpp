@@ -8,7 +8,7 @@
 #include "smtpconnection2.h"
 
 BOOL CSMTPConnection2::Connect(LPCTSTR lpszHostDomain, 
-							   DWORD dwTimeout /*= 10000*/) throw()
+							   DWORD dwTimeout /*= 10000*/)
 {
 	CSimpleArray<CString> arrSMTP;
 	_GetSMTPList(lpszHostDomain, arrSMTP);

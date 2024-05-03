@@ -20,6 +20,8 @@ CTestDrive::CTestDrive(void){
 	g_pTestDrive	= this;
 	m_bProjectOpen	= FALSE;
 	m_bRunning		= FALSE;
+	m_bThreaded		= FALSE;
+	m_pMsgOutput	= NULL;
 
 	{	// 현재 폴더를 프로젝트 폴더로 지정
 		TCHAR szTemp[MAX_PATH];
@@ -64,8 +66,9 @@ void CTestDrive::LogOut(LPCTSTR szMsg, SYSMSG_ID id){
 	DWORD		effect	= 0;
 	CString		msg;
 
-	if(id==SYSMSG_INFO) msg.Format(_T("%s\n"), szMsg);
-	else msg.Format(_T("%s : %s\n"), (id==SYSMSG_WARNING) ? _S(WARNING) : _S(ERROR), szMsg);
+	if (id == SYSMSG_NONE) msg = szMsg;
+	else if (id == SYSMSG_INFO) msg.Format(_T("%s\n"), szMsg);
+	else msg.Format(_T("%s : %s\n"), (id == SYSMSG_WARNING) ? _S(WARNING) : _S(ERROR), szMsg);
 
 	switch(id){
 	case SYSMSG_INFO:
@@ -222,6 +225,14 @@ BOOL CTestDrive::IsProjectOpen(void){
 BOOL CTestDrive::IsBusy(void){
 	if(CRedirectExecute::GetCurrent()) return TRUE;
 	return FALSE;
+}
+
+BOOL CTestDrive::IsThreaded(void) {
+	return m_bThreaded;
+}
+
+COutput* CTestDrive::GetMsgOutput(void) {
+	return m_pMsgOutput ? m_pMsgOutput : &g_Output[COutput::TD_OUTPUT_SYSTEM];
 }
 
 BOOL CTestDrive::IsValidProfile(TESTDRIVE_PROFILE id){
@@ -942,10 +953,6 @@ void TB_LUA_LogError(const char* msg){
 	g_pTestDrive->LogError(_T("%s"), CString(msg));
 }
 
-void TB_LUA_system_clear(void){
-	g_pTestDrive->ClearLog();
-}
-
 void TB_LUA_system_title(const char* title){
 	CString title_name(title);
 	g_pTestDrive->SetTitle(ITDSystem::TITLE_MAIN, title_name);
@@ -1221,10 +1228,12 @@ BOOL CTestDrive::Build(LPCTSTR szFileName, COutput* pMsg, BOOL bThreaded)
 	static DWORD RefCount = 0;
 	int i;
 	TCHAR token[MAX_PATH], temp[MAX_PATH];
-	BOOL bTest = TRUE;
+	BOOL		bTest		= TRUE;
 	LPCTSTR		sErrorMsg	= _S(ERROR_IN_PROGRESS);
 
 	CPaser paser;
+
+	m_bThreaded = bThreaded;
 
 	// Reference count check
 	if(RefCount>50){
@@ -1255,6 +1264,7 @@ NO_PROFILE_NAME:
 
 		// provide default message out interface
 		if(!pMsg) pMsg = &g_Output[COutput::TD_OUTPUT_SYSTEM];
+		m_pMsgOutput = pMsg;
 
 		// Set current directory
 		{
@@ -1282,8 +1292,27 @@ NO_PROFILE_NAME:
 		m_bRunning	= TRUE;
 
 		while(paser.NewLine() && m_bRunning){
-			//LogOut(paser.GetCurLine());	// test
-			if(!paser.GetTokenName(token)) continue;
+			//LogOut(paser.GetCurLine());	// for debug
+
+			if (!paser.GetTokenName(token)) {
+				if (!_tcscmp(token, _T("#"))) {
+					if (paser.GetTokenName(token) && !_tcscmp(token, _T("lua"))) {
+						// Change to Lua script
+						int iCurLine	= paser.GetLineCount();
+						CString sLuaScript;
+						while (paser.NewLine()) {
+							sLuaScript += paser.GetCurLine();
+							sLuaScript += _T("\n");
+						}
+
+						if (!m_Lua.RunBuffer(CStringA(sLuaScript), CStringA(paser.GetFilePath()), iCurLine))
+							return FALSE;
+
+						break;
+					}
+				}
+				continue;
+			}
 
 			if(!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
 

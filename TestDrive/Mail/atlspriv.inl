@@ -104,7 +104,7 @@ inline bool ZEvtSyncSocket::Create(int af, int st, int proto, WORD wFlags)
 	return bRet;
 }
 
-inline bool ZEvtSyncSocket::Connect(LPCTSTR szAddr, unsigned short nPort) throw()
+inline bool ZEvtSyncSocket::Connect(LPCTSTR szAddr, unsigned short nPort)
 {
 	if (m_bConnected)
 		return true;
@@ -337,19 +337,19 @@ inline bool ZEvtSyncSocket::Init(SOCKET hSocket, void * /*pData=NULL*/)
 	return false;
 }
 
-inline DWORD ZEvtSyncSocket::GetSocketTimeout() throw()
+inline DWORD ZEvtSyncSocket::GetSocketTimeout()
 {
 	return m_dwSocketTimeout;
 }
 
-inline DWORD ZEvtSyncSocket::SetSocketTimeout(DWORD dwNewTimeout) throw()
+inline DWORD ZEvtSyncSocket::SetSocketTimeout(DWORD dwNewTimeout)
 {
 	DWORD dwOldTimeout = m_dwSocketTimeout;
 	m_dwSocketTimeout = dwNewTimeout;
 	return dwOldTimeout;
 }
 
-inline bool ZEvtSyncSocket::SupportsScheme(ATL_URL_SCHEME scheme) throw()
+inline bool ZEvtSyncSocket::SupportsScheme(ATL_URL_SCHEME scheme)
 {
 	// default only supports HTTP
 	return scheme == ATL_URL_SCHEME_HTTP ? true : false;

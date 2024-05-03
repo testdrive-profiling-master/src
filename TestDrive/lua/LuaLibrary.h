@@ -7,7 +7,7 @@
 #ifndef LUALIBRARY_SOURCE
 
 #if LUABRIDGEDEMO_LUA_VERSION >= 502
-  #include "Lua-5.4.4/src/lua.hpp"
+  #include "Lua-5.4.6/src/lua.hpp"
 
 #else
   #error "Unknown LUA_VERSION_NUM"

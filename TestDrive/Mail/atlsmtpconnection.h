@@ -56,18 +56,18 @@ private:
 	bool m_bInit;
 
 public:
-	CSMTPWSAStartup() throw()
+	CSMTPWSAStartup()
 		:m_bInit(false)
 	{
 		Init();
 	}
 
-	~CSMTPWSAStartup() throw()
+	~CSMTPWSAStartup()
 	{
 		Uninit();
 	}
 
-	bool Init() throw()
+	bool Init()
 	{
 		if (m_bInit)
 			return true;
@@ -80,7 +80,7 @@ public:
 		return true;
 	}
 
-	bool Uninit() throw()
+	bool Uninit()
 	{
 		if (m_bInit)
 			if (WSACleanup())
@@ -107,21 +107,21 @@ protected:
 
 public:
 
-	CSMTPConnection() throw()
+	CSMTPConnection()
 		:m_hSocket(INVALID_SOCKET)
 	{
 		// initialize the OVERLAPPED struct
 		memset(&m_Overlapped, 0, sizeof(OVERLAPPED));
 	}
 
-	~CSMTPConnection() throw()
+	~CSMTPConnection()
 	{
 		Disconnect();
 	}
 
 	// Attempt to connect to the socket
 	// lpszHostName - the host name to connect to
-	BOOL Connect(LPCTSTR lpszHostName, DWORD dwTimeout = 10000) throw()
+	BOOL Connect(LPCTSTR lpszHostName, DWORD dwTimeout = 10000)
 	{
 		ATLASSERT(lpszHostName != NULL);
 
@@ -259,7 +259,7 @@ public:
 	}
 
 	// Disconnect the socket
-	inline BOOL Disconnect() throw()
+	inline BOOL Disconnect()
 	{
 		if (!Connected())
 		{
@@ -286,7 +286,7 @@ public:
 	}
 
 	// Are we connected?
-	inline BOOL Connected() throw()
+	inline BOOL Connected()
 	{
 		return (m_hSocket != INVALID_SOCKET ? TRUE : FALSE);
 	}
@@ -297,7 +297,7 @@ public:
 	//		in the file will be used
 	// lpszSender - the sender (optional - if not specified, the recipients specified in the file
 	//		will be used
-	BOOL SendMessage(LPCTSTR lpszFileName, LPCTSTR lpszRecipients = NULL, LPCTSTR lpszSender = NULL) throw()
+	BOOL SendMessage(LPCTSTR lpszFileName, LPCTSTR lpszRecipients = NULL, LPCTSTR lpszSender = NULL)
 	{
 		if (!Connected())
 		{
@@ -472,7 +472,7 @@ public:
 	// Send the message
 	// msg - the CMimeMessage to send
 	// lpszSender - the sender 
-	inline BOOL SendMessage(CMimeMessage& msg, LPCTSTR lpszRecipients = NULL, LPCTSTR lpszSender = NULL) throw()
+	inline BOOL SendMessage(CMimeMessage& msg, LPCTSTR lpszRecipients = NULL, LPCTSTR lpszSender = NULL)
 	{
 		if (!Connected())
 		{
@@ -543,7 +543,7 @@ public:
 	}
 
 	// Send a chunk of raw data
-	inline BOOL SendRaw(LPCTSTR lpszRawData, DWORD dwLen, LPCTSTR lpszRecipients, LPCTSTR lpszSender) throw()
+	inline BOOL SendRaw(LPCTSTR lpszRawData, DWORD dwLen, LPCTSTR lpszRecipients, LPCTSTR lpszSender)
 	{
 		ATLASSERT(lpszRawData != NULL);
 		ATLASSERT(lpszRecipients != NULL);
@@ -597,7 +597,7 @@ public:
 		return bRet;
 	}
 
-	inline BOOL SendSimple(LPCTSTR lpszRecipients, LPCTSTR lpszSender, LPCTSTR lpszSubject, LPCTSTR lpszBody, int nTextLen = -1) throw()
+	inline BOOL SendSimple(LPCTSTR lpszRecipients, LPCTSTR lpszSender, LPCTSTR lpszSubject, LPCTSTR lpszBody, int nTextLen = -1)
 	{
 		CMimeMessage msg;
 		BOOL bRet = msg.SetSubject(lpszSubject);
@@ -648,7 +648,7 @@ public:
 	// lpszSender - the sender (optional)
 	// dwFlags - the flags (optional)
 	inline BOOL WriteToFile(LPCTSTR lpszFileName, CMimeMessage& msg, LPCTSTR lpszRecipients = NULL, 
-		LPCTSTR lpszSender = NULL, DWORD dwFlags = 0) throw()
+		LPCTSTR lpszSender = NULL, DWORD dwFlags = 0)
 	{
 		//Try to create/open the file
 		HANDLE hFile = CreateFile(lpszFileName, GENERIC_WRITE, 0, NULL,
@@ -734,20 +734,20 @@ public:
 protected:
 
 	// disallow copy construction
-	CSMTPConnection(const CSMTPConnection&) throw()
+	CSMTPConnection(const CSMTPConnection&)
 	{
 		ATLASSERT(FALSE);
 	}
 
 	// disallow assignment
-	const CSMTPConnection& operator=(const CSMTPConnection&) throw()
+	const CSMTPConnection& operator=(const CSMTPConnection&)
 	{
 		ATLASSERT(FALSE);
 		return *this;
 	}
 
 	// Tell the server we are aborting the message
-	inline BOOL CancelMessage() throw()
+	inline BOOL CancelMessage()
 	{
 		char szBuf[ATLSMTP_MAX_LINE_LENGTH+1];
 		int nBufLen  = 0;
@@ -831,7 +831,7 @@ protected:
 
 	// Implementation - used from ReadLine
 	// fills pBuf with up to dwMaxLen bytes
-	BOOL FillBuffer(__in HANDLE hFile, __out_ecount_part(dwMaxLen, *pdwLen) LPSTR pBuf, __in DWORD dwMaxLen, __out LPDWORD pdwLen) throw()
+	BOOL FillBuffer(__in HANDLE hFile, __out_ecount_part(dwMaxLen, *pdwLen) LPSTR pBuf, __in DWORD dwMaxLen, __out LPDWORD pdwLen)
 	{
 		ATLASSERT(hFile != INVALID_HANDLE_VALUE);
 		ATLASSERT(pdwLen != NULL);

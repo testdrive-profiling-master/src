@@ -51,7 +51,7 @@ extern "C"
 #define lvm_c
 #define LUA_CORE
 #define LUA_LIB
-#include "Lua-5.4.4/src/luaconf.h"
+#include "Lua-5.4.6/src/luaconf.h"
 #undef lobject_c
 #undef lvm_c
 #undef LUA_CORE
@@ -66,47 +66,47 @@ extern "C"
 /* Include this early to prevent the conflict with luai_hashnum
    and supress the warning caused by #define lua_assert
 */
-#include "Lua-5.4.4/src/lapi.c"
-#include "Lua-5.4.4/src/lauxlib.c"
-#include "Lua-5.4.4/src/lbaselib.c"
-#include "Lua-5.4.4/src/lcode.c"
-#include "Lua-5.4.4/src/lcorolib.c"
-#include "Lua-5.4.4/src/lctype.c"
-#include "Lua-5.4.4/src/ldblib.c"
-#include "Lua-5.4.4/src/ldebug.c"
-#include "Lua-5.4.4/src/ldo.c"
-#include "Lua-5.4.4/src/ldump.c"
-#include "Lua-5.4.4/src/lfunc.c"
-#include "Lua-5.4.4/src/lgc.c"
-#include "Lua-5.4.4/src/linit.c"
-#include "Lua-5.4.4/src/liolib.c"
-#include "Lua-5.4.4/src/llex.c"
-#include "Lua-5.4.4/src/lmathlib.c"
-#include "Lua-5.4.4/src/lmem.c"
-//#include "Lua-5.4.4/src/loadlib.c"
-#include "Lua-5.4.4/src/lobject.c"
-#include "Lua-5.4.4/src/lopcodes.c"
-#include "Lua-5.4.4/src/loslib.c"
-#include "Lua-5.4.4/src/lparser.c"
-#include "Lua-5.4.4/src/lstate.c"
-#include "Lua-5.4.4/src/lstring.c"
-#include "Lua-5.4.4/src/lstrlib.c"
-#include "Lua-5.4.4/src/ltable.c"
-#include "Lua-5.4.4/src/ltablib.c"
-#include "Lua-5.4.4/src/ltm.c"
-//#include "Lua-5.4.4/src/lua.c"
-//#include "Lua-5.4.4/src/luac.c"
-#include "Lua-5.4.4/src/lundump.c"
-#include "Lua-5.4.4/src/lutf8lib.c"
-#include "Lua-5.4.4/src/lvm.c"
-#include "Lua-5.4.4/src/lzio.c"
+#include "Lua-5.4.6/src/lapi.c"
+#include "Lua-5.4.6/src/lauxlib.c"
+#include "Lua-5.4.6/src/lbaselib.c"
+#include "Lua-5.4.6/src/lcode.c"
+#include "Lua-5.4.6/src/lcorolib.c"
+#include "Lua-5.4.6/src/lctype.c"
+#include "Lua-5.4.6/src/ldblib.c"
+#include "Lua-5.4.6/src/ldebug.c"
+#include "Lua-5.4.6/src/ldo.c"
+#include "Lua-5.4.6/src/ldump.c"
+#include "Lua-5.4.6/src/lfunc.c"
+#include "Lua-5.4.6/src/lgc.c"
+#include "Lua-5.4.6/src/linit.c"
+#include "Lua-5.4.6/src/liolib.c"
+#include "Lua-5.4.6/src/llex.c"
+#include "Lua-5.4.6/src/lmathlib.c"
+#include "Lua-5.4.6/src/lmem.c"
+//#include "Lua-5.4.6/src/loadlib.c"
+#include "Lua-5.4.6/src/lobject.c"
+#include "Lua-5.4.6/src/lopcodes.c"
+#include "Lua-5.4.6/src/loslib.c"
+#include "Lua-5.4.6/src/lparser.c"
+#include "Lua-5.4.6/src/lstate.c"
+#include "Lua-5.4.6/src/lstring.c"
+#include "Lua-5.4.6/src/lstrlib.c"
+#include "Lua-5.4.6/src/ltable.c"
+#include "Lua-5.4.6/src/ltablib.c"
+#include "Lua-5.4.6/src/ltm.c"
+//#include "Lua-5.4.6/src/lua.c"
+//#include "Lua-5.4.6/src/luac.c"
+#include "Lua-5.4.6/src/lundump.c"
+#include "Lua-5.4.6/src/lutf8lib.c"
+#include "Lua-5.4.6/src/lvm.c"
+#include "Lua-5.4.6/src/lzio.c"
 
 
 
 /* loadlib.c includes Windows.h, which defines the LoadString macro,
    so include it last to prevent errors.
 */
-#include "Lua-5.4.4/src/loadlib.c"
+#include "Lua-5.4.6/src/loadlib.c"
 
 #if _MSC_VER
 #pragma warning (pop)

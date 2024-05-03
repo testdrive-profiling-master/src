@@ -52,7 +52,7 @@ extern __declspec(selectany) const DWORD ATL_MIME_BOUNDARYLEN = 32;
 extern __declspec(selectany) const DWORD ATL_MIME_DATE_LEN    = 64;
 
 // Called when message is sent - sets the "Date:" field
-inline size_t SetRfc822Time(__out_ecount_part_z_opt(dwLen, return) LPSTR szDate, __in size_t dwLen) throw()
+inline size_t SetRfc822Time(__out_ecount_part_z_opt(dwLen, return) LPSTR szDate, __in size_t dwLen)
 {
 	// Max buffer size required(including NULL) - 38
 	const size_t s_dwMaxBufferLen = 38;
@@ -123,7 +123,7 @@ inline size_t SetRfc822Time(__out_ecount_part_z_opt(dwLen, return) LPSTR szDate,
 	return s_dwMaxBufferLen;
 }
 
-inline DWORD GetContentTypeFromFileName(LPCTSTR szFileName, CSimpleString& strContentType) throw()
+inline DWORD GetContentTypeFromFileName(LPCTSTR szFileName, CSimpleString& strContentType)
 {
 	if (szFileName == NULL)
 	{
@@ -242,19 +242,19 @@ protected:
 
 public:
 
-	CMimeHeader() throw()
+	CMimeHeader()
 		:m_nPriority(ATL_MIME_NORMAL_PRIORITY)
 	{
 		m_szSubjectCharset[0] = '\0';
 		m_szSenderCharset[0] = '\0';
 	}
 
-	~CMimeHeader() throw()
+	~CMimeHeader()
 	{
 	}
 
 	// Initialize MLang for multilanguage support
-	inline BOOL Initialize(IMultiLanguage* pMultiLanguage = NULL) throw()
+	inline BOOL Initialize(IMultiLanguage* pMultiLanguage = NULL)
 	{
 		if (pMultiLanguage != NULL)
 		{
@@ -270,18 +270,18 @@ public:
 	}
 
 	// Get the content type
-	virtual inline LPCSTR GetContentType() throw()
+	virtual inline LPCSTR GetContentType()
 	{
 		return "text/plain";
 	}
 
 	// Get the character set
-	virtual inline LPCSTR GetCharset() throw()
+	virtual inline LPCSTR GetCharset()
 	{
 		return "iso-8859-1";
 	}
 
-	virtual ATL_NOINLINE CMimeBodyPart* Copy() throw( ... )
+	virtual ATL_NOINLINE CMimeBodyPart* Copy()
 	{
 		CAutoPtr<CMimeHeader> pNewHeader;
 		ATLTRY(pNewHeader.Attach(new CMimeHeader));
@@ -291,7 +291,7 @@ public:
 		return pNewHeader.Detach();
 	}
 
-	const CMimeHeader& operator=(const CMimeHeader& that) throw( ... )
+	const CMimeHeader& operator=(const CMimeHeader& that)
 	{
 		if (this != &that)
 		{
@@ -314,7 +314,7 @@ public:
 	}
 
 	// Set the priority of the message
-	inline BOOL SetPriority(ATL_MIME_PRIORITY nPriority) throw()
+	inline BOOL SetPriority(ATL_MIME_PRIORITY nPriority)
 	{
 		if (nPriority < 0)
 			return FALSE;
@@ -323,13 +323,13 @@ public:
 	}
 
 	// Get the priority of the message
-	inline ATL_MIME_PRIORITY GetPriority() throw()
+	inline ATL_MIME_PRIORITY GetPriority()
 	{
 		return m_nPriority;
 	}
 
 	// Set the display (friendly) name for the header
-	inline BOOL SetSenderName(LPCTSTR szName, UINT uiCodePage = 0) throw()
+	inline BOOL SetSenderName(LPCTSTR szName, UINT uiCodePage = 0)
 	{
 		if (szName == NULL)
 			return FALSE;
@@ -356,13 +356,13 @@ public:
 	}
 
 	// Get the display (friendly) name for the sender
-	inline LPCSTR GetSenderName() throw()
+	inline LPCSTR GetSenderName()
 	{
 		return m_strSenderName;
 	}
 
 	// Append a user defined header (should not contain CRLF)
-	inline BOOL AppendUserDefinedHeader(LPCTSTR szHeaderName, LPCTSTR szHeader, UINT uiCodePage = 0) throw()
+	inline BOOL AppendUserDefinedHeader(LPCTSTR szHeaderName, LPCTSTR szHeader, UINT uiCodePage = 0)
 	{
 		if ((szHeader == NULL) || (szHeaderName == NULL))
 			return FALSE;
@@ -418,45 +418,45 @@ public:
 	}
 
 	// Add a recipient ("To:" line)
-	inline BOOL AddRecipient(LPCTSTR szAddress, LPCTSTR szName = NULL, UINT uiCodePage = 0) throw()
+	inline BOOL AddRecipient(LPCTSTR szAddress, LPCTSTR szName = NULL, UINT uiCodePage = 0)
 	{
 		return AddRecipientHelper(m_strTo, szAddress, szName, uiCodePage);
 	}
 
 	// Get the recipients string ("To:" line)
-	inline LPCSTR GetRecipients() throw()
+	inline LPCSTR GetRecipients()
 	{
 		return m_strTo;
 	}
 
 	// Clear all recipients ("To:" line)
-	inline BOOL ClearRecipients() throw()
+	inline BOOL ClearRecipients()
 	{
 		m_strTo.Empty();
 		return TRUE;
 	}
 
 	// Add a recipient ("CC:" line)
-	inline BOOL AddCc(LPCTSTR szAddress, LPCTSTR szName = NULL, UINT uiCodePage = 0) throw()
+	inline BOOL AddCc(LPCTSTR szAddress, LPCTSTR szName = NULL, UINT uiCodePage = 0)
 	{
 		return AddRecipientHelper(m_strCc, szAddress, szName, uiCodePage);
 	}
 
 	// Get the recipients string ("CC:" line)
-	inline LPCSTR GetCc() throw()
+	inline LPCSTR GetCc()
 	{
 		return m_strCc;
 	}
 
 	// Clear the recipients string ("CC:" line)
-	inline BOOL ClearCc() throw()
+	inline BOOL ClearCc()
 	{
 		m_strCc.Empty();
 		return TRUE;
 	}
 
 	// Add a Bcc recipient (not output as part of message)
-	inline BOOL AddBcc(LPCTSTR szAddress) throw()
+	inline BOOL AddBcc(LPCTSTR szAddress)
 	{
 		if (szAddress == NULL)
 		{
@@ -483,20 +483,20 @@ public:
 	}
 
 	// Get the recipients string (Bcc part)
-	inline LPCSTR GetBcc() throw()
+	inline LPCSTR GetBcc()
 	{
 		return m_strBcc;
 	}
 
 	// Clear the recipients string (Bcc part)
-	inline BOOL ClearBcc() throw()
+	inline BOOL ClearBcc()
 	{
 		m_strBcc.Empty();
 		return TRUE;
 	}
 
 
-	inline DWORD GetRequiredRecipientsStringLength() throw()
+	inline DWORD GetRequiredRecipientsStringLength()
 	{
 		DWORD dwRet = m_strTo.GetLength();
 		if (m_strCc.GetLength())
@@ -514,7 +514,7 @@ public:
 	}
 
 	// returns the recipients string to be (addresses only, in comma separated format)
-	ATL_NOINLINE BOOL GetRecipientsString(__out_ecount_part_z(*pdwLen, *pdwLen) LPSTR szRecip, __inout LPDWORD pdwLen) throw()
+	ATL_NOINLINE BOOL GetRecipientsString(__out_ecount_part_z(*pdwLen, *pdwLen) LPSTR szRecip, __inout LPDWORD pdwLen)
 	{
 		if ( (szRecip == NULL) || (pdwLen == NULL) )
 		{
@@ -581,13 +581,13 @@ public:
 
 
 	// Get the sender
-	inline LPCSTR GetSender() throw()
+	inline LPCSTR GetSender()
 	{
 		return m_strFrom;
 	}
 
 	// Set the sender
-	inline BOOL SetSender(LPCTSTR szSender) throw()
+	inline BOOL SetSender(LPCTSTR szSender)
 	{
 		if (szSender == NULL)
 			return FALSE;
@@ -604,7 +604,7 @@ public:
 	}
 
 	// Set the subject
-	inline BOOL SetSubject(LPCTSTR szSubject, UINT uiCodePage = 0) throw()
+	inline BOOL SetSubject(LPCTSTR szSubject, UINT uiCodePage = 0)
 	{
 		if (szSubject == NULL)
 			return FALSE;
@@ -631,13 +631,13 @@ public:
 	}
 
 	// Get the subject
-	inline LPCSTR GetSubject() throw()
+	inline LPCSTR GetSubject()
 	{
 		return (LPCSTR)m_strSubject;
 	}
 
 	// Dump the header to hFile
-	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR /*szBoundary*/, DWORD dwFlags = 0) throw()
+	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR /*szBoundary*/, DWORD dwFlags = 0)
 	{
 		if (pOverlapped == NULL)
 		{
@@ -806,7 +806,7 @@ public:
 protected:
 
 	// Make the mime header
-	virtual inline BOOL MakeMimeHeader(CStringA& /*header*/, LPCSTR /*szBoundary*/) throw()
+	virtual inline BOOL MakeMimeHeader(CStringA& /*header*/, LPCSTR /*szBoundary*/)
 	{
 		// The message header does not have its own MIME header
 		ATLASSERT(FALSE);
@@ -814,7 +814,7 @@ protected:
 	}
 
 	// Get an encoded string for a header field
-	inline BOOL GetEncodedString(__in CStringA& headerString, __in LPCSTR szCharset, __out_ecount_part_z(nBufLen, dwLength) LPSTR szBuf, __in int nBufLen, __out DWORD& dwLength, __out BOOL& bEncoded) throw()
+	inline BOOL GetEncodedString(__in CStringA& headerString, __in LPCSTR szCharset, __out_ecount_part_z(nBufLen, dwLength) LPSTR szBuf, __in int nBufLen, __out DWORD& dwLength, __out BOOL& bEncoded)
 	{
 //		BOOL bEncoded = FALSE;
 		bEncoded = FALSE;
@@ -868,7 +868,7 @@ protected:
 
 
 	// Helper function for adding recipients
-	inline BOOL AddRecipientHelper(CStringA& str, LPCTSTR szAddress, LPCTSTR szName = NULL, UINT uiCodePage = 0) throw()
+	inline BOOL AddRecipientHelper(CStringA& str, LPCTSTR szAddress, LPCTSTR szName = NULL, UINT uiCodePage = 0)
 	{
 		if ((szAddress == NULL) && (szName == NULL))
 		{
@@ -971,7 +971,7 @@ protected:
 
 	// Get the formatted header information
 	inline BOOL FormatField(LPBYTE pbSrcData, int nSrcLen, LPBYTE pbDest, 
-		DWORD* pnBufLen, DWORD dwFlags = 0) throw()
+		DWORD* pnBufLen, DWORD dwFlags = 0)
 	{
 		if(pnBufLen == NULL)
 			return FALSE;
@@ -1033,7 +1033,7 @@ protected:
 
 	// Get the formatted recipient information
 	inline BOOL FormatRecipients(LPBYTE pbSrcData, int nSrcLen, LPBYTE pbDest, 
-		DWORD* pnBufLen) throw()
+		DWORD* pnBufLen)
 	{
 		
 		if(pnBufLen == NULL)
@@ -1078,7 +1078,7 @@ protected:
 	}
 
 	// Get the required buffer size for the header
-	inline int GetRequiredBufferSize(int nMaxLineLength) throw()
+	inline int GetRequiredBufferSize(int nMaxLineLength)
 	{
 		const static DWORD DATELINE    = 27;
 		const static DWORD FROMLINE    = 10;
@@ -1141,14 +1141,14 @@ protected:
 	TCHAR    m_szDisplayName[_MAX_FNAME];
 
 public:
-	CMimeAttachment() throw()
+	CMimeAttachment()
 		:m_nEncodingScheme(ATLSMTP_BASE64_ENCODE), m_pszEncodeString(NULL)
 	{
 		m_szCharset[0] = 0;
 		m_szDisplayName[0] = 0;
 	}
 
-	virtual ~CMimeAttachment() throw()
+	virtual ~CMimeAttachment()
 	{
 	}
 
@@ -1156,7 +1156,7 @@ public:
 	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary, DWORD dwFlags = 0) = 0;
 
 	// Set the encoding scheme of the attachment
-	inline BOOL SetEncodingScheme(int nScheme) throw()
+	inline BOOL SetEncodingScheme(int nScheme)
 	{
 		if (nScheme != ATLSMTP_BASE64_ENCODE && nScheme != ATLSMTP_UUENCODE && nScheme != ATLSMTP_QP_ENCODE)
 		{
@@ -1168,7 +1168,7 @@ public:
 	}
 
 	// Set the Content-Type of the attachment
-	inline BOOL SetContentType(LPCTSTR szContent) throw()
+	inline BOOL SetContentType(LPCTSTR szContent)
 	{
 		_ATLTRY
 		{
@@ -1182,20 +1182,20 @@ public:
 	}
 
 	// Get the content type of the attachment
-	virtual inline LPCSTR GetContentType() throw()
+	virtual inline LPCSTR GetContentType()
 	{
 		return m_ContentType;
 	}
 
 	// Get the character set of the attachment
-	virtual inline LPCSTR GetCharset() throw()
+	virtual inline LPCSTR GetCharset()
 	{
 		return m_szCharset;
 	}
 
 	virtual ATL_NOINLINE CMimeBodyPart* Copy() = 0;
 
-	const CMimeAttachment& operator=(const CMimeAttachment& that) throw( ... )
+	const CMimeAttachment& operator=(const CMimeAttachment& that)
 	{
 		if (this != &that)
 		{
@@ -1212,7 +1212,7 @@ public:
 protected:
 
 	// Make the MIME header for the attachment
-	virtual inline BOOL MakeMimeHeader(CStringA& header, LPCSTR szBoundary) throw()
+	virtual inline BOOL MakeMimeHeader(CStringA& header, LPCSTR szBoundary)
 	{
 		// if no display name is specified, default to "rawdata"
 		return MakeMimeHeader(header, szBoundary, _T("rawdata"));
@@ -1307,12 +1307,12 @@ protected:
 	TCHAR m_szFileName[MAX_PATH+1];
 
 public:
-	CMimeFileAttachment() throw()
+	CMimeFileAttachment()
 	{
 		m_szFileName[0] = 0;
 	}
 
-	virtual ATL_NOINLINE CMimeBodyPart* Copy() throw( ... )
+	virtual ATL_NOINLINE CMimeBodyPart* Copy()
 	{
 		CAutoPtr<CMimeFileAttachment> pNewAttachment;
 		ATLTRY(pNewAttachment.Attach(new CMimeFileAttachment));
@@ -1322,7 +1322,7 @@ public:
 		return pNewAttachment.Detach();
 	}
 
-	const CMimeFileAttachment& operator=(const CMimeFileAttachment& that) throw( ... )
+	const CMimeFileAttachment& operator=(const CMimeFileAttachment& that)
 	{
 		if (this != &that)
 		{
@@ -1339,7 +1339,7 @@ public:
 	// szDisplayName - the display name for the file (optional)
 	// pMultiLanguage - the IMulitLanguage pointer for codepage to charset conversion (optional)
 	// uiCodePage - the code page (optional)
-	inline BOOL Initialize(LPCTSTR szFileName, LPCTSTR szDisplayName = NULL, IMultiLanguage* pMultiLanguage = NULL, UINT uiCodePage = 0) throw()
+	inline BOOL Initialize(LPCTSTR szFileName, LPCTSTR szDisplayName = NULL, IMultiLanguage* pMultiLanguage = NULL, UINT uiCodePage = 0)
 	{
 		if (!AtlMimeCharsetFromCodePage(m_szCharset, uiCodePage, pMultiLanguage, ATL_MAX_ENC_CHARSET_LENGTH))
 			return FALSE;
@@ -1373,7 +1373,7 @@ public:
 	}
 
 	// Dump the data for the file attachment
-	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary, DWORD dwFlags = 0) throw()
+	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary, DWORD dwFlags = 0)
 	{
 		if ((pOverlapped == NULL) || (szBoundary == NULL))
 		{
@@ -1571,19 +1571,19 @@ protected:
 	bool  m_bShared;
 
 public:
-	CMimeRawAttachment() throw()
+	CMimeRawAttachment()
 		:m_dwLength(0), m_bShared(false), m_pvRaw(NULL)
 	{
 	}
 
-	~CMimeRawAttachment() throw()
+	~CMimeRawAttachment()
 	{
 		//If we own the raw data, free it
 		if (!m_bShared && m_pvRaw)
 			free(m_pvRaw);
 	}
 
-	virtual ATL_NOINLINE CMimeBodyPart* Copy() throw( ... )
+	virtual ATL_NOINLINE CMimeBodyPart* Copy()
 	{
 		CAutoPtr<CMimeRawAttachment> pNewAttachment;
 		ATLTRY(pNewAttachment.Attach(new CMimeRawAttachment));
@@ -1593,7 +1593,7 @@ public:
 		return pNewAttachment.Detach();
 	}
 
-	const CMimeRawAttachment& operator=(const CMimeRawAttachment& that) throw( ... )
+	const CMimeRawAttachment& operator=(const CMimeRawAttachment& that)
 	{
 		if (this != &that)
 		{
@@ -1628,7 +1628,7 @@ public:
 	// pMultiLanguage - the IMultiLanguage pointer for codepage to character set conversion (optional)
 	// uiCodePage - the codepage (optional)
 	inline BOOL Initialize(void* pData, DWORD nDataLength, BOOL bCopyData = TRUE, LPCTSTR szDisplayName = NULL, 
-		IMultiLanguage* pMultiLanguage = NULL, UINT uiCodePage = 0) throw()
+		IMultiLanguage* pMultiLanguage = NULL, UINT uiCodePage = 0)
 	{
 		// if we're already attached to some data, and it's not shared, free it
 		if (m_pvRaw && !m_bShared)
@@ -1671,7 +1671,7 @@ public:
 
 	// Output the data--similar to CFileAttachment::WriteData
 	// See CFileAttachment::WriteData for comments
-	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary, DWORD dwFlags = 0) throw()
+	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary, DWORD dwFlags = 0)
 	{
 		if ((pOverlapped == NULL) || (szBoundary == NULL))
 		{
@@ -1800,29 +1800,29 @@ protected:
 	int      m_nTextLen;
 
 public:
-	CMimeText() throw()
+	CMimeText()
 		:m_nTextLen(0)
 	{
 		Checked::strcpy_s(m_szCharset, ATL_MAX_ENC_CHARSET_LENGTH, ATLSMTP_DEFAULT_CSET);
 	}
 
-	virtual ~CMimeText() throw()
+	virtual ~CMimeText()
 	{
 	}
 
 	// Get the content type
-	virtual inline LPCSTR GetContentType() throw()
+	virtual inline LPCSTR GetContentType()
 	{
 		return "text/plain";
 	}
 
 	// Get the character set
-	virtual inline LPCSTR GetCharset() throw()
+	virtual inline LPCSTR GetCharset()
 	{
 		return m_szCharset;
 	}
 
-	virtual ATL_NOINLINE CMimeBodyPart* Copy() throw( ... )
+	virtual ATL_NOINLINE CMimeBodyPart* Copy()
 	{
 		CAutoPtr<CMimeText> pNewText;
 		ATLTRY(pNewText.Attach(new CMimeText));
@@ -1832,7 +1832,7 @@ public:
 		return pNewText.Detach();
 	}
 
-	const CMimeText& operator=(const CMimeText& that) throw( ... )
+	const CMimeText& operator=(const CMimeText& that)
 	{
 		if (this != &that)
 		{
@@ -1853,7 +1853,7 @@ public:
 	// nTextLen - the text length in bytes (optional--if not specified a _tcslen will be done)
 	// pMultiLanguage - the IMultiLanguagte pointer for converting codepages to MIME character sets (optional)
 	// uiCodePage - the codepage
-	inline BOOL Initialize(LPCTSTR szText, int nTextLen = -1, IMultiLanguage* pMultiLanguage = NULL, UINT uiCodePage = 0) throw()
+	inline BOOL Initialize(LPCTSTR szText, int nTextLen = -1, IMultiLanguage* pMultiLanguage = NULL, UINT uiCodePage = 0)
 	{
 		BOOL bRet = TRUE;
 
@@ -1896,7 +1896,7 @@ public:
 	}
 
 	// Dump the data to hFile
-	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary, DWORD dwFlags = 0) throw()
+	virtual inline BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary, DWORD dwFlags = 0)
 	{
 		if ((pOverlapped == NULL) || (szBoundary == NULL))
 		{
@@ -1984,7 +1984,7 @@ public:
 protected:
 
 	// Make the MIME header
-	virtual inline BOOL MakeMimeHeader(CStringA& header, LPCSTR szBoundary) throw()
+	virtual inline BOOL MakeMimeHeader(CStringA& header, LPCSTR szBoundary)
 	{
 		char szBegin[256];
 		if (*szBoundary)
@@ -2026,24 +2026,24 @@ protected:
 	char m_szDisplayName[MAX_PATH+1];
 
 public:
-	CMimeMessage(IMultiLanguage *pMultiLanguage = NULL) throw()
+	CMimeMessage(IMultiLanguage *pMultiLanguage = NULL)
 	{
 		Initialize(pMultiLanguage);
 		Checked::memcpy_s(m_szDisplayName, MAX_PATH+1, ATLMIME_EMAIL, sizeof(ATLMIME_EMAIL));
 	}
 
-	virtual ~CMimeMessage() throw()
+	virtual ~CMimeMessage()
 	{
 		RemoveParts();
 	}
 
-	void RemoveParts() throw()
+	void RemoveParts()
 	{
 		m_BodyParts.RemoveAll();
 	}
 
 
-	virtual ATL_NOINLINE CMimeBodyPart* Copy() throw( ... )
+	virtual ATL_NOINLINE CMimeBodyPart* Copy()
 	{
 		CAutoPtr<CMimeMessage> pNewMessage;
 		ATLTRY(pNewMessage.Attach(new CMimeMessage));
@@ -2054,7 +2054,7 @@ public:
 	}
 
 
-	const CMimeMessage& operator=(const CMimeMessage& that) throw( ... )
+	const CMimeMessage& operator=(const CMimeMessage& that)
 	{
 		if (this != &that)
 		{
@@ -2077,7 +2077,7 @@ public:
 	}
 
 	// Set the display name of the message
-	inline BOOL SetDisplayName(LPCTSTR szDisplayName) throw()
+	inline BOOL SetDisplayName(LPCTSTR szDisplayName)
 	{
 		if (szDisplayName == NULL)
 		{
@@ -2103,7 +2103,7 @@ public:
 	// nTextLen - the size of the text in bytes (optional - if not specified a _tcslen will be done)
 	// nPos - the position in the message at which to insert the text (optional)
 	// uiCodePage - the codepage (optional)
-	inline BOOL AddText(LPCTSTR szText, int nTextLen = -1, int nPos = 1, UINT uiCodePage = 0) throw()
+	inline BOOL AddText(LPCTSTR szText, int nTextLen = -1, int nPos = 1, UINT uiCodePage = 0)
 	{
 		if (szText == NULL)
 			return FALSE;
@@ -2148,7 +2148,7 @@ public:
 	}
 
 	// Dump the data
-	virtual BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary=NULL, DWORD dwFlags = 0) throw()
+	virtual BOOL WriteData(HANDLE hFile, LPOVERLAPPED pOverlapped, LPCSTR szBoundary=NULL, DWORD dwFlags = 0)
 	{	
 		if (pOverlapped == NULL)
 		{
@@ -2327,7 +2327,7 @@ public:
 
 	// Attach a CMimeMessage
 	// pMsg - pointer to the Msg object
-	inline BOOL AttachMessage(CMimeMessage* pMsg) throw( ... )
+	inline BOOL AttachMessage(CMimeMessage* pMsg)
 	{
 		if (!pMsg)
 			return FALSE;
@@ -2348,7 +2348,7 @@ public:
 
 protected:
 	// Make the MIME header
-	virtual inline BOOL MakeMimeHeader(CStringA& header, LPCSTR szBoundary) throw()
+	virtual inline BOOL MakeMimeHeader(CStringA& header, LPCSTR szBoundary)
 	{
 		_ATLTRY
 		{

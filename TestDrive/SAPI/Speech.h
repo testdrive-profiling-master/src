@@ -1,7 +1,7 @@
 #ifndef __SPEECH_H_
 #define __SPEECH_H_
 #pragma once
-#include <sapi.h>
+//#include <sapi.h>		// already include "stdafx.h"
 
 #define WM_SPEACH		(WM_USER+1014)
 

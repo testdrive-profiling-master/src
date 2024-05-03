@@ -13,7 +13,7 @@
 class CSMTPConnection2 : public CSMTPConnection
 {
 public:	
-	BOOL Connect(LPCTSTR lpszHostDomain, DWORD dwTimeout = 10000) throw();
+	BOOL Connect(LPCTSTR lpszHostDomain, DWORD dwTimeout = 10000);
 private:
 	void _GetSMTPList(LPCTSTR lpszHostDomain, CSimpleArray<CString>& arrSMTP);
 };

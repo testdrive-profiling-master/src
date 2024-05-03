@@ -78,6 +78,8 @@ public:
 	BOOL CloseProject(BOOL bPreserveMessage = FALSE);
 	BOOL IsProjectOpen(void);
 	BOOL IsBusy(void);
+	BOOL IsThreaded(void);
+	COutput* GetMsgOutput(void);
 	BOOL IsValidProfile(TESTDRIVE_PROFILE id);
 	BOOL Build(TESTDRIVE_PROFILE id = TESTDRIVE_PROFILE_INITIALIZE);
 	BOOL Build(LPCTSTR szFileName, COutput* msg = NULL, BOOL bThreaded = FALSE);
@@ -90,7 +92,7 @@ public:
 	// Project Configuration
  	CConfig				m_Config;
 	CSpeech				m_Speech;
-	CTestDriveLua		m_Lua;
+	TestDriveLua		m_Lua;
 
 protected:	// local
 	CString				m_sTitle;
@@ -102,6 +104,10 @@ protected:	// local
 
 	BOOL				m_bRunning;
 	BOOL				m_bProjectOpen;
+	BOOL				m_bThreaded;
+	COutput*			m_pMsgOutput;
+
+	friend class TestDriveLua;
 
 private:
 	BOOL GetEnvString(LPCTSTR sKey, CString& sAppName, CString& sKeyName, CString& sEnvPath);

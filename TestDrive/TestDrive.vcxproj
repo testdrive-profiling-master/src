@@ -115,6 +115,7 @@
       <PreprocessorDefinitions>TESTDRIVE_ENTRY;PUGIXML_WCHAR_MODE;WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;$(TESTDRIVE_DIR)include;.\ChartCtrl;.\System;.\ExcelCtrl;.\Mail;.\AviGenerator;.\SAPI;.\Network;.\lua;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -172,6 +173,7 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
       <PreprocessorDefinitions>TESTDRIVE_ENTRY;PUGIXML_WCHAR_MODE;WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;$(TESTDRIVE_DIR)include;.\ChartCtrl;.\System;.\ExcelCtrl;.\Mail;.\AviGenerator;.\SAPI;.\Network;.\lua;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
