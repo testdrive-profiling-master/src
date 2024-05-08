@@ -208,32 +208,70 @@ namespace Lua_System {
 	void ClearProfile(void) {
 		g_ProfileTree.DeleteAllItems();
 	}
+
+	bool CallProfile(const char* sFileName) {
+		bool		bRet = false;
+		CFullPath	cur_path;
+
+		bRet = g_pTestDrive->Build(CString(sFileName), &g_Output[COutput::TD_OUTPUT_SYSTEM], g_pTestDrive->IsThreaded());
+
+		SetCurrentDirectory(cur_path);
+
+		return bRet;
+	}
+
+	const char* GetLocaleString(void) {
+		static CStringA		sLocale;
+		sLocale = g_Localization.CurrentLocale()->sName;
+		return sLocale;
+	}
 };
 
+BOOL SearchTreeFile(LPCTSTR sPath, LPVOID pData);
 class ProfileTree {
 public:
-	ProfileTree(ProfileTree* pTree, const char* sName) {
+	ProfileTree(const char* sName, ProfileTree* pParent) {
 		CString	sTreeName(sName);
-		m_Tree = g_ProfileTree.FindChildItem(pTree ? pTree->Object() : NULL, sTreeName);
+		m_Tree = g_ProfileTree.FindChildItem(pParent ? pParent->Object() : NULL, sTreeName);
 		if (!m_Tree) {
-			if (pTree) {
-				//g_ProfileTree.AddItem();
-			} else {
-				// to TOP
-				//g_ProfileTree.Insert
-				//m_CurrentItem = InsertItem(szName, type, type, m_ParentItem ? m_ParentItem : TVI_ROOT, insert_after ? insert_after : TVI_LAST);
-			}
+			m_Tree = g_ProfileTree.InsertTree(sTreeName, pParent ? pParent->Object() : NULL);
 		}
 	}
+
 	virtual ~ProfileTree(void) {
 	}
 
-	void AddData(LPCTSTR sType) {
-		//InsertItem(szName, type, type, m_ParentItem ? m_ParentItem : TVI_ROOT, TVI_LAST);
+	void Expand(void) {
+		g_ProfileTree.ExpandTree(m_Tree, true);
 	}
 
-	void Search() {
+	void Collapse(void) {
+		g_ProfileTree.ExpandTree(m_Tree, false);
+	}
 
+	bool AddItem(const char* sType, const char* sName, const char* sCommand) {
+		if (!sType || !sName || !sCommand) {
+			return false;
+		}
+		CString		szType(sType);
+		int iType	= CheckCommand(szType, g_sProfileTree, (int)TREE_ITEM_PROFILE + 1);
+		if (iType < 0) {
+			g_pTestDrive->LogError(_T("Can't recognize item type of 'AddItem' : %s"), (LPCTSTR)szType);
+			return false;
+		}
+
+		g_ProfileTree.InsertData(m_Tree, (TD_TREE_ITEM)iType, CString(sName), CString(sCommand));
+
+		return true;
+	}
+
+	bool Search(const char* sSearchPath, const char* sFileName, const char* sHeader) {
+		if (!sSearchPath || !sFileName || !sHeader) {
+			return false;
+		}
+		g_ProfileTree.SetRootItem(m_Tree);
+		g_pTestDrive->SearchSubPathFile(CString(sSearchPath), CString(sFileName), SearchTreeFile, (LPVOID)(LPCTSTR)CString(sHeader));
+		return true;
 	}
 
 	inline HTREEITEM Object(void) {
@@ -253,24 +291,30 @@ bool TestDriveLua::Initialize(void){
 	luaL_openlibs(m_pLua);	// load all standard libraries
 
 	getGlobalNamespace(m_pLua)
-		//.beginClass<ProfileTree>("ProfileTree")
-		//.addConstructor<void (*)(const char* sDescription)>()
-		//.endClass()
+		.beginClass<ProfileTree>("ProfileTree")
+		.addConstructor<void (*)(const char* sName, ProfileTree* pParent)>()
+		.addFunction("AddItem", &ProfileTree::AddItem)
+		.addFunction("Expand", &ProfileTree::Expand)
+		.addFunction("Collapse", &ProfileTree::Collapse)
+		.addFunction("Search", &ProfileTree::Search)
+		.endClass()
 		.beginNamespace("System")
-		.addFunction("SetTitle", Lua_System::SetTitle)
-		.addFunction("SetSubTitle", Lua_System::SetSubTitle)
-		.addFunction("ShowSplash", Lua_System::ShowSplash)
-		.addFunction("CreateMemory", Lua_System::CreateMemory)
-		.addFunction("RunProfile", Lua_System::RunProfile)
-		.addFunction("Execute", Lua_System::Execute)
-		.addFunction("SetProfilePath", Lua_System::SetProfilePath)
-		.addFunction("ClearProfile", Lua_System::ClearProfile)
+		.addFunction("SetTitle", &Lua_System::SetTitle)
+		.addFunction("SetSubTitle", &Lua_System::SetSubTitle)
+		.addFunction("ShowSplash", &Lua_System::ShowSplash)
+		.addFunction("CreateMemory", &Lua_System::CreateMemory)
+		.addFunction("RunProfile", &Lua_System::RunProfile)
+		.addFunction("Execute", &Lua_System::Execute)
+		.addFunction("SetProfilePath", &Lua_System::SetProfilePath)
+		.addFunction("ClearProfile", &Lua_System::ClearProfile)
+		.addFunction("CallProfile", &Lua_System::CallProfile)
+		.addProperty("Locale", &Lua_System::GetLocaleString)
 		.endNamespace()
-		.addFunction("print", Lua_System::Log)
-		.addFunction("LOGI", Lua_System::LogInfo)
-		.addFunction("LOGE", Lua_System::LogError)
-		.addFunction("LOGW", Lua_System::LogWarning)
-		.addFunction("LOG_CLEAR", Lua_System::ClearLog);
+		.addFunction("print", &Lua_System::Log)
+		.addFunction("LOGI", &Lua_System::LogInfo)
+		.addFunction("LOGE", &Lua_System::LogError)
+		.addFunction("LOGW", &Lua_System::LogWarning)
+		.addFunction("LOG_CLEAR", &Lua_System::ClearLog);
 
 	return true;
 }

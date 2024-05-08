@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ViewTree.h"
+#include "ProfileData.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -138,7 +139,7 @@ HTREEITEM CViewTree::SetCurrentRootItem(LPCTSTR szName){
 			if(item_next){
 				m_ParentItem = item_next;
 			}else{
-				m_ParentItem = InsertItem(pCurName, TREE_ITEM_TREE_OPEN, TREE_ITEM_TREE_OPEN, m_ParentItem ? m_ParentItem : TVI_ROOT, TVI_LAST);
+				m_ParentItem = InsertItem(pCurName, TREE_ITEM_BRANCH, TREE_ITEM_BRANCH, m_ParentItem ? m_ParentItem : TVI_ROOT, TVI_LAST);
 			}
 			pCurName = pNextName;
 		}
@@ -147,9 +148,48 @@ HTREEITEM CViewTree::SetCurrentRootItem(LPCTSTR szName){
 	return m_CurrentItem;
 }
 
+HTREEITEM CViewTree::InsertTree(LPCTSTR sName, HTREEITEM parent) {
+	// 이미 트리에 존재하는 경우는 생성하지 않는다.
+	HTREEITEM	child = FindChildItem(parent, sName);
+	if (child) return child;
+
+	// branch 는 Item 보다 상위에 리스트를 만든다.
+	child = GetNextItem(parent, TVGN_CHILD);
+
+	if (child && !GetItemData(child)) {
+		HTREEITEM	next_child;
+		for (;;) {
+			next_child = GetNextItem(child, TVGN_NEXT);
+			if (!next_child || GetItemData(next_child)) break;
+			child = next_child;
+		}
+		if (!child) child = TVI_LAST;
+	} else {
+		child = TVI_FIRST;
+	}
+
+	return InsertItem(sName, TREE_ITEM_BRANCH, TREE_ITEM_BRANCH, parent ? parent : TVI_ROOT, child);
+}
+
+void CViewTree::InsertData(HTREEITEM parent, TD_TREE_ITEM type, LPCTSTR sName, LPCTSTR sCommand) {
+	HTREEITEM	child	= FindChildItem(parent, sName);
+
+	// add new child
+	if (!child) {
+		child = InsertItem(sName, type, type, parent, TVI_LAST);
+	}
+
+	{	// delete previous profile data
+		CProfileData* pPrevData = (CProfileData*)GetItemData(child);
+		if (pPrevData) delete pPrevData;
+	}
+
+	SetItemData(child, (DWORD_PTR)(new CProfileData(sCommand)));
+}
+
 void CViewTree::AddItem(TD_TREE_ITEM type, LPCTSTR szName){
 	switch (type){
-	case TREE_ITEM_TREE_OPEN:
+	case TREE_ITEM_BRANCH:
 		{	// 이미 트리에 branch 가 존재하는 경우는 생성하지 않는다.
 			HTREEITEM	child	= FindChildItem(m_ParentItem, szName);
 			if(child && !GetItemData(child)){
@@ -191,9 +231,9 @@ void CViewTree::AddItem(TD_TREE_ITEM type, LPCTSTR szName){
 	}
 }
 
-void CViewTree::SetRootItem(void){
-	m_CurrentItem	= GetRootItem();
-	m_ParentItem	= NULL;
+void CViewTree::SetRootItem(HTREEITEM parent){
+	m_CurrentItem	= parent ? NULL : GetRootItem();
+	m_ParentItem	= parent;
 }
 
 BOOL CViewTree::SetCurrentItemData(CTreeObject* pObject){
@@ -202,10 +242,14 @@ BOOL CViewTree::SetCurrentItemData(CTreeObject* pObject){
 	return TRUE;
 }
 
+void CViewTree::ExpandTree(HTREEITEM item, bool bExpand) {
+	Expand(item, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
+}
+
 void CViewTree::ExpandAll(void){
 	HTREEITEM item = GetNextItem(NULL, TVGN_ROOT);
 	while(item){
-		Expand(item, TVE_EXPAND);
+		CTreeCtrl::Expand(item, TVE_EXPAND);
 		item = GetNextItem(item, TVGN_NEXT);
 	}
 }

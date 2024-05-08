@@ -2,7 +2,7 @@
 class CFullPath
 {
 public:
-	CFullPath(LPCTSTR sPathName = NULL);
+	CFullPath(LPCTSTR sPathName = _T("."));
 	CFullPath(const char* sPathName);
 	~CFullPath(void);
 

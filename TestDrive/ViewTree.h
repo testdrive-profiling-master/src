@@ -35,9 +35,12 @@ public:
 	void DeleteSubItems(HTREEITEM item);
 	HTREEITEM FindChildItem(HTREEITEM parent, LPCTSTR name);
 	HTREEITEM SetCurrentRootItem(LPCTSTR name);
+	HTREEITEM InsertTree(LPCTSTR sName, HTREEITEM parent = NULL);
+	void InsertData(HTREEITEM parent, TD_TREE_ITEM type, LPCTSTR sName, LPCTSTR sCommand);
 	void AddItem(TD_TREE_ITEM type, LPCTSTR szName = NULL);
-	void SetRootItem(void);
+	void SetRootItem(HTREEITEM parent = NULL);
 	BOOL SetCurrentItemData(CTreeObject* pObject);
+	void ExpandTree(HTREEITEM item, bool bExpand = true);
 	void ExpandAll(void);
 	void ExpandCurrent(void);
 	CTreeObject* GetItemDataAtCursor(void);

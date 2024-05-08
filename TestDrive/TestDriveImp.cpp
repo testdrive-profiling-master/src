@@ -181,13 +181,16 @@ BOOL CTestDrive::OpenProject(LPCTSTR szFileName)
 	m_Lua.Initialize();
 
 	// TestDrive project initialization
-	{	// initialization script
-		CString sInitializeLuaPath(g_pTestDrive->InstalledPath());
-		sInitializeLuaPath += _T("bin\\testdrive_initialize.lua");
+	{
+		// initialization script
+		{
+			CString sInitializeLuaPath(g_pTestDrive->InstalledPath());
+			sInitializeLuaPath += _T("bin\\testdrive_initialize.lua");
 
-		if (!m_Lua.Run(CStringA(sInitializeLuaPath))) {
-			g_pTestDrive->LogError(_T("Can't run initial Lua script : '%s'"), (LPCTSTR)sInitializeLuaPath);
-			return false;
+			if (!m_Lua.Run(CStringA(sInitializeLuaPath))) {
+				g_pTestDrive->LogError(_T("Can't run initial Lua script : '%s'"), (LPCTSTR)sInitializeLuaPath);
+				return false;
+			}
 		}
 	}
 	g_pTestDrive->Build((LPCTSTR)(CString(InstalledPath()) + _T("bin\\testdrive_initialize.profile")), &g_Output[COutput::TD_OUTPUT_SYSTEM]);
@@ -271,7 +274,7 @@ static const LPCTSTR __sSearchCommand[SEARCH_COMMAND_SIZE] = {
 };
 
 
-static BOOL SearchTreeFile(LPCTSTR sPath, LPVOID pData){
+BOOL SearchTreeFile(LPCTSTR sPath, LPVOID pData){
 	BOOL	bRet			= TRUE;
 	LPCTSTR sHead			= (LPCTSTR)pData;
 	int		iType			= TREE_ITEM_PROFILE;
@@ -471,14 +474,14 @@ BOOL SetProfileTreeFromPaser(CPaser* pPaser)
 		case TD_TOKEN_NAME:
 			i = CheckCommand(token, g_sProfileTree, PROFILE_ITEM_SIZE);
 			switch(i){
-			case TREE_ITEM_TREE_OPEN:
+			case TREE_ITEM_BRANCH:
 				if(!pPaser->TokenOut(TD_DELIMITER_SOPEN)) goto END_RETRIEVE_PROFILE_TREE;		// (
 				if(pPaser->GetToken(token) != TD_TOKEN_STRING) goto END_RETRIEVE_PROFILE_TREE;	// name
 				if(!pPaser->TokenOut(TD_DELIMITER_SCLOSE)) goto END_RETRIEVE_PROFILE_TREE;		// )
 				if(!pPaser->TokenOut(TD_DELIMITER_LOPEN)) goto END_RETRIEVE_PROFILE_TREE;		// {
 				iLoop++;
 				// add new profile tree
-				g_ProfileTree.AddItem(TREE_ITEM_TREE_OPEN, token);
+				g_ProfileTree.AddItem(TREE_ITEM_BRANCH, token);
 				break;
 			case TREE_ITEM_TREE_EXPAND:
 				g_ProfileTree.ExpandCurrent();
@@ -884,7 +887,7 @@ BOOL CTestDrive::ReplaceText(LPCTSTR lpszTargetFile, LPCTSTR lpszReplaceDescFile
 	return TRUE;
 }
 
-BOOL CTestDrive::SearchSubPathFile(LPCTSTR sSearchPath, LPCTSTR sFileName, SEARCH_FILE_FUNCTION SearchFunc, LPVOID pData){
+BOOL CTestDrive::SearchSubPathFile(LPCTSTR sSearchPath, LPCTSTR sFileName, SEARCH_FILE_FUNCTION SearchFunc, LPVOID pData) {
 	CFullPath full_path(sSearchPath);
 	{	// no search file definition
 		CString sPath;
