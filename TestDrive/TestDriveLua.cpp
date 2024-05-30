@@ -282,6 +282,7 @@ protected:
 	HTREEITEM	m_Tree;
 };
 
+int			luaopen_lfs(lua_State* L);;
 bool TestDriveLua::Initialize(void){
 	Release();
 
@@ -289,6 +290,7 @@ bool TestDriveLua::Initialize(void){
 		return false;
 
 	luaL_openlibs(m_pLua);	// load all standard libraries
+	luaopen_lfs(m_pLua);	// lfs library
 
 	getGlobalNamespace(m_pLua)
 		.beginClass<ProfileTree>("ProfileTree")

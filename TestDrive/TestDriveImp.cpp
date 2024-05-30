@@ -181,7 +181,7 @@ BOOL CTestDrive::OpenProject(LPCTSTR szFileName)
 	m_Lua.Initialize();
 
 	// TestDrive project initialization
-	g_pTestDrive->Build((LPCTSTR)(CString(InstalledPath()) + _T("bin\\testdrive_initialize.profile")), &g_Output[COutput::TD_OUTPUT_SYSTEM]);
+	g_pTestDrive->Build((LPCTSTR)(CString(InstalledPath()) + _T("bin\\testdrive_initialize.lua")), &g_Output[COutput::TD_OUTPUT_SYSTEM]);
 
 	// run initialization profile
 	if(!Build(TESTDRIVE_PROFILE_INITIALIZE)) CloseProject(TRUE);
@@ -934,6 +934,7 @@ BOOL CTestDrive::Build(LPCTSTR szFileName, COutput* pMsg, BOOL bThreaded)
 	static DWORD RefCount = 0;
 	int i;
 	CString		sTemp, sToken;
+	bool		bLua		= false;
 	BOOL		bTest		= TRUE;
 	LPCTSTR		sErrorMsg	= _S(ERROR_IN_PROGRESS);
 
@@ -978,9 +979,9 @@ NO_PROFILE_NAME:
 	// Set current directory
 	{
 		CFullPath	full_path(szFileName);
-		TCHAR path[MAX_PATH], *pFilePart;
+		TCHAR path[8192], *pFilePart;
 
-		if(!GetFullPathName(full_path.Path(), MAX_PATH, path, &pFilePart)){
+		if(!GetFullPathName(full_path.Path(), 8192, path, &pFilePart)){
 			LogOut(_TEXT_(CString(_S(INVALID_FILE_PATH)) + _T(" : \"%s\""), full_path.Path()), SYSMSG_ERROR);
 			return FALSE;
 		}
@@ -992,6 +993,16 @@ NO_PROFILE_NAME:
 			return FALSE;
 		}
 
+		// get file extension
+		CString sExt(path);
+		for (int i = sExt.Find(_T(".")); i >= 0; i = sExt.Find(_T("."))) {
+			sExt.Delete(0, i + 1);
+		}
+		sExt.MakeLower();
+		if (sExt == "lua") {	// Is Lua file?
+			bLua = true;
+		}
+
 		*pFilePart	= NULL;
 		SetCurrentDirectory(path);
 	}
@@ -1000,450 +1011,471 @@ NO_PROFILE_NAME:
 	RefCount++;
 	m_bRunning	= TRUE;
 
-	while(paser.NewLine() && m_bRunning){
-		//LogOut(paser.GetCurLine());	// for debug
-
-		if (!paser.GetTokenName(sToken.GetBuffer())) {
-			if (sToken == _T("#")) {
-				if (paser.GetTokenName(sToken.GetBuffer()) && sToken == _T("lua")) {
-					// Change to Lua script
-					int iCurLine	= paser.GetLineCount();
-					CString sLuaScript;
-					while (paser.NewLine()) {
-						sLuaScript += paser.GetCurLine();
-						sLuaScript += _T("\n");
-					}
-
-					if (!m_Lua.RunBuffer(CStringA(sLuaScript), CStringA(paser.GetFilePath()), iCurLine))
-						return FALSE;
-
-					break;
-				}
-			}
-			continue;
+	// run lua file
+	if (bLua) {
+		CString sLuaScript;
+		while (paser.NewLine()) {
+			sLuaScript += paser.GetCurLine();
+			sLuaScript += _T("\n");
 		}
+		if (!m_Lua.RunBuffer(CStringA(sLuaScript), CStringA(paser.GetFilePath())))
+			return FALSE;
+	}
+	// or old profile file
+	else {
+		while (paser.NewLine() && m_bRunning) {
+			//LogOut(paser.GetCurLine());	// for debug
 
-		if(!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
+			if (!paser.GetTokenName(sToken.GetBuffer())) {
+				if (sToken == _T("#")) {
+					if (paser.GetTokenName(sToken.GetBuffer()) && sToken == _T("lua")) {
+						// Change to Lua script
+						int iCurLine = paser.GetLineCount();
+						CString sLuaScript;
+						while (paser.NewLine()) {
+							sLuaScript += paser.GetCurLine();
+							sLuaScript += _T("\n");
+						}
 
-		i = CheckCommand(sToken, g_sCmd, CMD_SIZE);
-		if(!bTest && i!=CMD_IF) continue;
+						if (!m_Lua.RunBuffer(CStringA(sLuaScript), CStringA(paser.GetFilePath()), iCurLine))
+							return FALSE;
 
-		switch(i){
-		case CMD_SYSTEM:
+						break;
+					}
+				}
+				continue;
+			}
+
+			if (!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
+
+			i = CheckCommand(sToken, g_sCmd, CMD_SIZE);
+			if (!bTest && i != CMD_IF) continue;
+
+			switch (i) {
+			case CMD_SYSTEM:
 			{
-				if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+				if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
 				i = CheckCommand(sToken, g_sCmdSystem, CMD_SYSTEM_SIZE);
 
-				switch(i){
+				switch (i) {
 				case CMD_SYSTEM_TITLE:
-					if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
 					SetTitle(TITLE_MAIN, sTemp);
-					pMsg->LogOut(CString(_S(MAIN_TITLE)) + _T(" : "), RGB(0,0,255));
-					pMsg->LogOut(_TEXT_(_T("\"%s\"\n"), (LPCTSTR)sTemp), RGB(0,0,255), CFE_BOLD);
+					pMsg->LogOut(CString(_S(MAIN_TITLE)) + _T(" : "), RGB(0, 0, 255));
+					pMsg->LogOut(_TEXT_(_T("\"%s\"\n"), (LPCTSTR)sTemp), RGB(0, 0, 255), CFE_BOLD);
 					break;
 				case CMD_SYSTEM_SUBTITLE:
-					if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
 					SetTitle(TITLE_WORK, sTemp);
-					pMsg->LogOut(CString(_S(SUB_TITLE)) + _T(" : "), RGB(0,0,255));
-					pMsg->LogOut(_TEXT_(_T("\"%s\"\n"), (LPCTSTR)sTemp), RGB(0,0,255), CFE_BOLD);
+					pMsg->LogOut(CString(_S(SUB_TITLE)) + _T(" : "), RGB(0, 0, 255));
+					pMsg->LogOut(_TEXT_(_T("\"%s\"\n"), (LPCTSTR)sTemp), RGB(0, 0, 255), CFE_BOLD);
 					break;
 				case CMD_SYSTEM_SPLASH:
-					if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
 					{
-						int iDelayTime	= 2000;
-						int iVelocity	= 15;
-						if(paser.TokenOut(TD_DELIMITER_COMMA)){
-							if(!paser.GetTokenInt(&iDelayTime)) goto ERROR_OCCUR;
-							if(paser.TokenOut(TD_DELIMITER_COMMA)){
-								if(!paser.GetTokenInt(&iVelocity)) goto ERROR_OCCUR;
-								if(iVelocity<=0) iVelocity = 1;
+						int iDelayTime = 2000;
+						int iVelocity = 15;
+						if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+							if (!paser.GetTokenInt(&iDelayTime)) goto ERROR_OCCUR;
+							if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+								if (!paser.GetTokenInt(&iVelocity)) goto ERROR_OCCUR;
+								if (iVelocity <= 0) iVelocity = 1;
 							}
 						}
-						CSplashScreenEx *pSplash=new CSplashScreenEx();
-						if(pSplash->Create(AfxGetMainWnd()->m_hWnd, sTemp)){
+						CSplashScreenEx* pSplash = new CSplashScreenEx();
+						if (pSplash->Create(AfxGetMainWnd()->m_hWnd, sTemp)) {
 							pSplash->Start(iDelayTime, iVelocity);
-						}else{
+						}
+						else {
 							delete pSplash;
-							pMsg->LogOut(CString(_S(LOAD_FILE_IS_FAILED)) + _T(" : "), RGB(255,0,0));
-							pMsg->LogOut(_TEXT_(_T("\"%s\"\n"), (LPCTSTR)sTemp), RGB(255,0,0), CFE_BOLD);
+							pMsg->LogOut(CString(_S(LOAD_FILE_IS_FAILED)) + _T(" : "), RGB(255, 0, 0));
+							pMsg->LogOut(_TEXT_(_T("\"%s\"\n"), (LPCTSTR)sTemp), RGB(255, 0, 0), CFE_BOLD);
 						}
 					}
 					break;
 				case CMD_SYSTEM_CLEAR:
-					for(i=0;i<COutput::TD_OUTPUT_SIZE;i++) g_Output[i].Clear();
+					for (i = 0; i < COutput::TD_OUTPUT_SIZE; i++) g_Output[i].Clear();
 					break;
 				case CMD_SYSTEM_CALL:
-					{
-						TCHAR sCommand[1024];
-						TCHAR sWorkPath[1024];
-						TCHAR sArg[1024];
-						BOOL bError = FALSE;
+				{
+					TCHAR sCommand[1024];
+					TCHAR sWorkPath[1024];
+					TCHAR sArg[1024];
+					BOOL bError = FALSE;
 
-						// 파일 이름 얻기
-						if(!paser.GetTokenString(sCommand)){
-							goto ERROR_OCCUR;
-						}
-						// argument 얻기
-						if(paser.TokenOut(TD_DELIMITER_COMMA)){
-							if(!paser.GetTokenString(sArg)) goto ERROR_OCCUR;
-						}else *sArg = NULL;
-						// work dir 얻기
-						if(paser.TokenOut(TD_DELIMITER_COMMA)){
-							if(!paser.GetTokenString(sWorkPath)) goto ERROR_OCCUR;
-							CFullPath	full_path(sWorkPath);
-							_tcscpy(sWorkPath, full_path.Path());
-						}else *sWorkPath = NULL;
-						// run batch file
-						{
-							CRedirectExecute* pExec = new CRedirectExecute(sCommand, pMsg, *sArg ? sArg : NULL, *sWorkPath ? sWorkPath : NULL);
-							// 에러 문자열 지정
-							while(paser.TokenOut(TD_DELIMITER_COMMA)){
-								int error_code = -1;
-								if(!paser.GetTokenString(sTemp.GetBuffer())){
-									SAFE_DELETE(pExec);
-									goto ERROR_OCCUR;
-								}
-								if(paser.TokenOut(TD_DELIMITER_COLON)){
-									TCHAR sCode[MAX_PATH];
-									switch (paser.GetToken(sCode)) {
-									case TD_TOKEN_INT:
-										error_code	= StrToInt(sTemp);
-										break;
-									case TD_TOKEN_NAME:
-										if (!_tcscmp(sCode, _T("W"))) {
-											error_code = INT_MAX;
-										} else goto ERROR_OCCUR;
-										break;
-									default:
-										goto ERROR_OCCUR;
-									}
-								}
-								pExec->AddErrorToken(sTemp, error_code);
-							}
-							pExec->AddErrorToken(_T("##"), 0);
-							if(!pExec->Run()) {
+					// 파일 이름 얻기
+					if (!paser.GetTokenString(sCommand)) {
+						goto ERROR_OCCUR;
+					}
+					// argument 얻기
+					if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+						if (!paser.GetTokenString(sArg)) goto ERROR_OCCUR;
+					}
+					else *sArg = NULL;
+					// work dir 얻기
+					if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+						if (!paser.GetTokenString(sWorkPath)) goto ERROR_OCCUR;
+						CFullPath	full_path(sWorkPath);
+						_tcscpy(sWorkPath, full_path.Path());
+					}
+					else *sWorkPath = NULL;
+					// run batch file
+					{
+						CRedirectExecute* pExec = new CRedirectExecute(sCommand, pMsg, *sArg ? sArg : NULL, *sWorkPath ? sWorkPath : NULL);
+						// 에러 문자열 지정
+						while (paser.TokenOut(TD_DELIMITER_COMMA)) {
+							int error_code = -1;
+							if (!paser.GetTokenString(sTemp.GetBuffer())) {
 								SAFE_DELETE(pExec);
 								goto ERROR_OCCUR;
 							}
-							bError = (pExec->GetErrorCode() < 0);
-							SAFE_DELETE(pExec);
-						}
-
-						if(bError){
-							LogOut(_S(ERROR_IN_PROGRESS), SYSMSG_ERROR);
-							goto ERROR_OCCUR;
-						}
-					}break;
-				case CMD_SYSTEM_SHELL:
-					{
-						// 파일 이름 얻기
-						if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
-						{
-							TCHAR cur_path[MAX_PATH], *pFile, sArg[MAX_PATH];
-							CFullPath full_path(sTemp);
-							GetFullPathName(full_path.Path(), MAX_PATH, cur_path, &pFile);
-							if(!pFile) goto ERROR_OCCUR;
-							*(pFile-1) = NULL;
-							*sArg	= NULL;
-							if(paser.TokenOut(TD_DELIMITER_COMMA)){
-								if(!paser.GetTokenString(sArg)) goto ERROR_OCCUR;
-							}
-							ShellExecute(NULL, _T("open"), pFile, sArg, cur_path, SW_SHOWNORMAL);
-						}
-					}
-					break;
-				case CMD_SYSTEM_LUA:
-					{
-						// 파일 이름 얻기
-						if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
-						CFullPath full_path(sTemp);
-						m_Lua.Run(CStringA(full_path.Path()));
-					}
-					break;
-				case CMD_SYSTEM_DOCUMENT:
-					if(!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
-					if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
-					i = CheckCommand(sToken, g_sCmdSystemDocument, CMD_SYSTEM_VIEW_SIZE);
-					if(i>=CMD_SYSTEM_VIEW_SIZE) goto ERROR_OCCUR;
-
-					switch(i){
-					case CMD_SYSTEM_DOCUMENT_ADD:
-						{
-							if(!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
-							paser.SetMultilineTokenable(TRUE);
-							{
-								// 이미 존재하는 도큐먼트일 경우 활성화 한다.
-								CDocumentView* pVDoc = g_pDocumentList->Find(sToken);
-								if(pVDoc){
-									if(!pVDoc->IsVisible()){
-										LogInfo(_S(DOCUEMT_IS_HIDE), pVDoc->DocumentTitle());
-									}else{
-
-										g_pDocumentList->SetActive(pVDoc);
+							if (paser.TokenOut(TD_DELIMITER_COLON)) {
+								TCHAR sCode[MAX_PATH];
+								switch (paser.GetToken(sCode)) {
+								case TD_TOKEN_INT:
+									error_code = StrToInt(sTemp);
+									break;
+								case TD_TOKEN_NAME:
+									if (!_tcscmp(sCode, _T("W"))) {
+										error_code = INT_MAX;
 									}
-									goto QUICK_END;
+									else goto ERROR_OCCUR;
+									break;
+								default:
+									goto ERROR_OCCUR;
 								}
 							}
-							if(!g_pDocumentList->Add(sToken, &paser)){
-								sErrorMsg = _S(DOCUEMT_DENIED);
-								goto ERROR_OCCUR;
-							}
-							paser.SetMultilineTokenable(FALSE);
+							pExec->AddErrorToken(sTemp, error_code);
+						}
+						pExec->AddErrorToken(_T("##"), 0);
+						if (!pExec->Run()) {
+							SAFE_DELETE(pExec);
+							goto ERROR_OCCUR;
+						}
+						bError = (pExec->GetErrorCode() < 0);
+						SAFE_DELETE(pExec);
+					}
 
-						}break;
+					if (bError) {
+						LogOut(_S(ERROR_IN_PROGRESS), SYSMSG_ERROR);
+						goto ERROR_OCCUR;
+					}
+				}break;
+				case CMD_SYSTEM_SHELL:
+				{
+					// 파일 이름 얻기
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					{
+						TCHAR cur_path[MAX_PATH], * pFile, sArg[MAX_PATH];
+						CFullPath full_path(sTemp);
+						GetFullPathName(full_path.Path(), MAX_PATH, cur_path, &pFile);
+						if (!pFile) goto ERROR_OCCUR;
+						*(pFile - 1) = NULL;
+						*sArg = NULL;
+						if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+							if (!paser.GetTokenString(sArg)) goto ERROR_OCCUR;
+						}
+						ShellExecute(NULL, _T("open"), pFile, sArg, cur_path, SW_SHOWNORMAL);
+					}
+				}
+				break;
+				case CMD_SYSTEM_LUA:
+				{
+					// 파일 이름 얻기
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					CFullPath full_path(sTemp);
+					m_Lua.Run(CStringA(full_path.Path()));
+				}
+				break;
+				case CMD_SYSTEM_DOCUMENT:
+					if (!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
+					if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+					i = CheckCommand(sToken, g_sCmdSystemDocument, CMD_SYSTEM_VIEW_SIZE);
+					if (i >= CMD_SYSTEM_VIEW_SIZE) goto ERROR_OCCUR;
+
+					switch (i) {
+					case CMD_SYSTEM_DOCUMENT_ADD:
+					{
+						if (!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
+						paser.SetMultilineTokenable(TRUE);
+						{
+							// 이미 존재하는 도큐먼트일 경우 활성화 한다.
+							CDocumentView* pVDoc = g_pDocumentList->Find(sToken);
+							if (pVDoc) {
+								if (!pVDoc->IsVisible()) {
+									LogInfo(_S(DOCUEMT_IS_HIDE), pVDoc->DocumentTitle());
+								}
+								else {
+
+									g_pDocumentList->SetActive(pVDoc);
+								}
+								goto QUICK_END;
+							}
+						}
+						if (!g_pDocumentList->Add(sToken, &paser)) {
+							sErrorMsg = _S(DOCUEMT_DENIED);
+							goto ERROR_OCCUR;
+						}
+						paser.SetMultilineTokenable(FALSE);
+
+					}break;
 					case CMD_SYSTEM_DOCUMENT_CLOSE:
-						if(!paser.IsTokenable()){
+						if (!paser.IsTokenable()) {
 							g_pDocumentList->RemoveAll();
-						}else{
-							if(!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
+						}
+						else {
+							if (!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
 							g_pDocumentList->Remove(sToken);
 						}break;
 					case CMD_SYSTEM_DOCUMENT_CALL:
+					{
+						ITDImplDocument* pDocImp;
+
+						{	// 구현 찾기
+							CDocumentView* pDoc;
+							if (paser.GetTokenString(sToken.GetBuffer())) {
+								pDoc = g_pDocumentList->Find(sToken);
+								if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+							}
+							if (!pDoc) break;
+							pDocImp = pDoc->GetImplementation();
+							if (!pDocImp) break;
+						}
 						{
-							ITDImplDocument* pDocImp;
+							int iCommand;
+							TCHAR sArg0[MAX_PATH], sArg1[MAX_PATH];
+							*sArg0 = NULL;
+							*sArg1 = NULL;
 
-							{	// 구현 찾기
-								CDocumentView* pDoc;
-								if(paser.GetTokenString(sToken.GetBuffer())){
-									pDoc = g_pDocumentList->Find(sToken);
-									if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-								}
-								if(!pDoc) break;
-								pDocImp = pDoc->GetImplementation();
-								if(!pDocImp) break;
+							paser.GetTokenInt(&iCommand);
+
+							if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+								if (!paser.GetTokenString(sArg0)) goto ERROR_OCCUR;
+								if (paser.TokenOut(TD_DELIMITER_COMMA))
+									if (!paser.GetTokenString(sArg1)) goto ERROR_OCCUR;
 							}
-							{
-								int iCommand;
-								TCHAR sArg0[MAX_PATH], sArg1[MAX_PATH];
-								*sArg0	= NULL;
-								*sArg1	= NULL;
-
-								paser.GetTokenInt(&iCommand);
-
-								if(paser.TokenOut(TD_DELIMITER_COMMA)){
-									if(!paser.GetTokenString(sArg0)) goto ERROR_OCCUR;
-									if(paser.TokenOut(TD_DELIMITER_COMMA))
-										if(!paser.GetTokenString(sArg1)) goto ERROR_OCCUR;
-								}
-								pDocImp->OnCommand(iCommand, (WPARAM)sArg0, (LPARAM)sArg1);
-							}
-						}break;
+							pDocImp->OnCommand(iCommand, (WPARAM)sArg0, (LPARAM)sArg1);
+						}
+					}break;
 					default:
 						goto ERROR_OCCUR;
 					}
 					break;
 				case CMD_SYSTEM_MSG:
-					if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
-					pMsg->LogOut(sTemp, RGB(0,0,255));
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					pMsg->LogOut(sTemp, RGB(0, 0, 255));
 					break;
 				case CMD_SYSTEM_ERROR:
-					if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
-					pMsg->LogOut(_TEXT_(CString(_S(ASERTED_BY_USER)) + _T(" : %s\n"), (LPCTSTR)sTemp), RGB(255,0,0));	// Assert error by user
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					pMsg->LogOut(_TEXT_(CString(_S(ASERTED_BY_USER)) + _T(" : %s\n"), (LPCTSTR)sTemp), RGB(255, 0, 0));	// Assert error by user
 				default:
 					goto ERROR_OCCUR;
 				}
 			}break;
-		case CMD_MEMORY:
+			case CMD_MEMORY:
 			{
-				if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+				if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
 				i = CheckCommand(sToken, g_sCmdMemory, CMD_MEMORY_SIZE);
-				switch(i){
+				switch (i) {
 				case CMD_MEMORY_CREATE:
+				{
+					uint64_t mem_size;
+					TCHAR mem_name[MAX_PATH];
+					*mem_name = 0;
+					if (!paser.GetTokenInt64((int64_t*)&mem_size)) goto ERROR_OCCUR;
+					if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+						if (!paser.GetTokenString(mem_name)) goto ERROR_OCCUR;
+					}
+
 					{
-						uint64_t mem_size;
-						TCHAR mem_name[MAX_PATH];
-						*mem_name = 0;
-						if(!paser.GetTokenInt64((int64_t*)&mem_size)) goto ERROR_OCCUR;
-						if(paser.TokenOut(TD_DELIMITER_COMMA)){
-							if(!paser.GetTokenString(mem_name)) goto ERROR_OCCUR;
-						}
-
-						{
-							CMemory* pMemory = CMemory::Find(mem_name);
-							if(pMemory){
-								if(pMemory->GetSize() != mem_size){	// 메모리가 존재하면서 사이즈가 다를 때...
-									LogOut(_S(ALREADY_MEMORY_EXIST), SYSMSG_WARNING);
-									LogError(_T("%s : %s"), _S(ALREADY_MEMORY_EXIST), mem_name);
-									goto ERROR_OCCUR;
-								}else{
-									break;
-								}
-							}
-						}
-
-						if(!*mem_name) _tcscpy(mem_name, MMFileName);
-
-						pMsg->LogOut(_S(CREATE_MEMORY_MODEL), RGB(0,0,255));
-						{
-							CString sBytes;	// 1000 자리 구분자 ',' 추가
-							sBytes.Format(_T("%lld"), mem_size);
-							for (int i = sBytes.GetLength() - 3; i > 0; i -= 3) {
-								sBytes.Insert(i, _T(','));
-							}
-							pMsg->LogOut(_TEXT_(_T("'%s' : %s Bytes "), mem_name, (LPCTSTR)sBytes), RGB(0, 0, 255), CFE_BOLD);
-						}
-
-						if((mem_size/0x100000))		pMsg->LogOut(_TEXT_(_T("(%.1fMB)\n"), (float)mem_size/0x100000), RGB(0,0,255), CFE_BOLD);
-						else if((mem_size/0x400))	pMsg->LogOut(_TEXT_(_T("(%.1fKB)\n"), (float)mem_size/0x400), RGB(0,0,255), CFE_BOLD);
-						else pMsg->LogOut(_T("\n"));
-
-						{
-							CMemory* pMemory = new CMemory;
-							if(!pMemory->Create(mem_size, mem_name)){
-								delete pMemory;
+						CMemory* pMemory = CMemory::Find(mem_name);
+						if (pMemory) {
+							if (pMemory->GetSize() != mem_size) {	// 메모리가 존재하면서 사이즈가 다를 때...
+								LogOut(_S(ALREADY_MEMORY_EXIST), SYSMSG_WARNING);
+								LogError(_T("%s : %s"), _S(ALREADY_MEMORY_EXIST), mem_name);
 								goto ERROR_OCCUR;
 							}
+							else {
+								break;
+							}
 						}
-					}break;
+					}
+
+					if (!*mem_name) _tcscpy(mem_name, MMFileName);
+
+					pMsg->LogOut(_S(CREATE_MEMORY_MODEL), RGB(0, 0, 255));
+					{
+						CString sBytes;	// 1000 자리 구분자 ',' 추가
+						sBytes.Format(_T("%lld"), mem_size);
+						for (int i = sBytes.GetLength() - 3; i > 0; i -= 3) {
+							sBytes.Insert(i, _T(','));
+						}
+						pMsg->LogOut(_TEXT_(_T("'%s' : %s Bytes "), mem_name, (LPCTSTR)sBytes), RGB(0, 0, 255), CFE_BOLD);
+					}
+
+					if ((mem_size / 0x100000))		pMsg->LogOut(_TEXT_(_T("(%.1fMB)\n"), (float)mem_size / 0x100000), RGB(0, 0, 255), CFE_BOLD);
+					else if ((mem_size / 0x400))	pMsg->LogOut(_TEXT_(_T("(%.1fKB)\n"), (float)mem_size / 0x400), RGB(0, 0, 255), CFE_BOLD);
+					else pMsg->LogOut(_T("\n"));
+
+					{
+						CMemory* pMemory = new CMemory;
+						if (!pMemory->Create(mem_size, mem_name)) {
+							delete pMemory;
+							goto ERROR_OCCUR;
+						}
+					}
+				}break;
 				case CMD_MEMORY_LOAD:
-					{
-						if(!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
-						if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
-						i = CheckCommand(sToken, g_sCmdMemoryLoadStore, CMD_MEMORY_LOAD_SIZE);
+				{
+					if (!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
+					if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+					i = CheckCommand(sToken, g_sCmdMemoryLoadStore, CMD_MEMORY_LOAD_SIZE);
 
-						if(i>=CMD_MEMORY_LOAD_SIZE) goto ERROR_OCCUR;
+					if (i >= CMD_MEMORY_LOAD_SIZE) goto ERROR_OCCUR;
 
-						if(i==CMD_MEMORY_LOAD_IMAGE){	// load image
-							TCHAR filename[MAX_PATH];
-							DWORD offset, stride = 0;
-							if(!paser.GetTokenString(filename)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
-							if(paser.TokenOut(TD_DELIMITER_COMMA)){
-								if(!paser.GetTokenInt((int*)&stride)) goto ERROR_OCCUR;
-							}
-							i = CheckCommand(sToken, g_sColorTypes, COLORTYPE_SIZE);
-							if(i>=COLORTYPE_SIZE){
-								LogOut(_S(INVALID_COLOR_TYPE), SYSMSG_ERROR);
+					if (i == CMD_MEMORY_LOAD_IMAGE) {	// load image
+						TCHAR filename[MAX_PATH];
+						DWORD offset, stride = 0;
+						if (!paser.GetTokenString(filename)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+						if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+							if (!paser.GetTokenInt((int*)&stride)) goto ERROR_OCCUR;
+						}
+						i = CheckCommand(sToken, g_sColorTypes, COLORTYPE_SIZE);
+						if (i >= COLORTYPE_SIZE) {
+							LogOut(_S(INVALID_COLOR_TYPE), SYSMSG_ERROR);
+							goto ERROR_OCCUR;
+						}
+						{
+							CMemory* pMemory = CMemory::Find(NULL);
+							if (!pMemory) {
+								LogError(_S(NONE_MEMORY_MODEL));
 								goto ERROR_OCCUR;
 							}
-							{
-								CMemory* pMemory = CMemory::Find(NULL);
-								if(!pMemory) {
-									LogError(_S(NONE_MEMORY_MODEL));
-									goto ERROR_OCCUR;
-								}
-								if(!pMemory->LoadImage(filename, offset, (COLORFORMAT)i, stride)) goto ERROR_OCCUR;
-							}
-
-							pMsg->LogOut(_TEXT_(CString(_S(LOAD_MEM_FROM_IMAGE)) + _T(" : \"%s\" (offset : %d (0x%X), color type : %s, stride : %d)\n"), filename, offset, offset, g_sColorTypes[i], stride), RGB(0,0,255));	// Load image to memory
-						}else{							// load data
-							TCHAR filename[MAX_PATH];
-							DWORD offset;
-							if(!paser.GetTokenString(filename)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
-							pMsg->LogOut(_TEXT_(CString(_S(LOAD_MEM_FROM_FILE)) + _T(" : \"%s\" (offset : %d (0x%X))\n"), filename, offset, offset), RGB(0,0,255)); // Load memory from source
-							{
-								CMemory* pMemory = CMemory::Find(NULL);
-								if(!pMemory) {
-									LogError(_S(NONE_MEMORY_MODEL));
-									goto ERROR_OCCUR;
-								}
-								if(!pMemory->Load((CMemory::MEM_DISC)(i-1), filename, offset)) goto ERROR_OCCUR;
-							}
+							if (!pMemory->LoadImage(filename, offset, (COLORFORMAT)i, stride)) goto ERROR_OCCUR;
 						}
-					}break;
+
+						pMsg->LogOut(_TEXT_(CString(_S(LOAD_MEM_FROM_IMAGE)) + _T(" : \"%s\" (offset : %d (0x%X), color type : %s, stride : %d)\n"), filename, offset, offset, g_sColorTypes[i], stride), RGB(0, 0, 255));	// Load image to memory
+					}
+					else {							// load data
+						TCHAR filename[MAX_PATH];
+						DWORD offset;
+						if (!paser.GetTokenString(filename)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
+						pMsg->LogOut(_TEXT_(CString(_S(LOAD_MEM_FROM_FILE)) + _T(" : \"%s\" (offset : %d (0x%X))\n"), filename, offset, offset), RGB(0, 0, 255)); // Load memory from source
+						{
+							CMemory* pMemory = CMemory::Find(NULL);
+							if (!pMemory) {
+								LogError(_S(NONE_MEMORY_MODEL));
+								goto ERROR_OCCUR;
+							}
+							if (!pMemory->Load((CMemory::MEM_DISC)(i - 1), filename, offset)) goto ERROR_OCCUR;
+						}
+					}
+				}break;
 				case CMD_MEMORY_STORE:
-					{
-						if(!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
-						if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
-						i = CheckCommand(sToken, g_sCmdMemoryLoadStore, CMD_MEMORY_STORE_SIZE);
+				{
+					if (!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
+					if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+					i = CheckCommand(sToken, g_sCmdMemoryLoadStore, CMD_MEMORY_STORE_SIZE);
 
-						if(i>=CMD_MEMORY_STORE_SIZE) goto ERROR_OCCUR;
+					if (i >= CMD_MEMORY_STORE_SIZE) goto ERROR_OCCUR;
 
-						if(i==CMD_MEMORY_STORE_IMAGE){
-							TCHAR filename[MAX_PATH];
-							DWORD offset, width, height, use_alpha = 0, stride = 0;
-							if(!paser.GetTokenString(filename)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenInt((int*)&width)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenInt((int*)&height)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
-							if(paser.TokenOut(TD_DELIMITER_COMMA)){
-								if(!paser.GetTokenInt((int*)&use_alpha)) goto ERROR_OCCUR;
-								if(paser.TokenOut(TD_DELIMITER_COMMA)){
-									if(!paser.GetTokenInt((int*)&stride)) goto ERROR_OCCUR;
-								}
-							}
-
-							i = CheckCommand(sToken, g_sColorTypes, COLORTYPE_SIZE);
-							if(i>=COLORTYPE_SIZE){
-								LogOut(_S(INVALID_COLOR_TYPE), SYSMSG_ERROR);
-								goto ERROR_OCCUR;
-							}
-							{
-								CMemory* pMemory = CMemory::Find(NULL);
-								if(!pMemory) {
-									LogError(_S(NONE_MEMORY_MODEL));
-									goto ERROR_OCCUR;
-								}
-								if(!pMemory->StoreImage(filename, offset, width, height, (COLORFORMAT)i, use_alpha, stride)) goto ERROR_OCCUR;
-							}
-							pMsg->LogOut(_TEXT_(CString(_S(STORE_IMAGE_FROM_MEM)) + _T(" : \"%s\" (offset : %d (0x%X), dimmension : %dx%d, color type : %s, stride : %d)\n"), filename, offset, offset, width, height, g_sColorTypes[i], stride), RGB(0,0,255)); // Store image from memory
-						}else{
-							TCHAR filename[MAX_PATH];
-							DWORD offset,size, stride = 0;
-							if(!paser.GetTokenString(filename)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
-							if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-							if(!paser.GetTokenInt((int*)&size)) goto ERROR_OCCUR;
-							if(i == CMemory::MEM_DISC_SIMUL) {
-								if(!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
-								if(!paser.GetTokenInt((int*)&stride)) goto ERROR_OCCUR;
-								if(stride<=0) goto ERROR_OCCUR;
-							}
-							pMsg->LogOut(_TEXT_(CString(_S(STORE_FILE_FROM_MEM)) + _T(" : \"%s\" (offset : %d (0x%X), size  : %d (0x%X))"), filename, offset, offset, size, size), RGB(0,0,255));	// Save memory to file
-							if(i == CMemory::MEM_DISC_SIMUL) pMsg->LogOut(_TEXT_(_T(", stride : %d"), stride), RGB(0,0,255));
-							pMsg->LogOut(_T("\n"));
-							{
-								CMemory* pMemory = CMemory::Find(NULL);
-								if(!pMemory) {
-									LogError(_S(NONE_MEMORY_MODEL));
-									goto ERROR_OCCUR;
-								}
-								if(!pMemory->Save((CMemory::MEM_DISC)(i-1), filename, offset, size, stride)) goto ERROR_OCCUR;
+					if (i == CMD_MEMORY_STORE_IMAGE) {
+						TCHAR filename[MAX_PATH];
+						DWORD offset, width, height, use_alpha = 0, stride = 0;
+						if (!paser.GetTokenString(filename)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenInt((int*)&width)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenInt((int*)&height)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+						if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+							if (!paser.GetTokenInt((int*)&use_alpha)) goto ERROR_OCCUR;
+							if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+								if (!paser.GetTokenInt((int*)&stride)) goto ERROR_OCCUR;
 							}
 						}
-					}break;
+
+						i = CheckCommand(sToken, g_sColorTypes, COLORTYPE_SIZE);
+						if (i >= COLORTYPE_SIZE) {
+							LogOut(_S(INVALID_COLOR_TYPE), SYSMSG_ERROR);
+							goto ERROR_OCCUR;
+						}
+						{
+							CMemory* pMemory = CMemory::Find(NULL);
+							if (!pMemory) {
+								LogError(_S(NONE_MEMORY_MODEL));
+								goto ERROR_OCCUR;
+							}
+							if (!pMemory->StoreImage(filename, offset, width, height, (COLORFORMAT)i, use_alpha, stride)) goto ERROR_OCCUR;
+						}
+						pMsg->LogOut(_TEXT_(CString(_S(STORE_IMAGE_FROM_MEM)) + _T(" : \"%s\" (offset : %d (0x%X), dimmension : %dx%d, color type : %s, stride : %d)\n"), filename, offset, offset, width, height, g_sColorTypes[i], stride), RGB(0, 0, 255)); // Store image from memory
+					}
+					else {
+						TCHAR filename[MAX_PATH];
+						DWORD offset, size, stride = 0;
+						if (!paser.GetTokenString(filename)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenInt((int*)&offset)) goto ERROR_OCCUR;
+						if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+						if (!paser.GetTokenInt((int*)&size)) goto ERROR_OCCUR;
+						if (i == CMemory::MEM_DISC_SIMUL) {
+							if (!paser.TokenOut(TD_DELIMITER_COMMA)) goto ERROR_OCCUR;
+							if (!paser.GetTokenInt((int*)&stride)) goto ERROR_OCCUR;
+							if (stride <= 0) goto ERROR_OCCUR;
+						}
+						pMsg->LogOut(_TEXT_(CString(_S(STORE_FILE_FROM_MEM)) + _T(" : \"%s\" (offset : %d (0x%X), size  : %d (0x%X))"), filename, offset, offset, size, size), RGB(0, 0, 255));	// Save memory to file
+						if (i == CMemory::MEM_DISC_SIMUL) pMsg->LogOut(_TEXT_(_T(", stride : %d"), stride), RGB(0, 0, 255));
+						pMsg->LogOut(_T("\n"));
+						{
+							CMemory* pMemory = CMemory::Find(NULL);
+							if (!pMemory) {
+								LogError(_S(NONE_MEMORY_MODEL));
+								goto ERROR_OCCUR;
+							}
+							if (!pMemory->Save((CMemory::MEM_DISC)(i - 1), filename, offset, size, stride)) goto ERROR_OCCUR;
+						}
+					}
+				}break;
 				default:
 					goto ERROR_OCCUR;
 				}
 			}break;
-		case CMD_IF:
+			case CMD_IF:
 			{
-				if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+				if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
 				i = CheckCommand(sToken, g_sCmdIf, CMD_IF_SIZE);
 
-				switch(i){
+				switch (i) {
 				case CMD_IF_FILE:
+				{
+					TCHAR filename[MAX_PATH];
+					if (!paser.GetTokenString(filename)) goto ERROR_OCCUR;
 					{
-						TCHAR filename[MAX_PATH];
-						if(!paser.GetTokenString(filename)) goto ERROR_OCCUR;
-						{
-							CFullPath	FilePath(filename);
-							bTest = PathFileExists(FilePath.Path());
-						}
-					}continue;
+						CFullPath	FilePath(filename);
+						bTest = PathFileExists(FilePath.Path());
+					}
+				}continue;
 				case CMD_IF_DOCUMENT:
-					{
-						TCHAR document[MAX_PATH];
-						if(!paser.GetTokenString(document)) goto ERROR_OCCUR;
-						bTest = GetDocument(document) != NULL;
-					}continue;
+				{
+					TCHAR document[MAX_PATH];
+					if (!paser.GetTokenString(document)) goto ERROR_OCCUR;
+					bTest = GetDocument(document) != NULL;
+				}continue;
 				case CMD_IF_LOCALE:
-					{
-						TCHAR locale[MAX_PATH];
-						if(!paser.GetTokenString(locale)) goto ERROR_OCCUR;
-						bTest = (g_Localization.CurrentLocale()->dwLangID == _ttoi(locale));
-					}continue;
+				{
+					TCHAR locale[MAX_PATH];
+					if (!paser.GetTokenString(locale)) goto ERROR_OCCUR;
+					bTest = (g_Localization.CurrentLocale()->dwLangID == _ttoi(locale));
+				}continue;
 				case CMD_IF_ELSE:
 					bTest = !bTest;
 					continue;
@@ -1454,92 +1486,93 @@ NO_PROFILE_NAME:
 					goto ERROR_OCCUR;
 				}
 			}break;
-		case CMD_PROFILE:
+			case CMD_PROFILE:
 			{
-				if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+				if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
 				i = CheckCommand(sToken, g_sCmdProfile, CMD_PROFILE_SIZE);
 
-				switch(i){
+				switch (i) {
 				case CMD_PROFILE_TREE:
-					if(!SetProfileTreeFromPaser(&paser)) goto ERROR_OCCUR;
+					if (!SetProfileTreeFromPaser(&paser)) goto ERROR_OCCUR;
 					break;
 				case CMD_PROFILE_CLEAR:
 					g_ProfileTree.DeleteAllItems();
 					break;
 				case CMD_PROFILE_CALL:
-					{
-						TCHAR cur_path[MAX_PATH];
-						BOOL bError = FALSE;
+				{
+					TCHAR cur_path[MAX_PATH];
+					BOOL bError = FALSE;
 
-						// 현재 폴더위치 저장
-						GetCurrentDirectory(MAX_PATH, cur_path);
-						// 파일 이름 얻기
-						if(!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
+					// 현재 폴더위치 저장
+					GetCurrentDirectory(MAX_PATH, cur_path);
+					// 파일 이름 얻기
+					if (!paser.GetTokenString(sTemp.GetBuffer())) goto ERROR_OCCUR;
 
-						COutput* pNewMsg = pMsg;
-						// 로그 이름 얻기
-						if(paser.TokenOut(TD_DELIMITER_COMMA)){
-							TCHAR logname[128];
-							if(!paser.GetTokenName(logname)) goto ERROR_OCCUR;
-							_tcslwr(logname);
-							if(!_tcscmp(logname,_T("sys")))		pNewMsg = &g_Output[COutput::TD_OUTPUT_SYSTEM];
-							else if(!_tcscmp(logname,_T("app")))	pNewMsg = &g_Output[COutput::TD_OUTPUT_APPLICATION];
-							else goto ERROR_OCCUR;
-						}
-						// run profile
-						if(!Build(sTemp, pNewMsg, bThreaded)) goto ERROR_OCCUR;
+					COutput* pNewMsg = pMsg;
+					// 로그 이름 얻기
+					if (paser.TokenOut(TD_DELIMITER_COMMA)) {
+						TCHAR logname[128];
+						if (!paser.GetTokenName(logname)) goto ERROR_OCCUR;
+						_tcslwr(logname);
+						if (!_tcscmp(logname, _T("sys")))		pNewMsg = &g_Output[COutput::TD_OUTPUT_SYSTEM];
+						else if (!_tcscmp(logname, _T("app")))	pNewMsg = &g_Output[COutput::TD_OUTPUT_APPLICATION];
+						else goto ERROR_OCCUR;
+					}
+					// run profile
+					if (!Build(sTemp, pNewMsg, bThreaded)) goto ERROR_OCCUR;
 
-						// 현재 폴더 위치 복구
-						SetCurrentDirectory(cur_path);
-						if(bError){
-							LogOut(_S(ERROR_IN_PROGRESS), SYSMSG_ERROR);
-							goto ERROR_OCCUR;
-						}
-					}break;
+					// 현재 폴더 위치 복구
+					SetCurrentDirectory(cur_path);
+					if (bError) {
+						LogOut(_S(ERROR_IN_PROGRESS), SYSMSG_ERROR);
+						goto ERROR_OCCUR;
+					}
+				}break;
 				case CMD_PROFILE_SET:
-					{
-						if(!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
-						if(!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
-						i = CheckCommand(sToken, g_sCmdProfileSet, TESTDRIVE_PROFILE_SIZE);
+				{
+					if (!paser.TokenOut(TD_DELIMITER_PERIOD)) goto ERROR_OCCUR;
+					if (!paser.GetTokenName(sToken.GetBuffer())) goto ERROR_OCCUR;
+					i = CheckCommand(sToken, g_sCmdProfileSet, TESTDRIVE_PROFILE_SIZE);
 
-						if(i >= TESTDRIVE_PROFILE_SIZE) goto ERROR_OCCUR;
+					if (i >= TESTDRIVE_PROFILE_SIZE) goto ERROR_OCCUR;
 
-						if(!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
+					if (!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
 
-						if(!SetProfilePath((TESTDRIVE_PROFILE)i, sToken)) {
-							LogOut(_TEXT_(CString(_S(INVALID_FILE_PATH)) + _T(" : %s"), (LPCTSTR)sToken), SYSMSG_ERROR);
-							goto ERROR_OCCUR;
-						}
-					}break;
+					if (!SetProfilePath((TESTDRIVE_PROFILE)i, sToken)) {
+						LogOut(_TEXT_(CString(_S(INVALID_FILE_PATH)) + _T(" : %s"), (LPCTSTR)sToken), SYSMSG_ERROR);
+						goto ERROR_OCCUR;
+					}
+				}break;
 				case CMD_PROFILE_PATH:
+				{
+					if (!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
 					{
-						if(!paser.GetTokenString(sToken.GetBuffer())) goto ERROR_OCCUR;
-						{
-							CFullPath	full_path(sToken);
-							full_path.Path().Replace(_T('\\'), _T('/'));
-							SetGlobalEnvironmentVariable(_T("TESTDRIVE_PROFILE"), full_path.Path());
+						CFullPath	full_path(sToken);
+						full_path.Path().Replace(_T('\\'), _T('/'));
+						SetGlobalEnvironmentVariable(_T("TESTDRIVE_PROFILE"), full_path.Path());
 
-							{	// set profile common binary path
-								CString sPath;
-								sPath.Format(_T("%scommon\\bin\\"), (LPCTSTR)full_path.Path());
-								full_path.SetPath(sPath);
-								//GetFullPathName(sPath, 1024, fullpath, NULL);
-								{
-									int iLen = (int)_tcslen(full_path);
-									if(full_path.Path()[iLen-1] == _T('\\'))
-										full_path.Path().SetAt(iLen-1, _T('\0'));
-								}
-								ModifyGlobalEnvironmentPath(full_path);
+						{	// set profile common binary path
+							CString sPath;
+							sPath.Format(_T("%scommon\\bin\\"), (LPCTSTR)full_path.Path());
+							full_path.SetPath(sPath);
+							//GetFullPathName(sPath, 1024, fullpath, NULL);
+							{
+								int iLen = (int)_tcslen(full_path);
+								if (full_path.Path()[iLen - 1] == _T('\\'))
+									full_path.Path().SetAt(iLen - 1, _T('\0'));
 							}
+							ModifyGlobalEnvironmentPath(full_path);
 						}
-					}break;
+					}
+				}break;
 				default:
 					goto ERROR_OCCUR;
 				}
 			}break;
-		default:
-			LogOut(_TEXT_(CString(_S(INVALID_COMMAND)) + _T(" : \"%s\""), (LPCTSTR)sToken));
-			goto ERROR_OCCUR;
+			default:
+				LogOut(_TEXT_(CString(_S(INVALID_COMMAND)) + _T(" : \"%s\""), (LPCTSTR)sToken));
+				goto ERROR_OCCUR;
+			}
 		}
 	}
 QUICK_END:
