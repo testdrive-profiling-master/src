@@ -4,6 +4,8 @@
 #include "ViewTree.h"
 #include "SplashScreenEx.h"
 #include "FullPath.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace luabridge;
 
@@ -12,6 +14,30 @@ static const TCHAR* MMFileName = _T("TESTDRIVE_MEMORY_MAPPED");	// default paged
 
 #define LUA_ERROR	lua_error(TestDriveLua::GetCurrent());
 TestDriveLua*	TestDriveLua::m_pCurrentLua	= NULL;
+
+static string __exec(const char* cmd)
+{
+	string sCmd(cmd);
+	char	buffer[128];
+	string	result = "";
+	sCmd += " 2>&1"; // redirect catch stderr
+	FILE* pipe = _popen(sCmd.c_str(), "r");
+	if (!pipe)
+		throw runtime_error("popen() failed!");
+
+	try {
+		while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+			result += buffer;
+		}
+	}
+	catch (...) {
+		_pclose(pipe);
+		throw;
+	}
+
+	_pclose(pipe);
+	return result;
+}
 
 TestDriveLua::TestDriveLua(void){
 	m_pLua	= NULL;
@@ -316,6 +342,7 @@ bool TestDriveLua::Initialize(void){
 		.addFunction("LOGI", &Lua_System::LogInfo)
 		.addFunction("LOGE", &Lua_System::LogError)
 		.addFunction("LOGW", &Lua_System::LogWarning)
+		.addFunction("exec", __exec)
 		.addFunction("LOG_CLEAR", &Lua_System::ClearLog);
 
 	return true;
