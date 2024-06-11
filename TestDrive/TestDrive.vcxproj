@@ -296,6 +296,8 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClInclude Include="HtmlCtrl.h" />
     <ClInclude Include="Html_old.h" />
     <ClInclude Include="Localization.h" />
+    <ClInclude Include="lua_extra\cstring.h" />
+    <ClInclude Include="lua_extra\TextFile.h" />
     <ClInclude Include="Mail\atlmime.h" />
     <ClInclude Include="Mail\atlsmtpconnection.h" />
     <ClInclude Include="Mail\atlsmtputil.h" />
@@ -393,6 +395,8 @@ cp -f TestDriveVersion.h $(TESTDRIVE_DIR)include\</Command>
     <ClCompile Include="HtmlCtrl.cpp" />
     <ClCompile Include="Html_old.cpp" />
     <ClCompile Include="Localization.cpp" />
+    <ClCompile Include="lua_extra\cstring.cpp" />
+    <ClCompile Include="lua_extra\TextFile.cpp" />
     <ClCompile Include="Mail\Mail.cpp" />
     <ClCompile Include="Mail\SMTPConnection2.cpp" />
     <ClCompile Include="MainFrm.cpp" />

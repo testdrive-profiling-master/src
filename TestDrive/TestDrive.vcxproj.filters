@@ -475,6 +475,12 @@
     <ClInclude Include="Html_old.h">
       <Filter>System</Filter>
     </ClInclude>
+    <ClInclude Include="lua_extra\cstring.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="lua_extra\TextFile.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -737,6 +743,12 @@
     </ClCompile>
     <ClCompile Include="Html_old.cpp">
       <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_extra\cstring.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="lua_extra\TextFile.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

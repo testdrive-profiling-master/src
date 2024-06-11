@@ -6,6 +6,8 @@
 #include "FullPath.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "lua_extra/cstring.h"
+#include "lua_extra/TextFile.h"
 
 using namespace luabridge;
 
@@ -14,6 +16,301 @@ static const TCHAR* MMFileName = _T("TESTDRIVE_MEMORY_MAPPED");	// default paged
 
 #define LUA_ERROR	lua_error(TestDriveLua::GetCurrent());
 TestDriveLua*	TestDriveLua::m_pCurrentLua	= NULL;
+
+class lua_cstring : public cstring
+{
+	int iTokenizePos;
+
+public:
+	lua_cstring(void)
+	{
+		iTokenizePos = 0;
+	}
+	lua_cstring(const char* s)
+	{
+		if (s)
+			m_sStr = s;
+
+		iTokenizePos = 0;
+	}
+	lua_cstring(const cstring& s)
+	{
+		m_sStr = s.c_str();
+		iTokenizePos = 0;
+	}
+	lua_cstring(const lua_cstring& s)
+	{
+		m_sStr = s.c_str();
+		iTokenizePos = 0;
+	}
+	~lua_cstring(void) {}
+
+	int Compare(const char* s)
+	{
+		return cstring::Compare(s);
+	}
+	bool CompareFront(const char* s) const
+	{
+		return cstring::CompareFront(s);
+	}
+	bool CompareBack(const char* s) const
+	{
+		return cstring::CompareBack(s);
+	}
+	bool IsEmpty(void) const
+	{
+		return cstring::IsEmpty();
+	}
+	bool CutFront(const char* s, bool bRecursive = false)
+	{
+		iTokenizePos = 0;
+		return cstring::CutFront(s, bRecursive);
+	}
+	bool CutBack(const char* s, bool bRecursive = false)
+	{
+		iTokenizePos = 0;
+		return cstring::CutBack(s, bRecursive);
+	}
+	bool DeleteFront(const char* s)
+	{
+		iTokenizePos = 0;
+		return cstring::DeleteFront(s);
+	}
+	bool DeleteBack(const char* s)
+	{
+		iTokenizePos = 0;
+		return cstring::DeleteBack(s);
+	}
+	bool DeleteBlock(const char* sExpression, int iPos = 0)
+	{
+		iTokenizePos = 0;
+		return cstring::DeleteBlock(sExpression, iPos);
+	}
+	void MakeUpper(void)
+	{
+		cstring::MakeUpper();
+	}
+	void MakeLower(void)
+	{
+		cstring::MakeLower();
+	}
+	bool Replace(const char* sSearch, const char* sReplace, bool bRecursive = false)
+	{
+		iTokenizePos = 0;
+		return cstring::Replace(sSearch, sReplace, bRecursive);
+	}
+	bool ReplaceVariable(const char* sSearch, const char* sReplace)
+	{
+		iTokenizePos = 0;
+		return cstring::ReplaceVariable(sSearch, sReplace);
+	}
+	void TrimLeft(const char* sDelim)
+	{
+		iTokenizePos = 0;
+		cstring::TrimLeft(sDelim);
+	}
+	void TrimRight(const char* sDelim)
+	{
+		iTokenizePos = 0;
+		cstring::TrimRight(sDelim);
+	}
+	void Trim(const char* sDelim)
+	{
+		iTokenizePos = 0;
+		cstring::Trim(sDelim);
+	}
+	bool ReadFile(const char* sFile, bool bUseComment = false)
+	{
+		TextFile f;
+		cstring	 sFileName(sFile);
+		clear();
+
+		if (f.Open(sFileName.c_str())) {
+			f.GetAll(*(cstring*)this, bUseComment);
+			return true;
+		}
+
+		return false;
+	}
+	int GetTokenizeLuaPos(void) const
+	{
+		return iTokenizePos;
+	}
+	void SetTokenizeLuaPos(int iPos)
+	{
+		iTokenizePos = iPos;
+	}
+	lua_cstring TokenizeLua(const char* sDelim)
+	{
+		return cstring::Tokenize(iTokenizePos, sDelim);
+	}
+
+	cstring		m_sVariable;
+	lua_cstring TokenizeVariable(const char* sExpression)
+	{
+		cstring sTok;
+
+		if (iTokenizePos >= 0) {
+			int iPrevPos = iTokenizePos;
+			iTokenizePos = FindVariableString(m_sVariable, sExpression, iTokenizePos);
+			sTok = m_sStr.c_str() + iPrevPos;
+
+			if (iTokenizePos >= 0) {
+				sTok = m_sStr.c_str() + iPrevPos;
+				sTok.erase(iTokenizePos - iPrevPos, -1);
+			}
+			else {
+				m_sVariable.clear();
+			}
+		}
+		else {
+			m_sVariable.clear();
+			sTok.clear();
+		}
+
+		return sTok;
+	}
+
+	lua_cstring GetVariable(void)
+	{
+		return m_sVariable;
+	}
+
+	int Length(void) const
+	{
+		return cstring::Length();
+	}
+	void Set(const char* sStr)
+	{
+		iTokenizePos = 0;
+		cstring::Set(sStr);
+	}
+
+	int CheckFileExtensionLua(const char* sExtList)
+	{
+		if (sExtList) {
+			const char* sDelim = " .,;";
+			cstring		 sExts(sExtList);
+			list<string> sList;
+			{
+				// make ext list
+				int iPos = 0;
+
+				while (1) {
+					cstring sExt = sExts.Tokenize(iPos, sDelim);
+
+					if (iPos > 0) {
+						sList.push_back(sExt.c_str());
+					}
+					else
+						break;
+				}
+			}
+
+			if (sList.size()) {
+				const char** sExtPrivateList = new const char* [sList.size() + 1];
+				int			 t = 0;
+
+				for (auto& i : sList) {
+					sExtPrivateList[t] = i.c_str();
+					t++;
+				}
+
+				sExtPrivateList[t] = NULL;
+				int id = CheckFileExtension(sExtPrivateList);
+				delete[] sExtPrivateList;
+				return id;
+			}
+		}
+
+		return -1;
+	}
+
+	bool GetEnvironment(const char* sKey)
+	{
+		return cstring::GetEnvironment(sKey);
+	}
+
+	void SetEnvironment(const char* sKey)
+	{
+		cstring::SetEnvironment(sKey);
+	}
+
+	void FormatDate(const char* sFormat, int iDayShift)
+	{
+		char	  sTime[1024];
+		time_t	  now = time(0);
+		struct tm t = *localtime(&now);
+
+		if (iDayShift) {
+			t.tm_mday += iDayShift;
+			mktime(&t);
+		}
+
+		strftime(sTime, sizeof(sTime), sFormat, &t);
+		m_sStr = sTime;
+	}
+
+	void Append(const char* sStr)
+	{
+		cstring::Append(sStr);
+	}
+	inline const char* c_str(void) const
+	{
+		return m_sStr.c_str();
+	}
+	inline char get(int iPos) const
+	{
+		if (iPos < 0 || iPos >= m_sStr.length())
+			return 0;
+
+		return m_sStr.c_str()[iPos];
+	}
+	inline int find_ch(char ch, int pos = 0)
+	{
+		return m_sStr.find(ch, pos);
+	}
+	inline int find(const char* s, int pos = 0)
+	{
+		return m_sStr.find(s, pos);
+	}
+	inline int rfind(const char* s)
+	{
+		return m_sStr.rfind(s);
+	}
+	inline int rfind_ch(char ch)
+	{
+		return m_sStr.rfind(ch);
+	}
+	inline int size(void)
+	{
+		return m_sStr.size();
+	}
+	inline int length(void)
+	{
+		return m_sStr.length();
+	}
+	inline void clear(void)
+	{
+		m_sStr.clear();
+		iTokenizePos = 0;
+	}
+	inline void erase(int iPos, int iSize)
+	{
+		m_sStr.erase(iPos, iSize);
+	}
+	inline void insert(int iPos, const char* s)
+	{
+		if (iPos < iTokenizePos)
+			iTokenizePos += strlen(s);
+
+		m_sStr.insert(iPos, s);
+	}
+	inline void replace(int iPos, int iSize, const char* s)
+	{
+		m_sStr.replace(iPos, iSize, s);
+	}
+};
 
 static string __exec(const char* cmd)
 {
@@ -319,6 +616,61 @@ bool TestDriveLua::Initialize(void){
 	luaopen_lfs(m_pLua);	// lfs library
 
 	getGlobalNamespace(m_pLua)
+		.beginClass<TextFile>("TextFile")
+		.addConstructor<void (*)(void)>()
+		.addFunction("Open", &TextFile::Open)
+		.addFunction("Create", &TextFile::Create)
+		.addFunction("Close", &TextFile::Close)
+		.addFunction("Put", &TextFile::Puts)
+		.addFunction("Get", &TextFile::Gets)
+		.addFunction("GetAll", std::function<string(TextFile* pFile, bool bUseComment)>(
+			[](TextFile* pFile, bool bUseComment) -> string {
+				cstring sContents;
+				pFile->GetAll(sContents, bUseComment);
+				return sContents.c_string();
+			}))
+		.addFunction("LineNumber", &TextFile::LineNumber)
+		.addFunction("IsOpen", &TextFile::IsOpen)
+		.addFunction("IsEOF", &TextFile::IsEOF)
+		.endClass()
+		.beginClass<lua_cstring>("String")
+		.addConstructor<void (*)(const char* s)>()
+		.addFunction("Replace", &lua_cstring::Replace)
+		.addFunction("ReplaceVariable", &lua_cstring::ReplaceVariable)
+		.addProperty("s", &lua_cstring::c_str, &lua_cstring::Set)
+		.addFunction("Append", &lua_cstring::Append)
+		.addFunction("Length", &lua_cstring::Length)
+		.addFunction("Compare", &lua_cstring::Compare)
+		.addFunction("CompareFront", &lua_cstring::CompareFront)
+		.addFunction("CompareBack", &lua_cstring::CompareBack)
+		.addFunction("IsEmpty", &lua_cstring::IsEmpty)
+		.addFunction("CutFront", &lua_cstring::CutFront)
+		.addFunction("CutBack", &lua_cstring::CutBack)
+		.addFunction("ReadFile", &lua_cstring::ReadFile)
+		.addFunction("Trim", &lua_cstring::Trim)
+		.addFunction("TrimLeft", &lua_cstring::TrimLeft)
+		.addFunction("TrimRight", &lua_cstring::TrimRight)
+		.addFunction("Tokenize", &lua_cstring::TokenizeLua)
+		.addFunction("TokenizeVariable", &lua_cstring::TokenizeVariable)
+		.addFunction("GetVariable", &lua_cstring::GetVariable)
+		.addProperty("TokenizePos", &lua_cstring::GetTokenizeLuaPos, &lua_cstring::SetTokenizeLuaPos)
+		.addFunction("DeleteFront", &lua_cstring::DeleteFront)
+		.addFunction("DeleteBack", &lua_cstring::DeleteBack)
+		.addFunction("DeleteBlock", &lua_cstring::DeleteBlock)
+		.addFunction("MakeUpper", &lua_cstring::MakeUpper)
+		.addFunction("MakeLower", &lua_cstring::MakeLower)
+		.addFunction("CheckFileExtension", &lua_cstring::CheckFileExtensionLua)
+		.addFunction("GetEnvironment", &lua_cstring::GetEnvironment)
+		.addFunction("SetEnvironment", &lua_cstring::SetEnvironment)
+		.addFunction("FormatDate", &lua_cstring::FormatDate)
+		.addFunction("insert", &lua_cstring::insert)
+		.addFunction("clear", &lua_cstring::clear)
+		.addFunction("find", &lua_cstring::find)
+		.addFunction("rfind", &lua_cstring::rfind)
+		.addFunction("at", &lua_cstring::get)
+		.addFunction("erase", &lua_cstring::erase)
+		.addFunction("insert", &lua_cstring::insert)
+		.endClass()
 		.beginClass<ProfileTree>("ProfileTree")
 		.addConstructor<void (*)(const char* sName, ProfileTree* pParent)>()
 		.addFunction("AddItem", &ProfileTree::AddItem)
