@@ -543,10 +543,15 @@ namespace Lua_System {
 
 	bool ElevatedExecute(const char* sExecute, const char* sParam, const char* sDir) {
 		UACElevate UAC;
-		CFullPath	work_path(sDir ? CString(sDir) : _T("."));
-		if (!sParam) sParam = "";
-		MessageBox(NULL, work_path, _T("T"), MB_OK);
-		return UAC.ShellExecWithElevation(NULL, CString(sExecute), CString(sParam), work_path);
+		CFullPath	cur_path;
+		BOOL bRet = FALSE;
+		{
+			CString work_path = g_pTestDrive->RetrieveFullPath(CString(sDir));
+			if (!sParam) sParam = "";
+			bRet = UAC.ShellExecWithElevation(NULL, CString(sExecute), CString(sParam), work_path);
+		}
+		SetCurrentDirectory(cur_path);
+		return bRet;
 	}
 
 	const char* GetLocaleString(void) {
