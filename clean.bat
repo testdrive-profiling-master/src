@@ -1,3 +1,8 @@
+@echo off
+if [%1] EQU []  (
+	goto :END
+)
+
 rmdir /S /Q %1\.vs
 rmdir /S /Q %1\Release
 rmdir /S /Q %1\Debug
@@ -11,3 +16,5 @@ del /Q /S %1\*.user
 del /Q /S %1\*.aps
 del /Q /S %1\*.o
 del /Q /S %1\*.d
+
+:END

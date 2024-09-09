@@ -178,6 +178,8 @@ BOOL CTestDriveApp::InitRegistries(void) {
 				return FALSE;
 			}
 		}
+	} else {
+		return TRUE;	// 더이상 초기화 할게 없음
 	}
 
 	SetGlobalEnvironmentVariable(_T("TESTDRIVE_DIR"), sTESTDRIVE_DIR);	// TestDrive path 환경 변수를 등록

@@ -4,6 +4,7 @@
 #include "ViewTree.h"
 #include "SplashScreenEx.h"
 #include "FullPath.h"
+#include "UACElevate.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "lua_extra/cstring.h"
@@ -22,14 +23,11 @@ class lua_cstring : public cstring
 	int iTokenizePos;
 
 public:
-	lua_cstring(void)
+	lua_cstring(LuaRef v)
 	{
-		iTokenizePos = 0;
-	}
-	lua_cstring(const char* s)
-	{
-		if (s)
-			m_sStr = s;
+		if (v.isString()) {
+			m_sStr = v.tostring();
+		}
 
 		iTokenizePos = 0;
 	}
@@ -543,6 +541,14 @@ namespace Lua_System {
 		return bRet;
 	}
 
+	bool ElevatedExecute(const char* sExecute, const char* sParam, const char* sDir) {
+		UACElevate UAC;
+		CFullPath	work_path(sDir ? CString(sDir) : _T("."));
+		if (!sParam) sParam = "";
+		MessageBox(NULL, work_path, _T("T"), MB_OK);
+		return UAC.ShellExecWithElevation(NULL, CString(sExecute), CString(sParam), work_path);
+	}
+
 	const char* GetLocaleString(void) {
 		static CStringA		sLocale;
 		sLocale = g_Localization.CurrentLocale()->sName;
@@ -634,7 +640,7 @@ bool TestDriveLua::Initialize(void){
 		.addFunction("IsEOF", &TextFile::IsEOF)
 		.endClass()
 		.beginClass<lua_cstring>("String")
-		.addConstructor<void (*)(const char* s)>()
+		.addConstructor<void (*)(LuaRef v)>()
 		.addFunction("Replace", &lua_cstring::Replace)
 		.addFunction("ReplaceVariable", &lua_cstring::ReplaceVariable)
 		.addProperty("s", &lua_cstring::c_str, &lua_cstring::Set)
@@ -688,6 +694,7 @@ bool TestDriveLua::Initialize(void){
 		.addFunction("SetProfilePath", &Lua_System::SetProfilePath)
 		.addFunction("ClearProfile", &Lua_System::ClearProfile)
 		.addFunction("CallProfile", &Lua_System::CallProfile)
+		.addFunction("ElevatedExecute", &Lua_System::ElevatedExecute)
 		.addProperty("Locale", &Lua_System::GetLocaleString)
 		.endNamespace()
 		.addFunction("print", &Lua_System::Log)
