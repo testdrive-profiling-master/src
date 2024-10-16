@@ -29,7 +29,7 @@ void CProfileData::OnSelect(void){
 		return;
 	}*/
 	CString sExt = GetFileExtension(m_sPathName);
-	if(!sExt.Compare(_T("sp")) || !sExt.Compare(_T("profile")))
+	if(!sExt.Compare(_T("sp")) || !sExt.Compare(_T("profile")) || !sExt.Compare(_T("lua")))
 		g_pTestDrive->Build(m_sPathName, 0, TRUE);
 	else
 		ShellExecute(NULL, NULL, m_sPathName, NULL, NULL, SW_SHOW);

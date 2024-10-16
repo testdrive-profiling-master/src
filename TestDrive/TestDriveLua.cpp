@@ -554,6 +554,45 @@ namespace Lua_System {
 		return bRet;
 	}
 
+	bool SendCommand(const char* sDocumentName, int iCommand, LuaRef v1, LuaRef v2) {
+		ITDDocument* pDoc = g_pTestDrive->GetDocument(CString(sDocumentName));
+		if (pDoc) {
+			ITDImplDocument* pImp = pDoc->GetImplementation();
+			UINT_PTR arg1 = 0, arg2 = 0;
+			string s1, s2;
+			if (!v1.isNil()) {
+				switch (v1.type()) {
+				case LUA_TBOOLEAN:
+					arg1 = (bool)v1;
+					break;
+				case LUA_TNUMBER:
+					*(double*)&arg1 = (double)v1;
+					break;
+				case LUA_TSTRING:
+					s1 = v1.tostring();
+					arg1 = (UINT_PTR)s1.c_str();
+					break;
+				}
+			}
+			if (!v2.isNil()) {
+				switch (v2.type()) {
+				case LUA_TBOOLEAN:
+					arg2 = (bool)v2;
+					break;
+				case LUA_TNUMBER:
+					*(double*)&arg2 = (double)v2;
+					break;
+				case LUA_TSTRING:
+					s2 = v2.tostring();
+					arg2 = (UINT_PTR)s2.c_str();
+					break;
+				}
+			}
+			return (bool)pImp->OnCommand(iCommand, arg1, arg2);
+		}
+		return false;
+	}
+
 	const char* GetLocaleString(void) {
 		static CStringA		sLocale;
 		sLocale = g_Localization.CurrentLocale()->sName;
@@ -700,6 +739,7 @@ bool TestDriveLua::Initialize(void){
 		.addFunction("ClearProfile", &Lua_System::ClearProfile)
 		.addFunction("CallProfile", &Lua_System::CallProfile)
 		.addFunction("ElevatedExecute", &Lua_System::ElevatedExecute)
+		.addFunction("SendCommand", &Lua_System::SendCommand)
 		.addProperty("Locale", &Lua_System::GetLocaleString)
 		.endNamespace()
 		.addFunction("print", &Lua_System::Log)
