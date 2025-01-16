@@ -317,8 +317,7 @@ static string __exec(const char* cmd)
 	string	result = "";
 	sCmd += " 2>&1"; // redirect catch stderr
 	FILE* pipe = _popen(sCmd.c_str(), "r");
-	if (!pipe)
-		throw runtime_error("popen() failed!");
+	if (!pipe) return NULL;
 
 	try {
 		while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
@@ -326,8 +325,7 @@ static string __exec(const char* cmd)
 		}
 	}
 	catch (...) {
-		_pclose(pipe);
-		throw;
+		//_pclose(pipe);
 	}
 
 	_pclose(pipe);
