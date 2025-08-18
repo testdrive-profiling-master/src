@@ -103,15 +103,22 @@ void CViewTree::DeleteSubItems(HTREEITEM item){
 	}
 }
 
+HTREEITEM CViewTree::Root(void){
+	return GetRootItem();
+}
+
 HTREEITEM CViewTree::FindChildItem(HTREEITEM parent, LPCTSTR name){
 	HTREEITEM	child	= NULL;
 	CString		child_name;
 	
 	child	= parent ? GetNextItem(parent, TVGN_CHILD) : GetNextItem(NULL, TVGN_ROOT);
-	while(child){
-		child_name = GetItemText(child);
-		if(!child_name.Compare(name)) break;
-		child = GetNextItem(child, TVGN_NEXT);
+
+	if (name) {
+		while (child) {
+			child_name = GetItemText(child);
+			if (!child_name.Compare(name)) break;
+			child = GetNextItem(child, TVGN_NEXT);
+		}
 	}
 
 	return child;
@@ -243,7 +250,7 @@ BOOL CViewTree::SetCurrentItemData(CTreeObject* pObject){
 }
 
 void CViewTree::ExpandTree(HTREEITEM item, bool bExpand) {
-	Expand(item, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
+	if(item) Expand(item, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
 }
 
 void CViewTree::ExpandAll(void){

@@ -446,10 +446,11 @@ namespace Lua_System {
 		return bRet;
 	}
 
-	int Execute(const char* sCmd, const char* sArg, const char* sWorkPath, const char* sErrorTokens) {
+	int Execute(const char* sCmd, LuaRef args, LuaRef workpath, LuaRef ErrorTokens) {
+		const char* sArg, *sWorkPath;
 		if (!sCmd) return -1;
-		if (!sArg) sArg = "";
-		if (!sWorkPath) sWorkPath = ".";
+		sArg = args.isString() ? (const char *)args : "";
+		sWorkPath = workpath.isString() ? (const char *)workpath : ".";
 
 		CString		sArgument(sArg);
 		CFullPath	work_path(sWorkPath);
@@ -457,22 +458,41 @@ namespace Lua_System {
 		// run batch file
 		CRedirectExecute* pExec = new CRedirectExecute(CString(sCmd), g_pTestDrive->GetMsgOutput(), sArg ? (LPCTSTR)sArgument : NULL, work_path);
 		// 에러 문자열 지정
-		if (sErrorTokens) {
-			int			iPos = 0;
-			CString		sTokens(sErrorTokens);
-			CString		sTok = sTokens.Tokenize(_T(";,"), iPos);
+		if(ErrorTokens.isTable()) {
+			for(int i=1;!ErrorTokens[i].isNil();i++) {
+				LuaRef Token = ErrorTokens[i];
 
-			while (iPos > 0) {
-				int iErrorPos = 0;
-				CString	sError = sTok.Tokenize(_T("|"), iErrorPos);
-				CString	sNum = sTok.Tokenize(NULL, iErrorPos);
-				int iErrorCode = (iErrorPos > 0) ? StrToInt(sNum) : 0;
-				if (sNum == _T("W")) iErrorCode = INT_MAX;	// for warning
-
-				pExec->AddErrorToken(sError, iErrorCode);
-				sTok = sTokens.Tokenize(NULL, iPos);
+				if(Token.isString()) {
+					pExec->AddErrorToken(CString((const char*)Token), -1);
+				}
+				else if (Token.isTable()) {
+					if (Token[1].isString() && Token[2].isNumber()) {
+						pExec->AddErrorToken(CString((const char*)Token[1]), (int)Token[2]);
+					} else if (Token[1].isString() && Token[2].isString()) {
+						CString sNum((const char*)Token[2]);
+						if(sNum == _T("warning")) {
+							pExec->AddErrorToken(CString((const char*)Token[1]), INT_MAX);
+						} else if(sNum == _T("sucess")) {
+							pExec->AddErrorToken(CString((const char*)Token[1]), 1);
+						} else if(sNum == _T("error")) {
+							pExec->AddErrorToken(CString((const char*)Token[1]), -1);
+						} else if(sNum == _T("ignore")) {
+							pExec->AddErrorToken(CString((const char*)Token[1]), 0);
+						} else {
+							g_pTestDrive->LogError(_T("Invalid error code : '%s'"), (LPCTSTR)sNum);
+							SAFE_DELETE(pExec);
+							return -1;
+						}
+					} else {
+						g_pTestDrive->LogError(_T("Invalid table error arguments on 'System.Execute'"));
+						SAFE_DELETE(pExec);
+						return -1;
+					}
+				}
 			}
+			
 		}
+
 		pExec->AddErrorToken(_T("##"), 0);
 		if (!pExec->Run()) {
 			SAFE_DELETE(pExec);
@@ -482,6 +502,10 @@ namespace Lua_System {
 		SAFE_DELETE(pExec);
 
 		return iRet;
+	}
+
+	bool Shell() {
+		return false;
 	}
 
 	bool SetProfilePath(const char* sID, const char* sPath) {
@@ -596,16 +620,39 @@ namespace Lua_System {
 		sLocale = g_Localization.CurrentLocale()->sName;
 		return sLocale;
 	}
+
+	string GetProjectPath(void) {
+		return string(CStringA(g_pTestDrive->GetProjectPath()));
+	}
 };
 
 BOOL SearchTreeFile(LPCTSTR sPath, LPVOID pData);
 class ProfileTree {
 public:
-	ProfileTree(const char* sName, ProfileTree* pParent) {
-		CString	sTreeName(sName);
-		m_Tree = g_ProfileTree.FindChildItem(pParent ? pParent->Object() : NULL, sTreeName);
-		if (!m_Tree) {
-			m_Tree = g_ProfileTree.InsertTree(sTreeName, pParent ? pParent->Object() : NULL);
+	ProfileTree(const char* sPath, LuaRef pTree) {
+		CString	sTreePath(sPath);
+		int iPos = 0;
+		m_Tree = NULL;
+		m_sName = sPath;
+		LPCTSTR __sDelim = _T("|");
+
+		if(pTree.isInstance<ProfileTree>()){
+			m_Tree = ((ProfileTree*)pTree)->Object();
+		}
+
+		while(iPos >= 0) {
+			CString sName = sTreePath.Tokenize(__sDelim, iPos);
+			sName.Trim(_T(" \t"));
+
+			if(iPos > 0) {
+				LPCTSTR sBranchName = sName.GetLength() ? (LPCTSTR)sName : NULL;
+				if (!sBranchName) break;
+				HTREEITEM next_tree = g_ProfileTree.FindChildItem(m_Tree, sBranchName);
+				if (!next_tree) {
+					next_tree = g_ProfileTree.InsertTree(sBranchName, m_Tree);
+				}
+				m_Tree = next_tree;
+			}
 		}
 	}
 
@@ -651,6 +698,7 @@ public:
 
 protected:
 	HTREEITEM	m_Tree;
+	CString		m_sName;
 };
 
 int			luaopen_lfs(lua_State* L);;
@@ -720,7 +768,7 @@ bool TestDriveLua::Initialize(void){
 		.addFunction("insert", &lua_cstring::insert)
 		.endClass()
 		.beginClass<ProfileTree>("ProfileTree")
-		.addConstructor<void (*)(const char* sName, ProfileTree* pParent)>()
+		.addConstructor<void (*)(const char* sName, LuaRef pTree)>()
 		.addFunction("AddItem", &ProfileTree::AddItem)
 		.addFunction("Expand", &ProfileTree::Expand)
 		.addFunction("Collapse", &ProfileTree::Collapse)
@@ -733,12 +781,14 @@ bool TestDriveLua::Initialize(void){
 		.addFunction("CreateMemory", &Lua_System::CreateMemory)
 		.addFunction("RunProfile", &Lua_System::RunProfile)
 		.addFunction("Execute", &Lua_System::Execute)
+		.addFunction("Shell", &Lua_System::Shell)
 		.addFunction("SetProfilePath", &Lua_System::SetProfilePath)
 		.addFunction("ClearProfile", &Lua_System::ClearProfile)
 		.addFunction("CallProfile", &Lua_System::CallProfile)
 		.addFunction("ElevatedExecute", &Lua_System::ElevatedExecute)
 		.addFunction("SendCommand", &Lua_System::SendCommand)
 		.addProperty("Locale", &Lua_System::GetLocaleString)
+		.addProperty("ProjectPath", &Lua_System::GetProjectPath)
 		.endNamespace()
 		.addFunction("print", &Lua_System::Log)
 		.addFunction("LOGI", &Lua_System::LogInfo)
@@ -761,11 +811,12 @@ bool TestDriveLua::Run(const char* sFileName){
 	if(!m_pLua) return false;
 
 	m_pCurrentLua	= this;
-	//lua_tinker::dofile(m_pLua, sFileName);
 	if(luaL_dofile(m_pLua, sFileName)){
 		Lua_System::LogError(lua_tostring(m_pLua,-1));
 		return false;
 	}
+
+	luaL_dostring(m_pLua, "collectgarbage()");
 
 	return true;
 }

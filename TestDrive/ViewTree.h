@@ -33,6 +33,7 @@ public:
 	void DeleteItem(HTREEITEM item);
 	BOOL DeleteAllItems(void);
 	void DeleteSubItems(HTREEITEM item);
+	HTREEITEM Root(void);
 	HTREEITEM FindChildItem(HTREEITEM parent, LPCTSTR name);
 	HTREEITEM SetCurrentRootItem(LPCTSTR name);
 	HTREEITEM InsertTree(LPCTSTR sName, HTREEITEM parent = NULL);
