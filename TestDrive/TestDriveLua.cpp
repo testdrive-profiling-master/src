@@ -504,8 +504,16 @@ namespace Lua_System {
 		return iRet;
 	}
 
-	bool Shell() {
-		return false;
+	bool Shell(const char* sCmd, LuaRef args) {
+		TCHAR cur_path[4096], * pFile;
+		CString sArg;
+		CFullPath full_path(sCmd);
+		GetFullPathName(full_path.Path(), 4096, cur_path, &pFile);
+		if (!pFile) return false;
+		*(pFile - 1) = NULL;
+		if (args.isString()) sArg = (const char*)args;
+		ShellExecute(NULL, _T("open"), pFile, sArg, cur_path, SW_SHOWNORMAL);
+		return true;
 	}
 
 	bool SetProfilePath(const char* sID, const char* sPath) {
